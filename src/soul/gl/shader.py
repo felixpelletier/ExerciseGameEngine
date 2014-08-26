@@ -6,6 +6,7 @@
 #
  
 from pyglet.gl import *
+import ctypes
  
 class Shader:
     # vert, frag and geom take arrays of source strings
@@ -37,26 +38,31 @@ class Shader:
  
         # convert the source strings into a ctypes pointer-to-char array, and upload them
         # this is deep, dark, dangerous black magick - don't try stuff like this at home!
-        src = (c_char_p * count)(*strings)
-        glShaderSource(shader, count, cast(pointer(src), POINTER(POINTER(c_char))), None)
+        #original, dysfunctionnal as python 3 changed a few things about strings
+        #src = (c_char_p * count)(*strings)
+        b_strings = b''
+        for i in strings:
+            b_strings += i.encode(encoding='UTF-8')
+        src = (ctypes.c_char_p * count)(b_strings)
+        glShaderSource(shader, count, ctypes.cast(ctypes.pointer(src), ctypes.POINTER(ctypes.POINTER(ctypes.c_char))), None)
  
         # compile the shader
         glCompileShader(shader)
  
-        temp = c_int(0)
+        temp = ctypes.c_int(0)
         # retrieve the compile status
-        glGetShaderiv(shader, GL_COMPILE_STATUS, byref(temp))
+        glGetShaderiv(shader, GL_COMPILE_STATUS, ctypes.byref(temp))
  
         # if compilation failed, print the log
         if not temp:
             # retrieve the log length
-            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, byref(temp))
+            glGetShaderiv(shader, GL_INFO_LOG_LENGTH, ctypes.byref(temp))
             # create a buffer for the log
-            buffer = create_string_buffer(temp.value)
+            buffer = ctypes.create_string_buffer(temp.value)
             # retrieve the log text
             glGetShaderInfoLog(shader, temp, None, buffer)
             # print the log to the console
-            print(buffer.value)
+            print((buffer.value))
         else:
             # all is well, so attach the shader to the program
             glAttachShader(self.handle, shader);
@@ -65,9 +71,9 @@ class Shader:
         # link the program
         glLinkProgram(self.handle)
  
-        temp = c_int(0)
+        temp = ctypes.c_int(0)
         # retrieve the link status
-        glGetProgramiv(self.handle, GL_LINK_STATUS, byref(temp))
+        glGetProgramiv(self.handle, GL_LINK_STATUS, ctypes.byref(temp))
  
         # if linking failed, print the log
         if not temp:
@@ -78,7 +84,7 @@ class Shader:
             # retrieve the log text
             glGetProgramInfoLog(self.handle, temp, None, buffer)
             # print the log to the console
-            print(buffer.value)
+            print((buffer.value))
         else:
             # all is well, so we are linked
             self.linked = True
@@ -103,7 +109,7 @@ class Shader:
                 3 : glUniform3f,
                 4 : glUniform4f
                 # retrieve the uniform location, and set
-            }[len(vals)](glGetUniformLocation(self.handle, name), *vals)
+            }[len(vals)](glGetUniformLocation(self.handle, name.encode(encoding='UTF-8')), *vals)
  
     # upload an integer uniform
     # this program must be currently bound
@@ -116,13 +122,13 @@ class Shader:
                 3 : glUniform3i,
                 4 : glUniform4i
                 # retrieve the uniform location, and set
-            }[len(vals)](glGetUniformLocation(self.handle, name), *vals)
+            }[len(vals)](glGetUniformLocation(self.handle, name.encode(encoding='UTF-8')), *vals)
  
     # upload a uniform matrix
     # works with matrices stored as lists,
     # as well as euclid matrices
     def uniform_matrixf(self, name, mat):
-        # obtian the uniform location
+        # obtain the uniform location
         loc = glGetUniformLocation(self.Handle, name)
         # uplaod the 4x4 floating point matrix
         glUniformMatrix4fv(loc, 1, False, (c_float * 16)(*mat))
