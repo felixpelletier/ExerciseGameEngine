@@ -1,6 +1,6 @@
 Sujet: Techniques d'antialiasing
 
 MSAA: Technique standard, OpenGL en offre une implémentation, coûteuse en calcul et peu efficace
-FXAA: Technique rapide et efficace, simple d'implémentation, voir fxaa.pdf pour des exemples d'implémentations
+FXAA: Technique rapide et efficace, simple d'implémentation, voir fxaa.pdf pour des exemples d'implémentations. Aussi: http://www.geeks3d.com/20110405/fxaa-fast-approximate-anti-aliasing-demo-glsl-opengl-test-radeon-geforce/
 NFAA: Reconstruit une carte des arêtes à l'aide des pixel, rapide, mais résultat inconsistent: http://www.gamedev.net/topic/580517-nfaa---a-post-process-anti-aliasing-filter-results-implementation-details/
 SMAA: Amélioration du MLAA, apparement donne les meilleurs résultat: http://www.iryoku.com/smaa/
