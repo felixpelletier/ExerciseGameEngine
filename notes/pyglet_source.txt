@@ -1,0 +1,3 @@
+Dépôt mercurial de pyglet:
+
+hg clone https://code.google.com/p/pyglet/
