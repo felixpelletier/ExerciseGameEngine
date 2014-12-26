@@ -22,12 +22,19 @@ find_package(Boost COMPONENTS system thread  python3 REQUIRED)
 include_directories(${Boost_INCLUDE_DIR})
 link_directories(${Boost_LIBRARY_DIRS})
 
+find_package(OpenGL REQUIRED)
+include_directories(${OPENGL_INCLUDE_DIR})
+
 find_package(PkgConfig REQUIRED)
 pkg_search_module(GLFW REQUIRED glfw3)
 include_directories(${GLFW_INCLUDE_DIRS})
 
 find_package(GLEW REQUIRED)
 include_directories(${GLEW_INCLUDE_DIRS})
+
+find_package(GLM REQUIRED)
+include_directories(${GLM_INCLUDE_DIRS})
+include_directories("${GLM_INCLUDE_DIRS}/gtc")
 
 #Flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -36,4 +43,10 @@ file(GLOB ALL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 add_executable(experiment exp.cpp)
-target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
+target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
+
+add_custom_target(run
+    COMMAND experiment
+    DEPENDS experiment
+    WORKING_DIRECTORY ${CMAKE_PROJECT_DIR}
+)
