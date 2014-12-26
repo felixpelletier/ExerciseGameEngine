@@ -34,7 +34,6 @@ include_directories(${GLEW_INCLUDE_DIRS})
 
 find_package(GLM REQUIRED)
 include_directories(${GLM_INCLUDE_DIRS})
-include_directories("${GLM_INCLUDE_DIRS}/gtc")
 
 #Flags
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
@@ -42,8 +41,17 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
 file(GLOB ALL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
+
+add_custom_target(copy_shaders)
+add_custom_command(TARGET copy_shaders POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E
+                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_CURRENT_BINARY_DIR}/shaders)
+
+
 add_executable(experiment exp.cpp)
 target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
+add_dependencies(experiment copy_shaders)
+
 
 add_custom_target(run
     COMMAND experiment
