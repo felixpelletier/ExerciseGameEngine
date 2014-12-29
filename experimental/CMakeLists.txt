@@ -55,7 +55,7 @@ add_custom_command(TARGET copy_images POST_BUILD
 
 add_executable(experiment exp.cpp)
 target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
-add_dependencies(experiment copy_shaders)
+add_dependencies(experiment copy_shaders copy_images)
 
 
 add_custom_target(run
