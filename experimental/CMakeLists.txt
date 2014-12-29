@@ -47,6 +47,11 @@ add_custom_command(TARGET copy_shaders POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E
                          copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_CURRENT_BINARY_DIR}/shaders)
 
+add_custom_target(copy_images)
+add_custom_command(TARGET copy_images POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E
+                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/images ${CMAKE_CURRENT_BINARY_DIR}/images)
+
 
 add_executable(experiment exp.cpp)
 target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
