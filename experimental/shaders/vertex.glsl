@@ -1,6 +1,7 @@
 #version 330 core
 in vec3 vertexPos;
 in vec2 vertexUV;
+in vec2 vertexNormal;
 uniform mat4 projMat;
 uniform mat4 viewMat;
 

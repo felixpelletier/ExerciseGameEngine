@@ -52,10 +52,19 @@ add_custom_command(TARGET copy_images POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E
                          copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/images ${CMAKE_CURRENT_BINARY_DIR}/images)
 
+add_custom_target(copy_models)
+add_custom_command(TARGET copy_models POST_BUILD
+                     COMMAND ${CMAKE_COMMAND} -E
+                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/models ${CMAKE_CURRENT_BINARY_DIR}/models)
 
-add_executable(experiment exp.cpp)
-target_link_libraries(experiment ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
-add_dependencies(experiment copy_shaders copy_images)
+add_subdirectory(tinyobjloader)
+
+file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
+file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+
+add_executable(experiment ${HEADER_FILES} ${SRC_FILES})
+target_link_libraries(experiment tinyobjloader ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
+add_dependencies(experiment copy_shaders copy_images copy_models)
 
 
 add_custom_target(run

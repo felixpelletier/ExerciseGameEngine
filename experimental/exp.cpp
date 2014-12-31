@@ -4,23 +4,16 @@
 #include <string>
 #include <cstring>
 #include <vector>
-#include <fstream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-
-#define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
-#define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
-#define FOURCC_DXT5 0x35545844 // Equivalent to "DXT5" in ASCII
+#include <utils.h>
 
 #define DEG2RAD(x) ((x) / 57.295779579f)
 
 //#include <ScriptEngine.h>
-
-#define SHADER_PATH "./shaders/"
-#define IMAGES_PATH "./images/"
 
 GLFWwindow* initWindow(int width, int height);
 GLuint LoadShaders(std::string vertex_file,std::string fragment_file);
@@ -33,103 +26,30 @@ const int winHeight = 768;
 
 const GLuint s_vertexPosition = 0;
 const GLuint s_vertexUV = 1;
+const GLuint s_vertexNormal = 2;
 
 int main()
 {
 	GLFWwindow* window = initWindow(winWidth, winHeight);
 
 	// Enable depth test
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	glEnable(GL_CULL_FACE);
+	//glEnable(GL_CULL_FACE);
 
-	// An array of 3 vectors which represents 3 vertices
-	static const GLfloat g_vertex_buffer_data[] = {
-	    -1.0f,-1.0f,-1.0f, // triangle 1 : begin
-	    -1.0f,-1.0f, 1.0f,
-	    -1.0f, 1.0f, 1.0f, // triangle 1 : end
-	    1.0f, 1.0f,-1.0f, // triangle 2 : begin
-	    -1.0f,-1.0f,-1.0f,
-	    -1.0f, 1.0f,-1.0f, // triangle 2 : end
-	    1.0f,-1.0f, 1.0f,
-	    -1.0f,-1.0f,-1.0f,
-	    1.0f,-1.0f,-1.0f,
-	    1.0f, 1.0f,-1.0f,
-	    1.0f,-1.0f,-1.0f,
-	    -1.0f,-1.0f,-1.0f,
-	    -1.0f,-1.0f,-1.0f,
-	    -1.0f, 1.0f, 1.0f,
-	    -1.0f, 1.0f,-1.0f,
-	    1.0f,-1.0f, 1.0f,
-	    -1.0f,-1.0f, 1.0f,
-	    -1.0f,-1.0f,-1.0f,
-	    -1.0f, 1.0f, 1.0f,
-	    -1.0f,-1.0f, 1.0f,
-	    1.0f,-1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f,-1.0f,-1.0f,
-	    1.0f, 1.0f,-1.0f,
-	    1.0f,-1.0f,-1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f,-1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f,-1.0f,
-	    -1.0f, 1.0f,-1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    -1.0f, 1.0f,-1.0f,
-	    -1.0f, 1.0f, 1.0f,
-	    1.0f, 1.0f, 1.0f,
-	    -1.0f, 1.0f, 1.0f,
-	    1.0f,-1.0f, 1.0f
-	};
+	std::string inputfile = "models/ship.obj";
+	std::vector<tinyobj::shape_t> shapes;
+	std::vector<tinyobj::material_t> materials;
 
-	// Two UV coordinatesfor each vertex. They were created with Blender. You'll learn shortly how to do this yourself.
-	static const GLfloat g_uv_buffer_data[] = {
-	    0.000059f, 1.0f-0.000004f,
-	    0.000103f, 1.0f-0.336048f,
-	    0.335973f, 1.0f-0.335903f,
-	    1.000023f, 1.0f-0.000013f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.999958f, 1.0f-0.336064f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.336024f, 1.0f-0.671877f,
-	    0.667969f, 1.0f-0.671889f,
-	    1.000023f, 1.0f-0.000013f,
-	    0.668104f, 1.0f-0.000013f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.000059f, 1.0f-0.000004f,
-	    0.335973f, 1.0f-0.335903f,
-	    0.336098f, 1.0f-0.000071f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.335973f, 1.0f-0.335903f,
-	    0.336024f, 1.0f-0.671877f,
-	    1.000004f, 1.0f-0.671847f,
-	    0.999958f, 1.0f-0.336064f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.668104f, 1.0f-0.000013f,
-	    0.335973f, 1.0f-0.335903f,
-	    0.667979f, 1.0f-0.335851f,
-	    0.335973f, 1.0f-0.335903f,
-	    0.668104f, 1.0f-0.000013f,
-	    0.336098f, 1.0f-0.000071f,
-	    0.000103f, 1.0f-0.336048f,
-	    0.000004f, 1.0f-0.671870f,
-	    0.336024f, 1.0f-0.671877f,
-	    0.000103f, 1.0f-0.336048f,
-	    0.336024f, 1.0f-0.671877f,
-	    0.335973f, 1.0f-0.335903f,
-	    0.667969f, 1.0f-0.671889f,
-	    1.000004f, 1.0f-0.671847f,
-	    0.667979f, 1.0f-0.335851f
-	};
+	std::string err = tinyobj::LoadObj(shapes, materials, inputfile.c_str());
 
-	GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
+	if (!err.empty()) {
+	  std::cerr << err << std::endl;
+	  exit(1);
+	}
 
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	glm::mat4 projMat = glm::perspectiveFov(
@@ -141,7 +61,7 @@ int main()
 	);
 
 	glm::mat4 viewMat = glm::lookAt(
-	    glm::vec3(3.0f,3.0f,2.0f), // Camera is at (4,3,3), in World Space
+	    glm::vec3(2.0f,1.5f,1.5f), // Camera is at (4,3,3), in World Space
 	    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
 	    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
@@ -150,36 +70,51 @@ int main()
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
+	tinyobj::mesh_t mesh = shapes[0].mesh;
+
 	// This will identify our vertex buffer
 	GLuint vertexbuffer;
-	 
-	// Generate 1 buffer, put the resulting identifier in vertexbuffer
 	glGenBuffers(1, &vertexbuffer);
-	 
-	// The following commands will talk about our 'vertexbuffer' buffer
 	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	 
-	// Give our vertices to OpenGL.
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, mesh.positions.size() * sizeof(float), mesh.positions.data(), GL_STATIC_DRAW);
+
+	GLuint uvbuffer;
+	glGenBuffers(1, &uvbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+	glBufferData(GL_ARRAY_BUFFER, mesh.texcoords.size() * sizeof(float), mesh.texcoords.data(), GL_STATIC_DRAW);
+
+	GLuint normalbuffer;
+	glGenBuffers(1, &normalbuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+	glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(float), mesh.normals.data(), GL_STATIC_DRAW);
+
+	// Generate a buffer for the indices as well
+	GLuint elementbuffer;
+	glGenBuffers(1, &elementbuffer);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
 
 	glBindAttribLocation(programID, s_vertexPosition, "vertexPos");
 	glBindAttribLocation(programID, s_vertexUV, "vertexUV");
+	glBindAttribLocation(programID, s_vertexNormal, "vertexNormal");
 
 	// Get a handle for our "MVP" uniform.
 	// Only at initialisation time.
 	GLuint s_projMat = glGetUniformLocation(programID, "projMat");
 	GLuint s_viewMat = glGetUniformLocation(programID, "viewMat");
  
-	GLuint Texture = loadDDS("uvtemplate.DDS");
+	GLuint Texture = loadDDS("ship.dds");
 
 	// Get a handle for our "myTextureSampler" uniform
         GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 	 
 	glUseProgram(programID); 
 	
+	// Dark blue background
+	glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
 
 	do{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -210,7 +145,7 @@ int main()
 		   (void*)0            // array buffer offset
 		);
 
-		// 2nd attribute buffer : colors
+		// 2nd attribute buffer : UVs
 		glEnableVertexAttribArray(1);
 		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
 		glVertexAttribPointer(
@@ -221,16 +156,40 @@ int main()
 		    0,                                // stride
 		    (void*)0                          // array buffer offset
 		);
-			 
-		// Draw the triangle !
-		glDrawArrays(GL_TRIANGLES, 0, 36); // Starting from vertex 0; 3 vertices total -> 1 triangle
-		 
+				
+		// 3rd attribute buffer : normals
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		glVertexAttribPointer(
+			s_vertexNormal,                                // attribute
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+	 
+		// Draw the triangles !
+		glDrawElements(
+		    GL_TRIANGLES,      // mode
+		    mesh.indices.size(),    // count
+		    GL_UNSIGNED_INT,   // type
+		    nullptr           // element array buffer offset
+		); 
+
+		//glDrawArrays(GL_TRIANGLES, 0, mesh.positions.size()/3);
+
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
 
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+
 	 
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
@@ -244,7 +203,7 @@ GLFWwindow* initWindow(int width, int height){
 	    fprintf( stderr, "Failed to initialize GLFW\n" );
 	    return NULL;
 	}
-	glfwWindowHint(GLFW_SAMPLES, 4); // 4x antialiasing
+	glfwWindowHint(GLFW_SAMPLES, 8); // 4x antialiasing
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3); // We want OpenGL 3.3
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); // To make MacOS happy; should not be needed
@@ -271,169 +230,5 @@ GLFWwindow* initWindow(int width, int height){
 	return window;
 }
 
-GLuint LoadShaders(std::string vertex_file,std::string fragment_file){
-	return _LoadShaders(SHADER_PATH + vertex_file, SHADER_PATH + fragment_file);
-}
-
-GLuint _LoadShaders(std::string vertex_file_path,std::string fragment_file_path){
- 
-    // Create the shaders
-    GLuint VertexShaderID = glCreateShader(GL_VERTEX_SHADER);
-    GLuint FragmentShaderID = glCreateShader(GL_FRAGMENT_SHADER);
- 
-    // Read the Vertex Shader code from the file
-    std::string VertexShaderCode;
-    std::ifstream VertexShaderStream(vertex_file_path, std::ios::in);
-    if(VertexShaderStream.is_open())
-    {
-        std::string Line = "";
-        while(getline(VertexShaderStream, Line))
-            VertexShaderCode += "\n" + Line;
-        VertexShaderStream.close();
-    }
- 
-    // Read the Fragment Shader code from the file
-    std::string FragmentShaderCode;
-    std::ifstream FragmentShaderStream(fragment_file_path, std::ios::in);
-    if(FragmentShaderStream.is_open()){
-        std::string Line = "";
-        while(getline(FragmentShaderStream, Line))
-            FragmentShaderCode += "\n" + Line;
-        FragmentShaderStream.close();
-    }
- 
-    GLint Result = GL_FALSE;
-    int InfoLogLength;
- 
-    // Compile Vertex Shader
-    std::cout << "Compiling shader : " << vertex_file_path << "\n";
-    char const * VertexSourcePointer = VertexShaderCode.c_str();
-    glShaderSource(VertexShaderID, 1, &VertexSourcePointer , NULL);
-    glCompileShader(VertexShaderID);
- 
-    // Check Vertex Shader
-    glGetShaderiv(VertexShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(VertexShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    std::vector<char> VertexShaderErrorMessage(InfoLogLength);
-    glGetShaderInfoLog(VertexShaderID, InfoLogLength, NULL, &VertexShaderErrorMessage[0]);
-    fprintf(stdout, "%s\n", &VertexShaderErrorMessage[0]);
- 
-    // Compile Fragment Shader
-    std::cout << "Compiling shader : " << fragment_file_path << "\n";
-    char const * FragmentSourcePointer = FragmentShaderCode.c_str();
-    glShaderSource(FragmentShaderID, 1, &FragmentSourcePointer , NULL);
-    glCompileShader(FragmentShaderID);
- 
-    // Check Fragment Shader
-    glGetShaderiv(FragmentShaderID, GL_COMPILE_STATUS, &Result);
-    glGetShaderiv(FragmentShaderID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    std::vector<char> FragmentShaderErrorMessage(InfoLogLength);
-    glGetShaderInfoLog(FragmentShaderID, InfoLogLength, NULL, &FragmentShaderErrorMessage[0]);
-    fprintf(stdout, "%s\n", &FragmentShaderErrorMessage[0]);
- 
-    // Link the program
-    fprintf(stdout, "Linking program\n");
-    GLuint ProgramID = glCreateProgram();
-    glAttachShader(ProgramID, VertexShaderID);
-    glAttachShader(ProgramID, FragmentShaderID);
-    glLinkProgram(ProgramID);
- 
-    // Check the program
-    glGetProgramiv(ProgramID, GL_LINK_STATUS, &Result);
-    glGetProgramiv(ProgramID, GL_INFO_LOG_LENGTH, &InfoLogLength);
-    std::vector<char> ProgramErrorMessage( std::max(InfoLogLength, int(1)) );
-    glGetProgramInfoLog(ProgramID, InfoLogLength, NULL, &ProgramErrorMessage[0]);
-    fprintf(stdout, "%s\n", &ProgramErrorMessage[0]);
- 
-    glDeleteShader(VertexShaderID);
-    glDeleteShader(FragmentShaderID);
- 
-    return ProgramID;
-}
-
-GLuint loadDDS(std::string imagepath){
-	return _loadDDS(IMAGES_PATH + imagepath);
-}
-
-GLuint _loadDDS(std::string imagepath){
-
-	unsigned char header[124];
-
-	FILE *fp;
-
-	/* try to open the file */
-	fp = fopen(imagepath.c_str(), "rb");
-	if (fp == NULL)
-	return 0;
-
-	/* verify the type of file */
-	char filecode[4];
-	fread(filecode, 1, 4, fp);
-	if (std::strncmp(filecode, "DDS ", 4) != 0) {
-	fclose(fp);
-	return 0;
-	}
-
-	/* get the surface desc */
-	fread(&header, 124, 1, fp); 
-
-	unsigned int height      = *(unsigned int*)&(header[8 ]);
-	unsigned int width         = *(unsigned int*)&(header[12]);
-	unsigned int linearSize     = *(unsigned int*)&(header[16]);
-	unsigned int mipMapCount = *(unsigned int*)&(header[24]);
-	unsigned int fourCC      = *(unsigned int*)&(header[80]);
-
-	unsigned char * buffer;
-	unsigned int bufsize;
-	/* how big is it going to be including all mipmaps? */
-	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
-	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
-	fread(buffer, 1, bufsize, fp);
-	/* close the file pointer */
-	fclose(fp);
-
-	//unsigned int components  = (fourCC == FOURCC_DXT1) ? 3 : 4;
-	unsigned int format;
-	switch(fourCC)
-	{
-	case FOURCC_DXT1:
-	format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-	break;
-	case FOURCC_DXT3:
-	format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-	break;
-	case FOURCC_DXT5:
-	format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-	break;
-	default:
-	free(buffer);
-	return 0;
-	}
-
-	// Create one OpenGL texture
-	GLuint textureID;
-	glGenTextures(1, &textureID);
-
-	// "Bind" the newly created texture : all future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, textureID);
-
-	unsigned int blockSize = (format == GL_COMPRESSED_RGBA_S3TC_DXT1_EXT) ? 8 : 16;
-	unsigned int offset = 0;
-
-	/* load the mipmaps */
-	for (unsigned int level = 0; level < mipMapCount && (width || height); ++level)
-	{
-		unsigned int size = ((width+3)/4)*((height+3)/4)*blockSize;
-		glCompressedTexImage2D(GL_TEXTURE_2D, level, format, width, height,
-		0, size, buffer + offset);
-
-		offset += size;
-		width /= 2;
-		height /= 2;
-	}
-	free(buffer); 
-
-	return textureID;
-}
 
 
