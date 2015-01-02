@@ -12,6 +12,7 @@ uniform vec3 lightColor;
 out vec2 UV;
 out vec3 lightDir_camspace;
 out vec3 normal_camspace;
+out vec3 eyeDir_camspace;
 
 void main(){
 	vec4 pos = vec4(vertexPos,1);
@@ -20,7 +21,7 @@ void main(){
 	vec3 pos_worldspace = (modelMat * pos).xyz;
 	
 	vec3 pos_camspace = (viewMat * modelMat * pos).xyz;
-	vec3 eyeDir_camspace = vec3(0,0,0) - pos_camspace;
+	eyeDir_camspace = vec3(0,0,0) - pos_camspace;
 
 	vec3 lightPos_camspace = (viewMat * vec4(lightPos, 1)).xyz;
 	lightDir_camspace = lightPos_camspace + eyeDir_camspace;
