@@ -28,6 +28,13 @@ const GLuint s_vertexPosition = 0;
 const GLuint s_vertexUV = 1;
 const GLuint s_vertexNormal = 2;
 
+struct Light{
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 direction = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 color = glm::vec3(50.0f, 50.0f, 50.0f);
+};
+	
+
 int main()
 {
 	GLFWwindow* window = initWindow(winWidth, winHeight);
@@ -44,7 +51,7 @@ int main()
 	std::vector<tinyobj::shape_t> shapes;
 	std::vector<tinyobj::material_t> materials;
 
-	std::string err = tinyobj::LoadObj(shapes, materials, inputfile.c_str());
+	std::string err = tinyobj::LoadObj(shapes, materials, inputfile.c_str(), "models/");
 
 	if (!err.empty()) {
 	  std::cerr << err << std::endl;
@@ -65,6 +72,8 @@ int main()
 	    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
 	    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
+	
+	glm::mat4 modelMat = glm::mat4(1.0f);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
@@ -105,8 +114,20 @@ int main()
 	// Only at initialisation time.
 	GLuint s_projMat = glGetUniformLocation(programID, "projMat");
 	GLuint s_viewMat = glGetUniformLocation(programID, "viewMat");
+	GLuint s_modelMat = glGetUniformLocation(programID, "modelMat");
+	
+	GLuint s_lightpos = glGetUniformLocation(programID, "lightPos");
+	GLuint s_lightdir = glGetUniformLocation(programID, "lightDir");
+	GLuint s_lightcolor = glGetUniformLocation(programID, "lightColor");
+
+	Light light;
+	light.position = glm::vec3(3.0f, 3.0f, 3.0f);
+	light.direction = glm::vec3(-3.0f, -3.0f, -3.0f);
  
-	GLuint Texture = loadDDS("ship.dds");
+	GLuint Texture = loadDDS(materials[mesh.material_ids[0]].diffuse_texname);
+
+	std::cout << "Material Index: " << mesh.material_ids[0] << "\n";
+	std::cout << "Texture: " << materials[mesh.material_ids[0]].diffuse_texname << "\n";
 
 	// Get a handle for our "myTextureSampler" uniform
         GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
@@ -126,6 +147,11 @@ int main()
 		// For each model you render, since the MVP will be different (at least the M part)
 		glUniformMatrix4fv(s_projMat, 1, GL_FALSE, &projMat[0][0]);
 		glUniformMatrix4fv(s_viewMat, 1, GL_FALSE, &viewMat[0][0]);
+		glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &modelMat[0][0]);
+		
+		glUniform3fv(s_lightpos, 1, &light.position[0]);
+		glUniform3fv(s_lightdir, 1, &light.direction[0]);
+		glUniform3fv(s_lightcolor, 1, &light.color[0]);
 		
 		// Bind our texture in Texture Unit 0
                 glActiveTexture(GL_TEXTURE0);
