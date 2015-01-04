@@ -33,19 +33,18 @@ struct Light{
 	glm::vec3 direction = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 color = glm::vec3(50.0f, 50.0f, 50.0f);
 };
-	
 
 int main()
 {
 	GLFWwindow* window = initWindow(winWidth, winHeight);
 
 	// Enable depth test
-	//glEnable(GL_DEPTH_TEST);
+	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
 	// Cull triangles which normal is not towards the camera
-	//glEnable(GL_CULL_FACE);
+	glEnable(GL_CULL_FACE);
 
 	std::string inputfile = "models/ship.obj";
 	std::vector<tinyobj::shape_t> shapes;
