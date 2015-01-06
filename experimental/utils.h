@@ -20,3 +20,34 @@ GLuint _LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 GLuint loadDDS(std::string imagepath);
 GLuint _loadDDS(std::string imagepath);
 GLuint loadOBJ(std::string inputfile);
+struct Entity loadModel(GLuint vertexarray, std::string inputfile);
+
+
+struct Light{
+	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
+	glm::vec3 direction = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 color = glm::vec3(50.0f, 50.0f, 50.0f);
+};
+
+struct Mesh{
+	GLuint vertexbuffer;
+	GLuint uvbuffer;
+	GLuint normalbuffer;
+	GLuint elementbuffer;
+	int materialId;
+	int indices;
+};
+
+struct Texture{
+	GLuint diffuse;
+	GLuint normal;
+};
+
+struct Entity{
+	std::vector<Mesh> meshes;
+	std::vector<tinyobj::material_t> materials;
+	std::vector<Texture> textures;
+	glm::mat4 modelMat;
+};
+
+

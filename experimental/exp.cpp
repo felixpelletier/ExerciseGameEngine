@@ -16,23 +16,13 @@
 //#include <ScriptEngine.h>
 
 GLFWwindow* initWindow(int width, int height);
-GLuint LoadShaders(std::string vertex_file,std::string fragment_file);
-GLuint _LoadShaders(std::string vertex_file_path,std::string fragment_file_path);
-GLuint loadDDS(std::string imagepath);
-GLuint _loadDDS(std::string imagepath);
 
-const int winWidth = 1024;
-const int winHeight = 768;
+const int winWidth = 1280;
+const int winHeight = 720;
 
 const GLuint s_vertexPosition = 0;
 const GLuint s_vertexUV = 1;
 const GLuint s_vertexNormal = 2;
-
-struct Light{
-	glm::vec3 position = glm::vec3(0.0f, 0.0f, 0.0f);
-	glm::vec3 direction = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 color = glm::vec3(50.0f, 50.0f, 50.0f);
-};
 
 int main()
 {
@@ -46,17 +36,6 @@ int main()
 	// Cull triangles which normal is not towards the camera
 	glEnable(GL_CULL_FACE);
 
-	std::string inputfile = "models/ship.obj";
-	std::vector<tinyobj::shape_t> shapes;
-	std::vector<tinyobj::material_t> materials;
-
-	std::string err = tinyobj::LoadObj(shapes, materials, inputfile.c_str(), "models/");
-
-	if (!err.empty()) {
-	  std::cerr << err << std::endl;
-	  exit(1);
-	}
-
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	glm::mat4 projMat = glm::perspectiveFov(
 	    DEG2RAD(67.0f),         // The horizontal Field of View
@@ -67,40 +46,17 @@ int main()
 	);
 
 	glm::mat4 viewMat = glm::lookAt(
-	    glm::vec3(2.0f,1.5f,1.5f), // Camera is at (4,3,3), in World Space
+	    glm::vec3(2.0f,3.0f,1.5f), // Camera is at (4,3,3), in World Space
 	    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
 	    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 	);
 	
-	glm::mat4 modelMat = glm::mat4(1.0f);
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	tinyobj::mesh_t mesh = shapes[0].mesh;
-
-	// This will identify our vertex buffer
-	GLuint vertexbuffer;
-	glGenBuffers(1, &vertexbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-	glBufferData(GL_ARRAY_BUFFER, mesh.positions.size() * sizeof(float), mesh.positions.data(), GL_STATIC_DRAW);
-
-	GLuint uvbuffer;
-	glGenBuffers(1, &uvbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-	glBufferData(GL_ARRAY_BUFFER, mesh.texcoords.size() * sizeof(float), mesh.texcoords.data(), GL_STATIC_DRAW);
-
-	GLuint normalbuffer;
-	glGenBuffers(1, &normalbuffer);
-	glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-	glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(float), mesh.normals.data(), GL_STATIC_DRAW);
-
-	// Generate a buffer for the indices as well
-	GLuint elementbuffer;
-	glGenBuffers(1, &elementbuffer);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
+	Entity entity = loadModel(VertexArrayID, "Snowmobile.obj");
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
@@ -122,12 +78,8 @@ int main()
 	Light light;
 	light.position = glm::vec3(3.0f, 3.0f, 3.0f);
 	light.direction = glm::vec3(-3.0f, -3.0f, -3.0f);
+
  
-	GLuint Texture = loadDDS(materials[mesh.material_ids[0]].diffuse_texname);
-
-	std::cout << "Material Index: " << mesh.material_ids[0] << "\n";
-	std::cout << "Texture: " << materials[mesh.material_ids[0]].diffuse_texname << "\n";
-
 	// Get a handle for our "myTextureSampler" uniform
         GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
 	 
@@ -146,71 +98,77 @@ int main()
 		// For each model you render, since the MVP will be different (at least the M part)
 		glUniformMatrix4fv(s_projMat, 1, GL_FALSE, &projMat[0][0]);
 		glUniformMatrix4fv(s_viewMat, 1, GL_FALSE, &viewMat[0][0]);
-		glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &modelMat[0][0]);
-		
 		glUniform3fv(s_lightpos, 1, &light.position[0]);
 		glUniform3fv(s_lightdir, 1, &light.direction[0]);
 		glUniform3fv(s_lightcolor, 1, &light.color[0]);
-		
-		// Bind our texture in Texture Unit 0
-                glActiveTexture(GL_TEXTURE0);
-                glBindTexture(GL_TEXTURE_2D, Texture);
-                // Set our "myTextureSampler" sampler to user Texture Unit 0
-                glUniform1i(TextureID, 0);
+	
+		int i = 0;
+		for (auto const &mesh : entity.meshes){
+			
+			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity.modelMat[0][0]);
 
-		// 1rst attribute buffer : vertices
-		glEnableVertexAttribArray(0);
-		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
-		glVertexAttribPointer(
-		   s_vertexPosition,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-		   3,                  // size
-		   GL_FLOAT,           // type
-		   GL_FALSE,           // normalized?
-		   0,                  // stride
-		   (void*)0            // array buffer offset
-		);
+			struct Texture texture = entity.textures[mesh.materialId];
+			// Bind our texture in Texture Unit 0
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture.diffuse);
+			// Set our "myTextureSampler" sampler to user Texture Unit 0
+			glUniform1i(TextureID, 0);
 
-		// 2nd attribute buffer : UVs
-		glEnableVertexAttribArray(1);
-		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
-		glVertexAttribPointer(
-		    s_vertexUV,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-		    2,                                // size
-		    GL_FLOAT,                         // type
-		    GL_FALSE,                         // normalized?
-		    0,                                // stride
-		    (void*)0                          // array buffer offset
-		);
-				
-		// 3rd attribute buffer : normals
-		glEnableVertexAttribArray(2);
-		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
-		glVertexAttribPointer(
-			s_vertexNormal,                                // attribute
-			3,                                // size
-			GL_FLOAT,                         // type
-			GL_FALSE,                         // normalized?
-			0,                                // stride
-			(void*)0                          // array buffer offset
-		);
+			// 1rst attribute buffer : vertices
+			glEnableVertexAttribArray(0);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
+			glVertexAttribPointer(
+			   s_vertexPosition,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+			   3,                  // size
+			   GL_FLOAT,           // type
+			   GL_FALSE,           // normalized?
+			   0,                  // stride
+			   (void*)0            // array buffer offset
+			);
 
-		// Index buffer
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
-	 
-		// Draw the triangles !
-		glDrawElements(
-		    GL_TRIANGLES,      // mode
-		    mesh.indices.size(),    // count
-		    GL_UNSIGNED_INT,   // type
-		    nullptr           // element array buffer offset
-		); 
+			// 2nd attribute buffer : UVs
+			glEnableVertexAttribArray(1);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.uvbuffer);
+			glVertexAttribPointer(
+			    s_vertexUV,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+			    2,                                // size
+			    GL_FLOAT,                         // type
+			    GL_FALSE,                         // normalized?
+			    0,                                // stride
+			    (void*)0                          // array buffer offset
+			);
+					
+			// 3rd attribute buffer : normals
+			glEnableVertexAttribArray(2);
+			glBindBuffer(GL_ARRAY_BUFFER, mesh.normalbuffer);
+			glVertexAttribPointer(
+				s_vertexNormal,                                // attribute
+				3,                                // size
+				GL_FLOAT,                         // type
+				GL_FALSE,                         // normalized?
+				0,                                // stride
+				(void*)0                          // array buffer offset
+			);
 
-		//glDrawArrays(GL_TRIANGLES, 0, mesh.positions.size()/3);
+			// Index buffer
+			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.elementbuffer);
+		 
+			// Draw the triangles !
+			glDrawElements(
+			    GL_TRIANGLES,      // mode
+			    mesh.indices,    // count
+			    GL_UNSIGNED_INT,   // type
+			    nullptr           // element array buffer offset
+			); 
 
-		glDisableVertexAttribArray(0);
-		glDisableVertexAttribArray(1);
-		glDisableVertexAttribArray(2);
+			i++;
 
+			//std::cout << glGetError() << "\n";
+
+			glDisableVertexAttribArray(0);
+			glDisableVertexAttribArray(1);
+			glDisableVertexAttribArray(2);
+		}
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
@@ -254,6 +212,8 @@ GLFWwindow* initWindow(int width, int height){
 
 	return window;
 }
+
+
 
 
 

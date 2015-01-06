@@ -171,3 +171,64 @@ GLuint loadOBJ(std::string inputfile){
 	return 0;
 
 }
+
+struct Entity loadModel(GLuint VertexArrayID, std::string inputfile){
+
+	Entity result;
+
+	glBindVertexArray(VertexArrayID);
+
+	inputfile = "models/" + inputfile;
+	std::vector<tinyobj::shape_t> shapes;
+
+	std::string err = tinyobj::LoadObj(shapes, result.materials, inputfile.c_str(), "models/");
+
+	if (!err.empty()) {
+	  std::cerr << err << std::endl;
+	  exit(1);
+	}
+
+	result.modelMat = glm::mat4(1.0f);
+	result.meshes.reserve(shapes.size());
+
+	result.textures.reserve(result.materials.size());
+	for (auto &material : result.materials){
+		 struct Texture texture;
+		 texture.diffuse = loadDDS(material.diffuse_texname);
+		 texture.normal = loadDDS(material.normal_texname);
+		 result.textures.push_back(texture);
+	}
+
+	for (auto &shape : shapes){
+	
+		tinyobj::mesh_t mesh = shape.mesh;
+
+		struct Mesh newmesh;
+
+		newmesh.materialId = mesh.material_ids[0];
+		newmesh.indices = mesh.indices.size();
+		
+		// This will identify our vertex buffer
+		glGenBuffers(1, &newmesh.vertexbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, newmesh.vertexbuffer);
+		glBufferData(GL_ARRAY_BUFFER, mesh.positions.size() * sizeof(float), mesh.positions.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &newmesh.uvbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, newmesh.uvbuffer);
+		glBufferData(GL_ARRAY_BUFFER, mesh.texcoords.size() * sizeof(float), mesh.texcoords.data(), GL_STATIC_DRAW);
+
+		glGenBuffers(1, &newmesh.normalbuffer);
+		glBindBuffer(GL_ARRAY_BUFFER, newmesh.normalbuffer);
+		glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(float), mesh.normals.data(), GL_STATIC_DRAW);
+
+		// Generate a buffer for the indices as well
+		glGenBuffers(1, &newmesh.elementbuffer);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newmesh.elementbuffer);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
+		
+		result.meshes.push_back(newmesh);
+	}
+
+	return result;
+
+}

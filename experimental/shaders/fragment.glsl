@@ -31,6 +31,11 @@ void main(){
 
     vec3 ambient = vec3(0.1, 0.1, 0.1);
 
+    vec3 specular = lightColor * pow(cosAlpha,50);
+
+    vec3 fog = vec3(0, 0, 0);
+
     color = ambient + (texcolor * lightColor * cosTheta / (dist*dist))
-	    + lightColor * pow(cosAlpha,5);
+	    + specular + fog;
+
 }
