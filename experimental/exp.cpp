@@ -87,7 +87,9 @@ int main()
 	glClearColor(0.01f, 0.0f, 0.1f, 0.0f);
 
 	double lastTime = glfwGetTime();
-
+	
+	glm::vec3 position;
+	float orientation = 0.0f;
 	do{
 		double currentTime = glfwGetTime();
 		float deltaTime = float(currentTime - lastTime);
@@ -95,27 +97,41 @@ int main()
 
 		// Move forward
 		if (glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS){
-		    entities[1].modelMat[3][2] += 6 * deltaTime;
+		    position[0] += 6 * deltaTime * glm::sin(orientation);
+		    position[2] += 6 * deltaTime * glm::cos(orientation);
 		}
 		
 		if (glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS){
-		    entities[1].modelMat[3][2] -= 6 * deltaTime;
+		    position[0] -= 6 * deltaTime * glm::sin(orientation);
+		    position[2] -= 6 * deltaTime * glm::cos(orientation);
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS){
-		    entities[1].modelMat[3][0] += 6 * deltaTime;
+		   orientation  += 1.0f * deltaTime;
 		}
 		
 		if (glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
-		    entities[1].modelMat[3][0] -= 6 * deltaTime;
+		   orientation -= 1.0f * deltaTime;
 		}
+
+		glm::mat4 playerMat;
+		playerMat = glm::translate(playerMat, position);
+		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
+
+		entities[1].modelMat = playerMat;
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
 		glUseProgram(programID);
 
+		glm::vec3 cameraPos = glm::vec3(position);
+		cameraPos.y = 3.0f;
+		cameraPos.x -= 6.0f * glm::sin(orientation);
+		cameraPos.z -= 6.0f * glm::cos(orientation);
+
 		glm::mat4 viewMat = glm::lookAt(
-		    glm::vec3(8.0f,8.0f,8.0f), // Camera is at (4,3,3), in World Space
-		    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
+		    cameraPos, // Camera is at (4,3,3), in World Space
+		    position, // and looks at the origin
 		    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 

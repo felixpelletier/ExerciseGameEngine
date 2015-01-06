@@ -188,7 +188,6 @@ struct Entity loadModel(GLuint VertexArrayID, std::string inputfile){
 	  exit(1);
 	}
 
-	result.modelMat = glm::mat4(1.0f);
 	result.meshes.reserve(shapes.size());
 
 	result.textures.reserve(result.materials.size());
