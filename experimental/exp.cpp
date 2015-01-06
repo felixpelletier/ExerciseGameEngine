@@ -45,18 +45,15 @@ int main()
 	    100.0f       // Far clipping plane. Keep as little as possible.
 	);
 
-	glm::mat4 viewMat = glm::lookAt(
-	    glm::vec3(2.0f,3.0f,1.5f), // Camera is at (4,3,3), in World Space
-	    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
-	    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
-	);
 	
 
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	Entity entity = loadModel(VertexArrayID, "Snowmobile.obj");
+	std::vector<Entity> entities;
+	entities.push_back(loadModel(VertexArrayID, "ice.obj"));
+	entities.push_back(loadModel(VertexArrayID, "Snowmobile.obj"));
 
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
@@ -76,22 +73,51 @@ int main()
 	GLuint s_lightcolor = glGetUniformLocation(programID, "lightColor");
 
 	Light light;
-	light.position = glm::vec3(3.0f, 3.0f, 3.0f);
-	light.direction = glm::vec3(-3.0f, -3.0f, -3.0f);
-
+	light.position = glm::vec3(-0.0f, 5.0f, 0.0f);
+	light.direction = glm::vec3(-0.0f, -1.0f, -0.0f);
+	light.color = glm::vec3(10.0f, 10.0f, 10.0f);
  
 	// Get a handle for our "myTextureSampler" uniform
-        GLuint TextureID  = glGetUniformLocation(programID, "myTextureSampler");
+        GLuint DiffuseTexID  = glGetUniformLocation(programID, "DiffuseSampler");
+        GLuint NormalTexID  = glGetUniformLocation(programID, "NormalSampler");
 	 
 	glUseProgram(programID); 
 	
 	// Dark blue background
-	glClearColor(0.0f, 0.0f, 0.1f, 0.0f);
+	glClearColor(0.01f, 0.0f, 0.1f, 0.0f);
+
+	double lastTime = glfwGetTime();
 
 	do{
+		double currentTime = glfwGetTime();
+		float deltaTime = float(currentTime - lastTime);
+		lastTime = currentTime;
+
+		// Move forward
+		if (glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS){
+		    entities[1].modelMat[3][2] += 6 * deltaTime;
+		}
+		
+		if (glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS){
+		    entities[1].modelMat[3][2] -= 6 * deltaTime;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS){
+		    entities[1].modelMat[3][0] += 6 * deltaTime;
+		}
+		
+		if (glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
+		    entities[1].modelMat[3][0] -= 6 * deltaTime;
+		}
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
 		glUseProgram(programID);
+
+		glm::mat4 viewMat = glm::lookAt(
+		    glm::vec3(8.0f,8.0f,8.0f), // Camera is at (4,3,3), in World Space
+		    glm::vec3(0.0f,0.0f,0.0f), // and looks at the origin
+		    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
+		);
 
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
@@ -101,74 +127,79 @@ int main()
 		glUniform3fv(s_lightpos, 1, &light.position[0]);
 		glUniform3fv(s_lightdir, 1, &light.direction[0]);
 		glUniform3fv(s_lightcolor, 1, &light.color[0]);
-	
-		int i = 0;
-		for (auto const &mesh : entity.meshes){
-			
-			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity.modelMat[0][0]);
+		
+		for (auto const &entity : entities){
+			for (auto const &mesh : entity.meshes){
+				
+				glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity.modelMat[0][0]);
 
-			struct Texture texture = entity.textures[mesh.materialId];
-			// Bind our texture in Texture Unit 0
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture.diffuse);
-			// Set our "myTextureSampler" sampler to user Texture Unit 0
-			glUniform1i(TextureID, 0);
+				struct Texture texture = entity.textures[mesh.materialId];
+				// Bind our texture in Texture Unit 0
+				glActiveTexture(GL_TEXTURE0);
+				glBindTexture(GL_TEXTURE_2D, texture.diffuse);
+				// Set our "myTextureSampler" sampler to user Texture Unit 0
+				glUniform1i(DiffuseTexID, 0);
 
-			// 1rst attribute buffer : vertices
-			glEnableVertexAttribArray(0);
-			glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
-			glVertexAttribPointer(
-			   s_vertexPosition,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-			   3,                  // size
-			   GL_FLOAT,           // type
-			   GL_FALSE,           // normalized?
-			   0,                  // stride
-			   (void*)0            // array buffer offset
-			);
+				// Bind our texture in Texture Unit 1
+				glActiveTexture(GL_TEXTURE1);
+				glBindTexture(GL_TEXTURE_2D, texture.normal);
+				// Set our "myTextureSampler" sampler to user Texture Unit 0
+				glUniform1i(NormalTexID, 1);
 
-			// 2nd attribute buffer : UVs
-			glEnableVertexAttribArray(1);
-			glBindBuffer(GL_ARRAY_BUFFER, mesh.uvbuffer);
-			glVertexAttribPointer(
-			    s_vertexUV,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-			    2,                                // size
-			    GL_FLOAT,                         // type
-			    GL_FALSE,                         // normalized?
-			    0,                                // stride
-			    (void*)0                          // array buffer offset
-			);
-					
-			// 3rd attribute buffer : normals
-			glEnableVertexAttribArray(2);
-			glBindBuffer(GL_ARRAY_BUFFER, mesh.normalbuffer);
-			glVertexAttribPointer(
-				s_vertexNormal,                                // attribute
-				3,                                // size
-				GL_FLOAT,                         // type
-				GL_FALSE,                         // normalized?
-				0,                                // stride
-				(void*)0                          // array buffer offset
-			);
+				// 1rst attribute buffer : vertices
+				glEnableVertexAttribArray(0);
+				glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
+				glVertexAttribPointer(
+				   s_vertexPosition,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+				   3,                  // size
+				   GL_FLOAT,           // type
+				   GL_FALSE,           // normalized?
+				   0,                  // stride
+				   (void*)0            // array buffer offset
+				);
 
-			// Index buffer
-			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.elementbuffer);
-		 
-			// Draw the triangles !
-			glDrawElements(
-			    GL_TRIANGLES,      // mode
-			    mesh.indices,    // count
-			    GL_UNSIGNED_INT,   // type
-			    nullptr           // element array buffer offset
-			); 
+				// 2nd attribute buffer : UVs
+				glEnableVertexAttribArray(1);
+				glBindBuffer(GL_ARRAY_BUFFER, mesh.uvbuffer);
+				glVertexAttribPointer(
+				    s_vertexUV,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+				    2,                                // size
+				    GL_FLOAT,                         // type
+				    GL_FALSE,                         // normalized?
+				    0,                                // stride
+				    (void*)0                          // array buffer offset
+				);
+						
+				// 3rd attribute buffer : normals
+				glEnableVertexAttribArray(2);
+				glBindBuffer(GL_ARRAY_BUFFER, mesh.normalbuffer);
+				glVertexAttribPointer(
+					s_vertexNormal,                                // attribute
+					3,                                // size
+					GL_FLOAT,                         // type
+					GL_FALSE,                         // normalized?
+					0,                                // stride
+					(void*)0                          // array buffer offset
+				);
 
-			i++;
+				// Index buffer
+				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.elementbuffer);
+			 
+				// Draw the triangles !
+				glDrawElements(
+				    GL_TRIANGLES,      // mode
+				    mesh.indices,    // count
+				    GL_UNSIGNED_INT,   // type
+				    nullptr           // element array buffer offset
+				); 
 
-			//std::cout << glGetError() << "\n";
+				//std::cout << glGetError() << "\n";
 
-			glDisableVertexAttribArray(0);
-			glDisableVertexAttribArray(1);
-			glDisableVertexAttribArray(2);
+			}
 		}
+		glDisableVertexAttribArray(0);
+		glDisableVertexAttribArray(1);
+		glDisableVertexAttribArray(2);
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();

@@ -10,14 +10,15 @@ in vec3 eyeDir_camspace;
 out vec3 color;
  
 // Values that stay constant for the whole mesh.
-uniform sampler2D myTextureSampler;
+uniform sampler2D DiffuseSampler;
+uniform sampler2D NormalSampler;
 uniform vec3 lightColor;
  
 void main(){
  
     vec2 UV_INV = vec2(UV.x, UV.y); //Temporary, necessary for DDS
     // Output color = color of the texture at the specified UV
-    vec3 texcolor = texture( myTextureSampler, UV_INV ).rgb;
+    vec3 texcolor = texture( DiffuseSampler, UV_INV ).rgb;
 
     vec3 normal = normalize( normal_camspace );
     vec3 light = normalize( lightDir_camspace );
@@ -29,13 +30,13 @@ void main(){
     
     float dist = length(lightDir_camspace);
 
-    vec3 ambient = vec3(0.1, 0.1, 0.1);
+    vec3 ambient = vec3(0.5, 0.5, 0.5);
 
-    vec3 specular = lightColor * pow(cosAlpha,50);
+    vec3 specular = lightColor * pow(cosAlpha,10) * vec3(0.05,0.05,0.05);
 
     vec3 fog = vec3(0, 0, 0);
 
-    color = ambient + (texcolor * lightColor * cosTheta / (dist*dist))
+    color = ambient * texcolor + (texcolor * lightColor * cosTheta / (dist*dist))
 	    + specular + fog;
 
 }
