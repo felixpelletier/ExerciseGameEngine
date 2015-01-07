@@ -2,6 +2,7 @@
 in vec3 vertexPos;
 in vec2 vertexUV;
 in vec3 vertexNormal;
+in vec3 vertexOffset;
 uniform mat4 projMat;
 uniform mat4 viewMat;
 uniform mat4 modelMat;
@@ -15,7 +16,8 @@ out vec3 normal_camspace;
 out vec3 eyeDir_camspace;
 
 void main(){
-	vec4 pos = vec4(vertexPos,1);
+	vec4 pos = vec4(vertexPos + vertexOffset,1);
+
 	gl_Position = projMat * viewMat * modelMat * pos;
 
 	vec3 pos_worldspace = (modelMat * pos).xyz;

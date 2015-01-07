@@ -23,6 +23,7 @@ const int winHeight = 720;
 const GLuint s_vertexPosition = 0;
 const GLuint s_vertexUV = 1;
 const GLuint s_vertexNormal = 2;
+const GLuint s_offset = 3;
 
 int main()
 {
@@ -45,22 +46,21 @@ int main()
 	    100.0f       // Far clipping plane. Keep as little as possible.
 	);
 
-	
-
 	GLuint VertexArrayID;
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
-	std::vector<Entity> entities;
-	entities.push_back(loadModel(VertexArrayID, "ice.obj"));
-	entities.push_back(loadModel(VertexArrayID, "Snowmobile.obj"));
-
+	std::vector<Entity*> entities;
+	Entity floor = loadModel(VertexArrayID, "ice.obj");
+	Entity player = loadModel(VertexArrayID, "Snowmobile.obj");
+	entities.push_back(&player);
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
 
 	glBindAttribLocation(programID, s_vertexPosition, "vertexPos");
 	glBindAttribLocation(programID, s_vertexUV, "vertexUV");
 	glBindAttribLocation(programID, s_vertexNormal, "vertexNormal");
+	glBindAttribLocation(programID, s_offset, "vertexOffset");
 
 	// Get a handle for our "MVP" uniform.
 	// Only at initialisation time.
@@ -71,7 +71,7 @@ int main()
 	GLuint s_lightpos = glGetUniformLocation(programID, "lightPos");
 	GLuint s_lightdir = glGetUniformLocation(programID, "lightDir");
 	GLuint s_lightcolor = glGetUniformLocation(programID, "lightColor");
-
+	
 	Light light;
 	light.position = glm::vec3(-0.0f, 5.0f, 0.0f);
 	light.direction = glm::vec3(-0.0f, -1.0f, -0.0f);
@@ -82,6 +82,23 @@ int main()
         GLuint NormalTexID  = glGetUniformLocation(programID, "NormalSampler");
 	 
 	glUseProgram(programID); 
+
+	std::vector<glm::vec3> offsets;
+	float magic = 33.95f;
+	offsets.push_back(glm::vec3(0.0f,0.0f,0.0f));
+	offsets.push_back(glm::vec3(magic,0.0f,0.0f));
+	offsets.push_back(glm::vec3(0.0f,0.0f,magic));
+	offsets.push_back(glm::vec3(-magic,0.0f,0.0f));
+	offsets.push_back(glm::vec3(0.0f,0.0f,-magic));
+	offsets.push_back(glm::vec3(magic,0.0f,magic));
+	offsets.push_back(glm::vec3(-magic,0.0f,magic));
+	offsets.push_back(glm::vec3(-magic,0.0f,-magic));
+	offsets.push_back(glm::vec3(magic,0.0f,-magic));
+
+	GLuint floorTilePos;
+	glGenBuffers(1, &floorTilePos);
+	glBindBuffer(GL_ARRAY_BUFFER, floorTilePos);
+	glBufferData(GL_ARRAY_BUFFER, offsets.size() * sizeof(glm::vec3), offsets.data(), GL_STATIC_DRAW);
 	
 	// Dark blue background
 	glClearColor(0.01f, 0.0f, 0.1f, 0.0f);
@@ -118,7 +135,7 @@ int main()
 		playerMat = glm::translate(playerMat, position);
 		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		entities[1].modelMat = playerMat;
+		player.modelMat = playerMat;
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
@@ -145,62 +162,16 @@ int main()
 		glUniform3fv(s_lightcolor, 1, &light.color[0]);
 		
 		for (auto const &entity : entities){
-			for (auto const &mesh : entity.meshes){
-				
-				glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity.modelMat[0][0]);
+			
+			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity->modelMat[0][0]);
 
-				struct Texture texture = entity.textures[mesh.materialId];
-				// Bind our texture in Texture Unit 0
-				glActiveTexture(GL_TEXTURE0);
-				glBindTexture(GL_TEXTURE_2D, texture.diffuse);
-				// Set our "myTextureSampler" sampler to user Texture Unit 0
-				glUniform1i(DiffuseTexID, 0);
+			for (auto const &mesh : entity->meshes){
 
-				// Bind our texture in Texture Unit 1
-				glActiveTexture(GL_TEXTURE1);
-				glBindTexture(GL_TEXTURE_2D, texture.normal);
-				// Set our "myTextureSampler" sampler to user Texture Unit 0
-				glUniform1i(NormalTexID, 1);
+				struct Texture texture = entity->textures[mesh.materialId];
+		
+				texture.bind(DiffuseTexID, NormalTexID);
+				mesh.bind(s_vertexPosition, s_vertexUV, s_vertexNormal);	
 
-				// 1rst attribute buffer : vertices
-				glEnableVertexAttribArray(0);
-				glBindBuffer(GL_ARRAY_BUFFER, mesh.vertexbuffer);
-				glVertexAttribPointer(
-				   s_vertexPosition,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
-				   3,                  // size
-				   GL_FLOAT,           // type
-				   GL_FALSE,           // normalized?
-				   0,                  // stride
-				   (void*)0            // array buffer offset
-				);
-
-				// 2nd attribute buffer : UVs
-				glEnableVertexAttribArray(1);
-				glBindBuffer(GL_ARRAY_BUFFER, mesh.uvbuffer);
-				glVertexAttribPointer(
-				    s_vertexUV,                                // attribute. No particular reason for 1, but must match the layout in the shader.
-				    2,                                // size
-				    GL_FLOAT,                         // type
-				    GL_FALSE,                         // normalized?
-				    0,                                // stride
-				    (void*)0                          // array buffer offset
-				);
-						
-				// 3rd attribute buffer : normals
-				glEnableVertexAttribArray(2);
-				glBindBuffer(GL_ARRAY_BUFFER, mesh.normalbuffer);
-				glVertexAttribPointer(
-					s_vertexNormal,                                // attribute
-					3,                                // size
-					GL_FLOAT,                         // type
-					GL_FALSE,                         // normalized?
-					0,                                // stride
-					(void*)0                          // array buffer offset
-				);
-
-				// Index buffer
-				glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh.elementbuffer);
-			 
 				// Draw the triangles !
 				glDrawElements(
 				    GL_TRIANGLES,      // mode
@@ -209,13 +180,51 @@ int main()
 				    nullptr           // element array buffer offset
 				); 
 
-				//std::cout << glGetError() << "\n";
-
 			}
 		}
+		
+		for (auto const &mesh : floor.meshes){
+
+			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &floor.modelMat[0][0]);
+			
+			const int floorTiles = 9;
+
+			struct Texture texture = floor.textures[mesh.materialId];
+	
+			texture.bind(DiffuseTexID, NormalTexID);
+			mesh.bind(s_vertexPosition, s_vertexUV, s_vertexNormal);	
+			
+			glEnableVertexAttribArray(3);
+			glBindBuffer(GL_ARRAY_BUFFER, floorTilePos);
+			glVertexAttribPointer(
+		   		s_offset,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   		3,                  // size
+		   		GL_FLOAT,           // type
+				GL_FALSE,           // normalized?
+				0,                  // stride
+				(void*)0            // array buffer offset
+			);
+
+			glVertexAttribDivisor(0, 0); 
+			glVertexAttribDivisor(1, 0);
+			glVertexAttribDivisor(2, 0); 
+			glVertexAttribDivisor(3, 1); 
+ 
+			// Draw the triangles !
+			glDrawElementsInstanced(
+			    GL_TRIANGLES,      // mode
+			    mesh.indices,    // count
+			    GL_UNSIGNED_INT,   // type
+			    nullptr,		// element array buffer offset
+			    floorTiles
+			); 
+
+		}
+
 		glDisableVertexAttribArray(0);
 		glDisableVertexAttribArray(1);
 		glDisableVertexAttribArray(2);
+		glDisableVertexAttribArray(3);
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();

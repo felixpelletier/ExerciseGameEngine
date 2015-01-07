@@ -36,11 +36,74 @@ struct Mesh{
 	GLuint elementbuffer;
 	int materialId;
 	int indices;
+	bool bind(GLuint pos, GLuint uv, GLuint normal) const{
+		// 1rst attribute buffer : vertices
+		glEnableVertexAttribArray(0);
+		glBindBuffer(GL_ARRAY_BUFFER, vertexbuffer);
+		glVertexAttribPointer(
+		   pos,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
+		   3,                  // size
+		   GL_FLOAT,           // type
+		   GL_FALSE,           // normalized?
+		   0,                  // stride
+		   (void*)0            // array buffer offset
+		);
+
+		// 2nd attribute buffer : UVs
+		glEnableVertexAttribArray(1);
+		glBindBuffer(GL_ARRAY_BUFFER, uvbuffer);
+		glVertexAttribPointer(
+		    uv,                                // attribute. No particular reason for 1, but must match the layout in the shader.
+		    2,                                // size
+		    GL_FLOAT,                         // type
+		    GL_FALSE,                         // normalized?
+		    0,                                // stride
+		    (void*)0                          // array buffer offset
+		);
+				
+		// 3rd attribute buffer : normals
+		glEnableVertexAttribArray(2);
+		glBindBuffer(GL_ARRAY_BUFFER, normalbuffer);
+		glVertexAttribPointer(
+			normal,                                // attribute
+			3,                                // size
+			GL_FLOAT,                         // type
+			GL_FALSE,                         // normalized?
+			0,                                // stride
+			(void*)0                          // array buffer offset
+		);
+
+		// Index buffer
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, elementbuffer);
+
+		return true;
+	}
+
 };
 
 struct Texture{
 	GLuint diffuse;
 	GLuint normal;
+	bool bind(GLuint DiffuseTexID, GLuint NormalTexID) const{
+		// Bind our texture in Texture Unit 0
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, diffuse);
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(DiffuseTexID, 0);
+
+		// Bind our texture in Texture Unit 1
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, normal);
+		// Set our "myTextureSampler" sampler to user Texture Unit 0
+		glUniform1i(NormalTexID, 1);
+
+		return true;
+	}
+};
+
+struct BoundingBox{
+	glm::vec3 max;
+	glm::vec3 min;
 };
 
 struct Entity{
@@ -48,6 +111,7 @@ struct Entity{
 	std::vector<tinyobj::material_t> materials;
 	std::vector<Texture> textures;
 	glm::mat4 modelMat;
+	BoundingBox boundingBox;
 };
 
 
