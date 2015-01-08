@@ -125,11 +125,11 @@ int main()
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS){
-		   orientation  += glm::pow(speed, 0.5f) * orientationDampen * deltaTime;
+		   orientation  += glm::pow(glm::abs(speed), 0.5f) * orientationDampen * deltaTime;
 		}
 		
 		if (glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
-		   orientation -= glm::pow(speed, 0.5f) * orientationDampen * deltaTime;
+		   orientation -= glm::pow(glm::abs(speed), 0.5f) * orientationDampen * deltaTime;
 		}
 
 		speed = speed * glm::pow(0.7f, deltaTime);
