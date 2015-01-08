@@ -107,29 +107,34 @@ int main()
 	
 	glm::vec3 position;
 	float orientation = 0.0f;
+	float speed = 0.0f;
 	do{
 		double currentTime = glfwGetTime();
 		float deltaTime = float(currentTime - lastTime);
 		lastTime = currentTime;
 
+		float speedBoost = 6.0f;
+		float orientationDampen = 0.2f;
 		// Move forward
 		if (glfwGetKey(window, GLFW_KEY_UP ) == GLFW_PRESS){
-		    position[0] += 6 * deltaTime * glm::sin(orientation);
-		    position[2] += 6 * deltaTime * glm::cos(orientation);
+		    speed += speedBoost * deltaTime;
 		}
 		
 		if (glfwGetKey(window, GLFW_KEY_DOWN ) == GLFW_PRESS){
-		    position[0] -= 6 * deltaTime * glm::sin(orientation);
-		    position[2] -= 6 * deltaTime * glm::cos(orientation);
+		    speed -= speedBoost * deltaTime;
 		}
 
 		if (glfwGetKey(window, GLFW_KEY_LEFT ) == GLFW_PRESS){
-		   orientation  += 1.0f * deltaTime;
+		   orientation  += glm::pow(speed, 0.5f) * orientationDampen * deltaTime;
 		}
 		
 		if (glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
-		   orientation -= 1.0f * deltaTime;
+		   orientation -= glm::pow(speed, 0.5f) * orientationDampen * deltaTime;
 		}
+
+		speed = speed * glm::pow(0.7f, deltaTime);
+		position[0] += speed * deltaTime * glm::sin(orientation);
+		position[2] += speed * deltaTime * glm::cos(orientation);
 
 		glm::mat4 playerMat;
 		playerMat = glm::translate(playerMat, position);
