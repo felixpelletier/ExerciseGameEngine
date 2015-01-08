@@ -43,7 +43,7 @@ int main()
 	    (float) winWidth,
 	    (float) winHeight, // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
 	    0.1f,        // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-	    100.0f       // Far clipping plane. Keep as little as possible.
+	    1000.0f       // Far clipping plane. Keep as little as possible.
 	);
 
 	GLuint VertexArrayID;
@@ -53,7 +53,9 @@ int main()
 	std::vector<Entity*> entities;
 	Entity floor = loadModel(VertexArrayID, "ice.obj");
 	Entity player = loadModel(VertexArrayID, "Snowmobile.obj");
+	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
 	entities.push_back(&player);
+	//entities.push_back(&skybox);
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
 
@@ -101,7 +103,7 @@ int main()
 	glBufferData(GL_ARRAY_BUFFER, offsets.size() * sizeof(glm::vec3), offsets.data(), GL_STATIC_DRAW);
 	
 	// Dark blue background
-	glClearColor(0.01f, 0.0f, 0.1f, 0.0f);
+	glClearColor(0.6f, 0.6f, 0.65f, 0.0f);
 
 	double lastTime = glfwGetTime();
 	

@@ -34,9 +34,12 @@ void main(){
 
     vec3 specular = lightColor * pow(cosAlpha,10) * vec3(0.05,0.05,0.05);
 
-    vec3 fog = vec3(0, 0, 0);
+    vec3 fogcolor = vec3(0.6, 0.6, 0.65);
+    float fogfactor = clamp((eyeDir_camspace.z - 20.0) * 0.01, 0, 1);
 
     color = ambient * texcolor + (texcolor * lightColor * cosTheta / (dist*dist))
-	    + specular + fog;
+	    + specular;
+
+    color = mix(color, fogcolor, fogfactor);
 
 }
