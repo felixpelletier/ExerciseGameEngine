@@ -8,8 +8,9 @@
 #include <GLFW/glfw3.h>
 #include <tinyobjloader/tiny_obj_loader.h>
 
-#define SHADER_PATH "./shaders/"
-#define IMAGES_PATH "./images/"
+#define SHADER_PATH "./assets/shaders/"
+#define IMAGES_PATH "./assets/images/"
+#define MODELS_PATH "./assets/models/"
 
 #define FOURCC_DXT1 0x31545844 // Equivalent to "DXT1" in ASCII
 #define FOURCC_DXT3 0x33545844 // Equivalent to "DXT3" in ASCII
@@ -106,12 +107,14 @@ struct BoundingBox{
 	glm::vec3 min;
 };
 
-struct Entity{
-	std::vector<Mesh> meshes;
-	std::vector<tinyobj::material_t> materials;
-	std::vector<Texture> textures;
-	glm::mat4 modelMat;
-	BoundingBox boundingBox;
+class Entity{
+	public:
+		Entity (GLuint vertexarray, std::string inputfile);
+		std::vector<Mesh> meshes;
+		std::vector<tinyobj::material_t> materials;
+		std::vector<Texture> textures;
+		glm::mat4 modelMat;
+		BoundingBox boundingBox;
 };
 
 

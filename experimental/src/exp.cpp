@@ -9,7 +9,7 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <utils.h>
+#include <misc.h>
 
 #define DEG2RAD(x) ((x) / 57.295779579f)
 
@@ -51,8 +51,8 @@ int main()
 	glBindVertexArray(VertexArrayID);
 
 	std::vector<Entity*> entities;
-	Entity floor = loadModel(VertexArrayID, "ice.obj");
-	Entity player = loadModel(VertexArrayID, "Snowmobile.obj");
+	Entity floor = Entity(VertexArrayID, "ice.obj");
+	Entity player = Entity(VertexArrayID, "Snowmobile.obj");
 	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
 	entities.push_back(&player);
 	//entities.push_back(&skybox);

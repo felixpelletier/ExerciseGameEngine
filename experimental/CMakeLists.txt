@@ -42,29 +42,20 @@ file(GLOB ALL_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 include_directories("${CMAKE_CURRENT_SOURCE_DIR}")
 
-add_custom_target(copy_shaders)
-add_custom_command(TARGET copy_shaders POST_BUILD
+add_custom_target(copy_assets)
+add_custom_command(TARGET copy_assets POST_BUILD
                      COMMAND ${CMAKE_COMMAND} -E
-                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/shaders ${CMAKE_CURRENT_BINARY_DIR}/shaders)
-
-add_custom_target(copy_images)
-add_custom_command(TARGET copy_images POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E
-                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/images ${CMAKE_CURRENT_BINARY_DIR}/images)
-
-add_custom_target(copy_models)
-add_custom_command(TARGET copy_models POST_BUILD
-                     COMMAND ${CMAKE_COMMAND} -E
-                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/models ${CMAKE_CURRENT_BINARY_DIR}/models)
+                         copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/assets ${CMAKE_CURRENT_BINARY_DIR}/assets)
 
 add_subdirectory(tinyobjloader)
 
-file(GLOB HEADER_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.h")
-file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp")
+file(GLOB SRC_FILES "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_executable(experiment ${HEADER_FILES} ${SRC_FILES})
+include_directories("${CMAKE_CURRENT_SOURCE_DIR}/include/")
+
+add_executable(experiment ${SRC_FILES})
 target_link_libraries(experiment tinyobjloader ${Boost_LIBRARIES} ${PYTHON_LIBRARIES} ${OPENGL_LIBRARIES} ${GLFW_LIBRARIES} ${GLEW_LIBRARIES})
-add_dependencies(experiment copy_shaders copy_images copy_models)
+add_dependencies(experiment copy_assets)
 
 
 add_custom_target(run

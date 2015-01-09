@@ -1,4 +1,4 @@
-#include <utils.h>
+#include <misc.h>
 
 
 GLuint LoadShaders(std::string vertex_file,std::string fragment_file){
@@ -166,36 +166,28 @@ GLuint _loadDDS(std::string imagepath){
 	return textureID;
 }
 
-GLuint loadOBJ(std::string inputfile){
-
-	return 0;
-
-}
-
-struct Entity loadModel(GLuint VertexArrayID, std::string inputfile){
-
-	Entity result;
+Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 
 	glBindVertexArray(VertexArrayID);
 
-	inputfile = "models/" + inputfile;
+	inputfile = MODELS_PATH + inputfile;
 	std::vector<tinyobj::shape_t> shapes;
 
-	std::string err = tinyobj::LoadObj(shapes, result.materials, inputfile.c_str(), "models/");
+	std::string err = tinyobj::LoadObj(shapes, this->materials, inputfile.c_str(), MODELS_PATH);
 
 	if (!err.empty()) {
 	  std::cerr << err << std::endl;
 	  exit(1);
 	}
 
-	result.meshes.reserve(shapes.size());
+	this->meshes.reserve(shapes.size());
 
-	result.textures.reserve(result.materials.size());
-	for (auto &material : result.materials){
+	this->textures.reserve(this->materials.size());
+	for (auto &material : this->materials){
 		 struct Texture texture;
 		 texture.diffuse = loadDDS(material.diffuse_texname);
 		 texture.normal = loadDDS(material.normal_texname);
-		 result.textures.push_back(texture);
+		 this->textures.push_back(texture);
 	}
 
 	for (auto &shape : shapes){
@@ -225,10 +217,9 @@ struct Entity loadModel(GLuint VertexArrayID, std::string inputfile){
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newmesh.elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
 		
-		result.meshes.push_back(newmesh);
+		this->meshes.push_back(newmesh);
 	}
 
-	return result;
-
 }
+
 
