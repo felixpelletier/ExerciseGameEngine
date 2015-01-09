@@ -10,6 +10,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include <misc.h>
+#include <entity.h>
 
 #define DEG2RAD(x) ((x) / 57.295779579f)
 
