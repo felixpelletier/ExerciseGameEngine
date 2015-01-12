@@ -88,8 +88,8 @@ int main()
 	glUseProgram(programID); 
 
 	std::vector<glm::vec3> tiles;
-	float magic = 33.95f;
-	makeGrid(&tiles, 9, magic);
+
+	makeGrid(&tiles, 18, floor.boundingBox.max.x - floor.boundingBox.min.x);
 
 	GLuint floorTilePos;
 	glGenBuffers(1, &floorTilePos);

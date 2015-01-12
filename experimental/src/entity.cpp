@@ -15,14 +15,16 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 	}
 
 	this->meshes.reserve(shapes.size());
-
 	this->textures.reserve(this->materials.size());
+
 	for (auto &material : this->materials){
 		 struct Texture texture;
 		 texture.diffuse = loadDDS(material.diffuse_texname);
 		 texture.normal = loadDDS(material.normal_texname);
 		 this->textures.push_back(texture);
 	}
+
+
 
 	for (auto &shape : shapes){
 	
@@ -50,6 +52,16 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		glGenBuffers(1, &newmesh.elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newmesh.elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
+
+		for (unsigned int p = 0; p < mesh.positions.size(); p+=3){
+			boundingBox.max.x = std::max(mesh.positions[p], boundingBox.max.x);
+			boundingBox.max.y = std::max(mesh.positions[p+1], boundingBox.max.y);
+			boundingBox.max.z = std::max(mesh.positions[p+2], boundingBox.max.z);
+			
+			boundingBox.min.x = std::min(mesh.positions[p], boundingBox.min.x);
+			boundingBox.min.y = std::min(mesh.positions[p+1], boundingBox.min.y);
+			boundingBox.min.z = std::min(mesh.positions[p+2], boundingBox.min.z);
+		}
 		
 		this->meshes.push_back(newmesh);
 	}
