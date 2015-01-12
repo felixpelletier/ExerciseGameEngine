@@ -127,8 +127,13 @@ int main()
 		if (glfwGetKey(window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
 		   orientation -= glm::pow(glm::abs(speed), 0.5f) * orientationDampen * deltaTime;
 		}
-
-		speed = speed * glm::pow(0.7f, deltaTime);
+		
+		if (glm::abs(speed) < 3.0f){
+			speed = speed * glm::pow(0.2f, deltaTime);
+		}
+		else{
+			speed = speed * glm::pow(0.7f, deltaTime);
+		}
 		position[0] += speed * deltaTime * glm::sin(orientation);
 		position[2] += speed * deltaTime * glm::cos(orientation);
 
