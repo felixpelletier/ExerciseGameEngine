@@ -17,6 +17,7 @@
 //#include <ScriptEngine.h>
 
 GLFWwindow* initWindow(int width, int height);
+void makeGrid(std::vector<glm::vec3>* list, int size,float tileHalfSize);
 
 const int winWidth = 1280;
 const int winHeight = 720;
@@ -86,22 +87,14 @@ int main()
 	 
 	glUseProgram(programID); 
 
-	std::vector<glm::vec3> offsets;
+	std::vector<glm::vec3> tiles;
 	float magic = 33.95f;
-	offsets.push_back(glm::vec3(0.0f,0.0f,0.0f));
-	offsets.push_back(glm::vec3(magic,0.0f,0.0f));
-	offsets.push_back(glm::vec3(0.0f,0.0f,magic));
-	offsets.push_back(glm::vec3(-magic,0.0f,0.0f));
-	offsets.push_back(glm::vec3(0.0f,0.0f,-magic));
-	offsets.push_back(glm::vec3(magic,0.0f,magic));
-	offsets.push_back(glm::vec3(-magic,0.0f,magic));
-	offsets.push_back(glm::vec3(-magic,0.0f,-magic));
-	offsets.push_back(glm::vec3(magic,0.0f,-magic));
+	makeGrid(&tiles, 9, magic);
 
 	GLuint floorTilePos;
 	glGenBuffers(1, &floorTilePos);
 	glBindBuffer(GL_ARRAY_BUFFER, floorTilePos);
-	glBufferData(GL_ARRAY_BUFFER, offsets.size() * sizeof(glm::vec3), offsets.data(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, tiles.size() * sizeof(glm::vec3), tiles.data(), GL_STATIC_DRAW);
 	
 	// Dark blue background
 	glClearColor(0.6f, 0.6f, 0.65f, 0.0f);
@@ -195,8 +188,6 @@ int main()
 
 			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &floor.modelMat[0][0]);
 			
-			const int floorTiles = 9;
-
 			struct Texture texture = floor.textures[mesh.materialId];
 	
 			texture.bind(DiffuseTexID, NormalTexID);
@@ -224,7 +215,7 @@ int main()
 			    mesh.indices,    // count
 			    GL_UNSIGNED_INT,   // type
 			    nullptr,		// element array buffer offset
-			    floorTiles
+			    tiles.size() 
 			); 
 
 		}
@@ -275,6 +266,15 @@ GLFWwindow* initWindow(int width, int height){
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
 	return window;
+}
+
+void makeGrid(std::vector<glm::vec3>* list, int size,float tileSize){
+	float offset = tileSize * (size/4.0f);
+	for(int x = 0; x < size;x++){
+		for(int y = 0; y < size;y++){
+			list->push_back(glm::vec3(x*tileSize - offset,0.0f,y*tileSize - offset));
+		}
+	}
 }
 
 
