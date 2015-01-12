@@ -4,7 +4,7 @@
 #include <GameState.h>
 #include <StrategyState.h>
 
-namespace Soul { namespace Script { 
+//namespace Soul { namespace Script { 
 
 class StrategieEngine {
 	struct GameState gameState;
@@ -12,7 +12,6 @@ class StrategieEngine {
 	
 	void updatePosition();
 	private:
-		boost::thread updateThread;
 	public:
 		StrategieEngine();
 		~StrategieEngine();
@@ -20,4 +19,4 @@ class StrategieEngine {
 		struct StrategyState getState();
 };
 
-} }
+//} }

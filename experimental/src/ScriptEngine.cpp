@@ -1,7 +1,7 @@
 #include <ScriptEngine.h>
 #include <sys/time.h>
 
-namespace Soul { namespace Script { 
+//namespace Soul { namespace Script { 
 
 using namespace boost::python;
 using namespace boost::python::api;
@@ -9,23 +9,21 @@ using namespace boost::python::api;
 StrategieEngine::StrategieEngine(){
 
     Py_Initialize();
-    PyEval_InitThreads(); 
+    //PyEval_InitThreads(); 
     
     //Ajouter le dossier 'scripts' au path temporaire Python
     PyObject *sys = PyImport_ImportModule("sys");
     PyObject *path = PyObject_GetAttrString(sys, "path");
-    PyList_Append(path, PyUnicode_FromString("./scripts"));
+    PyList_Append(path, PyUnicode_FromString("./assets/scripts"));
     PyList_Append(path, PyUnicode_FromString("."));
 
     //Relacher l'exclusivité de l'interpreteur
     //pour pouvoir l'utiliser sur les autres threads
     PyEval_ReleaseLock(); 
    
-    this->updateThread = boost::thread(&StrategieEngine::updatePosition, this);//Démarrage du thread
 }
 
 StrategieEngine::~StrategieEngine(){
-	this->updateThread.interrupt();
 	Py_Finalize();	
 }
 
@@ -77,8 +75,6 @@ void StrategieEngine::updatePosition(){
 				
 				this->strategyState = result;//We made it safe
 
-				boost::this_thread::interruption_point();//This is where the thread stops if it gets interrupted
-
 			}
 
 		}
@@ -103,4 +99,4 @@ struct StrategyState StrategieEngine::getState()
 	return this->strategyState;
 }
 
-}}
+//}}
