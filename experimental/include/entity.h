@@ -16,14 +16,19 @@
 namespace Soul { 
 
 class Entity{
+	private:
+		static unsigned int counter;
 	public:
+		int id;
 		Entity (GLuint vertexarray, std::string inputfile);
 		std::vector<Mesh> meshes;
 		std::vector<tinyobj::material_t> materials;
 		std::vector<Texture> textures;
 		glm::mat4 modelMat;
 		BoundingBox boundingBox;
+		virtual void collision(Entity* other);
 };
+
 
 }
 

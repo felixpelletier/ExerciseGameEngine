@@ -2,7 +2,11 @@
 
 namespace Soul { 
 
+unsigned int Entity::counter = 0;
+
 Entity::Entity(GLuint VertexArrayID, std::string inputfile){
+
+	this->id = this->counter++;
 
 	glBindVertexArray(VertexArrayID);
 
@@ -25,8 +29,6 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		 texture.normal = loadDDS(material.normal_texname);
 		 this->textures.push_back(texture);
 	}
-
-
 
 	for (auto &shape : shapes){
 	
@@ -67,6 +69,12 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		
 		this->meshes.push_back(newmesh);
 	}
+
+}
+
+void Entity::collision(Entity* other){
+
+	std::cout << other->id << "\n";
 
 }
 

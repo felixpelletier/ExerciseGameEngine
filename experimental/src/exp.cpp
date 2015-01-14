@@ -146,6 +146,21 @@ int main()
 
 		player.modelMat = playerMat;
 
+		for (auto &entity : entities){
+			if (entity != &player){
+				BoundingBox bb1 = player.boundingBox.transform(player.modelMat);
+				BoundingBox bb2 = entity->boundingBox.transform(entity->modelMat);
+
+				if(bb1.intersect(bb2)){
+
+					player.collision(entity);
+					entity->collision(&player);
+
+				}		
+			}
+
+		}
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
 		glUseProgram(programID);
