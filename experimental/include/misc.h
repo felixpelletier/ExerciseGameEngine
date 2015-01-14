@@ -24,7 +24,6 @@ GLuint _LoadShaders(std::string vertex_file_path,std::string fragment_file_path)
 GLuint loadDDS(std::string imagepath);
 GLuint _loadDDS(std::string imagepath);
 GLuint loadOBJ(std::string inputfile);
-struct Entity loadModel(GLuint vertexarray, std::string inputfile);
 int arrayToVec3(const std::vector<float> vecArray, std::vector<glm::vec3>* vec3Vector);
 
 

@@ -20,15 +20,38 @@ class Entity{
 		static unsigned int counter;
 	public:
 		int id;
+		bool visible = true;
 		Entity (GLuint vertexarray, std::string inputfile);
 		std::vector<Mesh> meshes;
 		std::vector<tinyobj::material_t> materials;
 		std::vector<Texture> textures;
 		glm::mat4 modelMat;
 		BoundingBox boundingBox;
-		virtual void collision(Entity* other);
+		virtual void collision(Entity* other); 
 };
 
+class CollectibleObject : public Entity{
+
+	private: 
+		int points = 100;
+	public:
+		CollectibleObject(GLuint vertexarray, std::string inputfile);
+		virtual void collision(Entity* other);
+		int getPoints(){ return points; };
+
+};
+
+class Player : public Entity{
+
+	private: 
+		int points = 0;
+
+	public:
+		Player(GLuint vertexarray, std::string inputfile);
+		virtual void collision(Entity* other);
+		int getPoints(){ return points; };
+
+};
 
 }
 

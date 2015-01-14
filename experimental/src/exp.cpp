@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <misc.h>
 #include <entity.h>
+#include <random>
 
 //#include <ScriptEngine.h>
 
@@ -54,13 +55,21 @@ int main()
 
 	std::vector<Entity*> entities;
 	Entity floor = Entity(VertexArrayID, "ice.obj");
-	Entity player = Entity(VertexArrayID, "Snowmobile.obj");
-	Entity oildrum = Entity(VertexArrayID, "oildrum.obj");
-	oildrum.modelMat = glm::translate(oildrum.modelMat, glm::vec3(0.0f, 0.0f, 5.0f));
-	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
+	Player player = Player(VertexArrayID, "Snowmobile.obj");
+	for (int o = 0; o < 300; o++){
+		CollectibleObject* oildrum = new CollectibleObject(VertexArrayID, "oildrum.obj");
+		glm::vec3 ranPos;
+		const float low = -50.0f;
+		const float high = 50.0f;
+		ranPos.x = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
+		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
+		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
+		oildrum->modelMat = glm::translate(oildrum->modelMat, ranPos);
+		entities.push_back(oildrum);
+	}
 	entities.push_back(&player);
-	entities.push_back(&oildrum);
 	//entities.push_back(&skybox);
+	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
 
@@ -147,11 +156,14 @@ int main()
 		player.modelMat = playerMat;
 
 		for (auto &entity : entities){
-			if (entity != &player){
+			if (entity->visible && entity != &player){
 				BoundingBox bb1 = player.boundingBox.transform(player.modelMat);
 				BoundingBox bb2 = entity->boundingBox.transform(entity->modelMat);
 
-				if(bb1.intersect(bb2)){
+				glm::vec3 center1 = (bb1.min + bb1.max) / 2.0f;
+				glm::vec3 center2 = (bb2.min + bb2.max) / 2.0f;
+
+				if(glm::length(center2-center1) < 1.75f){
 
 					player.collision(entity);
 					entity->collision(&player);
@@ -186,23 +198,27 @@ int main()
 		glUniform3fv(s_lightcolor, 1, &light.color[0]);
 		
 		for (auto const &entity : entities){
+
+			if(entity->visible){
 			
-			glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity->modelMat[0][0]);
+				glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &entity->modelMat[0][0]);
 
-			for (auto const &mesh : entity->meshes){
+				for (auto const &mesh : entity->meshes){
 
-				struct Texture texture = entity->textures[mesh.materialId];
-		
-				texture.bind(DiffuseTexID, NormalTexID);
-				mesh.bind(s_vertexPosition, s_vertexUV, s_vertexNormal);	
+					struct Texture texture = entity->textures[mesh.materialId];
+			
+					texture.bind(DiffuseTexID, NormalTexID);
+					mesh.bind(s_vertexPosition, s_vertexUV, s_vertexNormal);	
 
-				// Draw the triangles !
-				glDrawElements(
-				    GL_TRIANGLES,      // mode
-				    mesh.indices,    // count
-				    GL_UNSIGNED_INT,   // type
-				    nullptr           // element array buffer offset
-				); 
+					// Draw the triangles !
+					glDrawElements(
+					    GL_TRIANGLES,      // mode
+					    mesh.indices,    // count
+					    GL_UNSIGNED_INT,   // type
+					    nullptr           // element array buffer offset
+					); 
+
+				}
 
 			}
 		}

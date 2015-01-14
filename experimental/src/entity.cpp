@@ -74,9 +74,32 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 
 void Entity::collision(Entity* other){
 
-	std::cout << other->id << "\n";
+}
+
+CollectibleObject::CollectibleObject(GLuint VertexArrayID, std::string inputfile) : Entity::Entity(VertexArrayID, inputfile){}
+
+void CollectibleObject::collision(Entity* other){
+
+	this->visible = false;
 
 }
 
+Player::Player(GLuint VertexArrayID, std::string inputfile) : Entity::Entity(VertexArrayID, inputfile){}
+
+void Player::collision(Entity* other){
+
+	CollectibleObject* collect = (CollectibleObject*) other;
+	if (other->visible){
+		points += collect->getPoints(); 
+	}
+
+	std::cout << points << " points\n";
+
 }
+
+
+}
+
+
+
 
