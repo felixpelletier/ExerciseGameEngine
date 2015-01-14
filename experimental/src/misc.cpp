@@ -1,5 +1,6 @@
 #include <misc.h>
 
+namespace Soul{
 
 GLuint LoadShaders(std::string vertex_file,std::string fragment_file){
 	return _LoadShaders(SHADER_PATH + vertex_file, SHADER_PATH + fragment_file);
@@ -166,5 +167,23 @@ GLuint _loadDDS(std::string imagepath){
 	return textureID;
 }
 
+int arrayToVec3(const std::vector<float> vecArray, std::vector<glm::vec3>* vec3Vector){
 
+	if (vecArray.size() % 3 != 0){
+		return 1;
+	}
+
+	for(int i = 0; i < vecArray.size(); i += 3){
+		glm::vec3 newVec;
+		newVec.x = vecArray[i];
+		newVec.y = vecArray[i+1];
+		newVec.z = vecArray[i+2];
+		vec3Vector->push_back(newVec);
+	}
+
+	return 0;
+
+}
+
+}
 

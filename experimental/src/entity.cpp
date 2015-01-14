@@ -1,5 +1,7 @@
 #include <entity.h>
 
+namespace Soul { 
+
 Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 
 	glBindVertexArray(VertexArrayID);
@@ -65,6 +67,8 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		
 		this->meshes.push_back(newmesh);
 	}
+
+}
 
 }
 

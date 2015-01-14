@@ -12,6 +12,8 @@
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <misc.h>
 
+namespace Soul { 
+
 class Entity{
 	public:
 		Entity (GLuint vertexarray, std::string inputfile);
@@ -21,5 +23,7 @@ class Entity{
 		glm::mat4 modelMat;
 		BoundingBox boundingBox;
 };
+
+}
 
 #endif

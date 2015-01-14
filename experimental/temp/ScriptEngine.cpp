@@ -1,7 +1,7 @@
 #include <ScriptEngine.h>
 #include <sys/time.h>
 
-//namespace Soul { namespace Script { 
+namespace Soul { namespace Script { 
 
 using namespace boost::python;
 using namespace boost::python::api;
@@ -99,4 +99,4 @@ struct StrategyState StrategieEngine::getState()
 	return this->strategyState;
 }
 
-//}}
+}}

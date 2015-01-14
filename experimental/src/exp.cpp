@@ -12,9 +12,9 @@
 #include <misc.h>
 #include <entity.h>
 
-#define DEG2RAD(x) ((x) / 57.295779579f)
-
 //#include <ScriptEngine.h>
+
+using namespace Soul;
 
 GLFWwindow* initWindow(int width, int height);
 void makeGrid(std::vector<glm::vec3>* list, int size,float tileHalfSize);
@@ -41,11 +41,11 @@ int main()
 
 	// Generates a really hard-to-read matrix, but a normal, standard 4x4 matrix nonetheless
 	glm::mat4 projMat = glm::perspectiveFov(
-	    DEG2RAD(67.0f),         // The horizontal Field of View
+	    glm::radians(67.0f),         // The horizontal Field of View
 	    (float) winWidth,
 	    (float) winHeight, // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
 	    0.1f,        // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-	    1000.0f       // Far clipping plane. Keep as little as possible.
+	    500.0f       // Far clipping plane. Keep as little as possible.
 	);
 
 	GLuint VertexArrayID;
@@ -237,6 +237,8 @@ int main()
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
 	glfwWindowShouldClose(window) == 0 );
+
+	return 0;
 }
 
 GLFWwindow* initWindow(int width, int height){
@@ -281,8 +283,4 @@ void makeGrid(std::vector<glm::vec3>* list, int size,float tileSize){
 		}
 	}
 }
-
-
-
-
 
