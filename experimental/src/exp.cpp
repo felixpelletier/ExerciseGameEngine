@@ -55,8 +55,10 @@ int main()
 	std::vector<Entity*> entities;
 	Entity floor = Entity(VertexArrayID, "ice.obj");
 	Entity player = Entity(VertexArrayID, "Snowmobile.obj");
+	Entity oildrum = Entity(VertexArrayID, "oildrum.obj");
 	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
 	entities.push_back(&player);
+	entities.push_back(&oildrum);
 	//entities.push_back(&skybox);
 	// Create and compile our GLSL program from the shaders
 	GLuint programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
