@@ -16,7 +16,7 @@ uniform vec3 lightColor;
  
 void main(){
  
-    vec2 UV_INV = vec2(UV.x, UV.y); //Temporary, necessary for DDS
+    vec2 UV_INV = vec2(UV.x, 1.0 - UV.y); //Temporary, necessary for DDS
     // Output color = color of the texture at the specified UV
     vec3 texcolor = texture( DiffuseSampler, UV_INV ).rgb;
 
