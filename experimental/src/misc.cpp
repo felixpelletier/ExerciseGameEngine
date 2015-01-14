@@ -173,7 +173,7 @@ int arrayToVec3(const std::vector<float> vecArray, std::vector<glm::vec3>* vec3V
 		return 1;
 	}
 
-	for(int i = 0; i < vecArray.size(); i += 3){
+	for(unsigned int i = 0; i < vecArray.size(); i += 3){
 		glm::vec3 newVec;
 		newVec.x = vecArray[i];
 		newVec.y = vecArray[i+1];

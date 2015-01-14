@@ -56,6 +56,7 @@ int main()
 	Entity floor = Entity(VertexArrayID, "ice.obj");
 	Entity player = Entity(VertexArrayID, "Snowmobile.obj");
 	Entity oildrum = Entity(VertexArrayID, "oildrum.obj");
+	oildrum.modelMat = glm::translate(oildrum.modelMat, glm::vec3(0.0f, 0.0f, 5.0f));
 	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
 	entities.push_back(&player);
 	entities.push_back(&oildrum);

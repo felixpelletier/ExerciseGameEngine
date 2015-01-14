@@ -106,13 +106,6 @@ struct Texture{
 	}
 };
 
-struct BoundingBox{
-	glm::vec3 max;
-	glm::vec3 min;
-};
-
-
-
 }
 
 

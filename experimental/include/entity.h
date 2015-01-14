@@ -11,6 +11,7 @@
 #include <GLFW/glfw3.h>
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <misc.h>
+#include <boundingbox.h>
 
 namespace Soul { 
 
