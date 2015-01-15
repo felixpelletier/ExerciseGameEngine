@@ -6,6 +6,7 @@
 #include <vector>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
@@ -56,14 +57,16 @@ int main()
 	std::vector<Entity*> entities;
 	Entity floor = Entity(VertexArrayID, "ice.obj");
 	Player player = Player(VertexArrayID, "Snowmobile.obj");
-	for (int o = 0; o < 300; o++){
+	for (int o = 0; o < 25; o++){
 		CollectibleObject* oildrum = new CollectibleObject(VertexArrayID, "oildrum.obj");
 		glm::vec3 ranPos;
-		const float low = -50.0f;
-		const float high = 50.0f;
+		const float low = -100.0f;
+		const float high = 100.0f;
 		ranPos.x = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
+		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
+		oildrum->modelMat = glm::rotate(oildrum->modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
 		oildrum->modelMat = glm::translate(oildrum->modelMat, ranPos);
 		entities.push_back(oildrum);
 	}
@@ -101,7 +104,7 @@ int main()
 
 	std::vector<glm::vec3> tiles;
 
-	makeGrid(&tiles, 18, floor.boundingBox.max.x - floor.boundingBox.min.x);
+	makeGrid(&tiles, 180, floor.boundingBox.max.x - floor.boundingBox.min.x);
 
 	GLuint floorTilePos;
 	glGenBuffers(1, &floorTilePos);
