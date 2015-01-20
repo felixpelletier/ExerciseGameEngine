@@ -2,16 +2,11 @@
 
 namespace Soul { 
 
-unsigned int Entity::counter = 0;
+GraphicsComponent::GraphicsComponent(GLuint VertexArrayID, std::string inputfile){
 
-Entity::Entity(GLuint VertexArrayID, std::string inputfile){
-
-	this->id = this->counter++;
-
-	glBindVertexArray(VertexArrayID);
+	//glBindVertexArray(VertexArrayID);
 
 	inputfile = MODELS_PATH + inputfile;
-	std::vector<tinyobj::shape_t> shapes;
 
 	std::string err = tinyobj::LoadObj(shapes, this->materials, inputfile.c_str(), MODELS_PATH);
 
@@ -39,7 +34,6 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		newmesh.materialId = mesh.material_ids[0];
 		newmesh.indices = mesh.indices.size();
 		
-		// This will identify our vertex buffer
 		glGenBuffers(1, &newmesh.vertexbuffer);
 		glBindBuffer(GL_ARRAY_BUFFER, newmesh.vertexbuffer);
 		glBufferData(GL_ARRAY_BUFFER, mesh.positions.size() * sizeof(float), mesh.positions.data(), GL_STATIC_DRAW);
@@ -52,11 +46,41 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 		glBindBuffer(GL_ARRAY_BUFFER, newmesh.normalbuffer);
 		glBufferData(GL_ARRAY_BUFFER, mesh.normals.size() * sizeof(float), mesh.normals.data(), GL_STATIC_DRAW);
 
-		// Generate a buffer for the indices as well
 		glGenBuffers(1, &newmesh.elementbuffer);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, newmesh.elementbuffer);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh.indices.size() * sizeof(unsigned int), mesh.indices.data() , GL_STATIC_DRAW);
+		
+		this->meshes.push_back(newmesh);
+	}
 
+
+}
+
+InstancedGraphicsComponent::InstancedGraphicsComponent(GLuint VertexArrayID, std::string inputfile, std::vector<glm::vec3> positions)
+: GraphicsComponent(VertexArrayID, inputfile)
+{
+	this->positions = positions;
+
+	glGenBuffers(1, &instPosBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, instPosBuf);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(glm::vec3), positions.data(), GL_STATIC_DRAW);
+	
+}
+
+
+
+
+unsigned int Entity::counter = 0;
+
+Entity::Entity(std::string inputfile){
+
+	this->id = this->counter++;
+	this->graphics = new GraphicsComponent(0, inputfile);
+
+	for (auto &shape : graphics->shapes){
+
+		tinyobj::mesh_t mesh = shape.mesh;
+		
 		for (unsigned int p = 0; p < mesh.positions.size(); p+=3){
 			boundingBox.max.x = std::max(mesh.positions[p], boundingBox.max.x);
 			boundingBox.max.y = std::max(mesh.positions[p+1], boundingBox.max.y);
@@ -66,17 +90,16 @@ Entity::Entity(GLuint VertexArrayID, std::string inputfile){
 			boundingBox.min.y = std::min(mesh.positions[p+1], boundingBox.min.y);
 			boundingBox.min.z = std::min(mesh.positions[p+2], boundingBox.min.z);
 		}
-		
-		this->meshes.push_back(newmesh);
 	}
 
+	
 }
 
 void Entity::collision(Entity* other){
 
 }
 
-CollectibleObject::CollectibleObject(GLuint VertexArrayID, std::string inputfile) : Entity::Entity(VertexArrayID, inputfile){}
+CollectibleObject::CollectibleObject(std::string inputfile) : Entity::Entity(inputfile){}
 
 void CollectibleObject::collision(Entity* other){
 
@@ -84,7 +107,7 @@ void CollectibleObject::collision(Entity* other){
 
 }
 
-Player::Player(GLuint VertexArrayID, std::string inputfile) : Entity::Entity(VertexArrayID, inputfile){}
+Player::Player(std::string inputfile) : Entity::Entity(inputfile){}
 
 void Player::collision(Entity* other){
 
