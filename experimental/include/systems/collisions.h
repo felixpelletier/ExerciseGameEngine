@@ -9,7 +9,8 @@ namespace Soul{
 
 	class CollisionSystem : public System{
 		public:
-			virtual void update (float dt, std::vector<Entity*> entities);
+			CollisionSystem(EntityManager* entityManager);
+			virtual void update (float dt, std::vector<Handle> handles);
 	};
 
 }

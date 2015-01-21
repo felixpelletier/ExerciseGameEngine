@@ -24,14 +24,22 @@ void makeGrid(std::vector<glm::vec3>* list, int size,float tileHalfSize);
 
 int main()
 {
-	GraphicSystem graphics;
-	CollisionSystem collisions;
+	EntityManager entityGod;
+	GraphicSystem graphics = GraphicSystem(&entityGod);
+	CollisionSystem collisions = CollisionSystem(&entityGod);
 
-	std::vector<Entity*> entities;
-	Entity floor = Entity("ice.obj");
-	Player player = Player("Snowmobile.obj");
+	std::vector<Handle> entities;
+
+	Handle h_floor = entityGod.createEntity(Entity::Standard, "ice.obj");
+	Handle h_player = entityGod.createEntity(Entity::Player, "Snowmobile.obj");
+
+	entities.push_back(h_floor);
+	entities.push_back(h_player);
+
+	
 	for (int o = 0; o < 25; o++){
-		CollectibleObject* oildrum = new CollectibleObject("oildrum.obj");
+		Handle h_oildrum = entityGod.createEntity(Entity::Collectible, "oildrum.obj");
+		Entity* oildrum = entityGod.getEntity(h_oildrum);
 		glm::vec3 ranPos;
 		const float low = -100.0f;
 		const float high = 100.0f;
@@ -39,22 +47,16 @@ int main()
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
-		oildrum->graphics->modelMat = glm::rotate(oildrum->graphics->modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
-		oildrum->graphics->modelMat = glm::translate(oildrum->graphics->modelMat, ranPos);
-		entities.push_back(oildrum);
+		oildrum->graphics.modelMat = glm::rotate(oildrum->graphics.modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
+		oildrum->graphics.modelMat = glm::translate(oildrum->graphics.modelMat, ranPos);
+		entities.push_back(h_oildrum);
 	}
-	//entities.push_back(&skybox);
-	//Entity skybox = loadModel(VertexArrayID, "skybox.obj");
-	// Create and compile our GLSL program from the shaders
-
+	
 	std::vector<glm::vec3> tiles;
 
-	makeGrid(&tiles, 180, floor.boundingBox.max.x - floor.boundingBox.min.x);
+	//makeGrid(&tiles, 180, floor.boundingBox.max.x - floor.boundingBox.min.x);
 
-	floor.graphics = new InstancedGraphicsComponent(0, "ice.obj",tiles);//this is ugly as fuck, but temporary
-
-	entities.push_back(&player);
-	entities.push_back(&floor);
+	//floor.graphics = InstancedGraphicsComponent(0, "ice.obj",tiles);//this is ugly as fuck, but temporary
 
 	double lastTime = glfwGetTime();
 	
@@ -63,6 +65,7 @@ int main()
 	float speed = 0.0f;
 
 	do{
+		Entity* player = entityGod.getEntity(h_player);
 		double currentTime = glfwGetTime();
 		float dt = float(currentTime - lastTime);
 		lastTime = currentTime;
@@ -101,7 +104,7 @@ int main()
 		playerMat = glm::translate(playerMat, position);
 		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		player.graphics->modelMat = playerMat;
+		player->graphics.modelMat = playerMat;
 
 		collisions.update(dt, entities);
 
@@ -115,7 +118,6 @@ int main()
 		    position, // and looks at the origin
 		    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
-
 
 		graphics.update(dt, entities);
 

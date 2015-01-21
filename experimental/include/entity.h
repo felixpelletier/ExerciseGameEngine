@@ -2,6 +2,7 @@
 #define SOUL_ENTITY
 
 #include <config.h>
+#include <cstdint>
 #include <vector>
 #include <cstring>
 #include <string>
@@ -17,19 +18,15 @@
 namespace Soul { 
 
 class GraphicsComponent{
-	public:
-		enum GraphicComponentType {Simple, Instanced}; 
+	public : enum GraphicComponentType {Simple, Instanced}; 
 	
 	protected:
 		static const GraphicComponentType type = Simple;
 	public:
 		virtual GraphicComponentType getType() { return type; };
 		GraphicsComponent() {};
-		GraphicsComponent(GLuint VertexArrayID, std::string inputfile);
-		std::vector<Mesh> meshes;
-		std::vector<tinyobj::material_t> materials;
-		std::vector<Texture> textures;
-		std::vector<tinyobj::shape_t> shapes;
+		GraphicsComponent(Model model);
+		Model model;
 		glm::mat4 modelMat;
 
 };
@@ -38,7 +35,7 @@ class InstancedGraphicsComponent : public GraphicsComponent{
 		static const GraphicComponentType type = Instanced;
 	public:
 		InstancedGraphicsComponent() {};
-		InstancedGraphicsComponent(GLuint VertexArrayID, std::string inputfile, std::vector<glm::vec3> positions);
+		InstancedGraphicsComponent(Model model, std::vector<glm::vec3> positions);
 		std::vector<glm::vec3> positions;
 		GLuint instPosBuf;
 		unsigned getInstanceCount() {return positions.size();};
@@ -46,15 +43,18 @@ class InstancedGraphicsComponent : public GraphicsComponent{
 };
 
 class Entity{
+	public: 
+		enum Type{
+			Standard, Collectible, Player
+		};
 	private:
-		static unsigned int counter;
 		int id;
 		bool collidable = false;
 	public:
 		bool visible = true;
-		Entity (std::string inputfile);
+		Entity (GraphicsComponent graphics);
 		//static Entity::createEntity;
-		GraphicsComponent* graphics;
+		GraphicsComponent graphics;
 		BoundingBox boundingBox;
 		virtual bool isCollidable() {return collidable;};
 		virtual void collision(Entity* other); 
@@ -66,7 +66,7 @@ class CollectibleObject : public Entity{
 		int points = 100;
 		bool collidable = true;
 	public:
-		CollectibleObject(std::string inputfile);
+		CollectibleObject(GraphicsComponent graphics);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
@@ -80,11 +80,49 @@ class Player : public Entity{
 		int points = 0;
 
 	public:
-		Player(std::string inputfile);
+		Player(GraphicsComponent graphics);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
 
+};
+
+struct Handle
+{
+    Handle() : m_index(0), m_counter(0), m_type(0)
+    {}
+
+    Handle(uint32_t index, uint32_t counter, uint32_t type)
+        : m_index(index), m_counter(counter), m_type(type)
+    {}
+
+    inline operator uint32_t() const;
+    
+    uint32_t m_index : 12;
+    uint32_t m_counter : 15;
+    uint32_t m_type : 5;
+};
+
+Handle::operator uint32_t() const
+{
+    return m_type << 27 | m_counter << 12 | m_index;
+}
+
+
+class EntityManager{
+
+	std::vector<Entity> entities;
+//	std::vector<Mesh> meshes;
+//	std::vector<tinyobj::material_t> materials;
+//	std::vector<Texture> textures;
+//	std::vector<tinyobj::shape_t> shapes;
+
+	Model loadModel(std::string inputfile);
+
+	public:
+		Entity* getEntity(Handle handle);
+		Handle createEntity(Entity::Type type, std::string modelPath);
+	
 };
 
 }

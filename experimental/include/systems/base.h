@@ -3,8 +3,11 @@
 namespace Soul{
 	class System{
 
+		protected:
+			EntityManager* entityManager;
 		public:
-			virtual void update (float dt, std::vector<Entity*> entities) = 0;
+			System(EntityManager* entityManager) {this->entityManager = entityManager;};
+			virtual void update (float dt, std::vector<Handle> handles) = 0;
 
 	};
 }

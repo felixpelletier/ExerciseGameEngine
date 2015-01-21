@@ -33,6 +33,7 @@ struct Light{
 	glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
 };
 
+
 struct Mesh{
 	GLuint vertexbuffer;
 	GLuint uvbuffer;
@@ -85,6 +86,8 @@ struct Mesh{
 
 };
 
+
+
 struct Texture{
 	GLuint diffuse;
 	GLuint normal;
@@ -103,6 +106,12 @@ struct Texture{
 
 		return true;
 	}
+};
+
+struct Model{
+	std::vector<Mesh> meshes;
+	std::vector<Texture> textures;
+	std::vector<tinyobj::shape_t> shapes;
 };
 
 }

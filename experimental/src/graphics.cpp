@@ -2,7 +2,7 @@
 
 namespace Soul{
 
-GraphicSystem::GraphicSystem(){
+GraphicSystem::GraphicSystem(EntityManager* entityManager) : System(entityManager){
 	window = initWindow(this->winWidth, this->winHeight);
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -57,7 +57,7 @@ GraphicSystem::GraphicSystem(){
 
 }
 
-void GraphicSystem::update(float dt, std::vector<Entity*> entities){
+void GraphicSystem::update(float dt, std::vector<Handle> handles){
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		// For each model you render, since the MVP will be different (at least the M part)
@@ -67,12 +67,15 @@ void GraphicSystem::update(float dt, std::vector<Entity*> entities){
 		glUniform3fv(this->s_lightdir, 1, &this->light.direction[0]);
 		glUniform3fv(this->s_lightcolor, 1, &this->light.color[0]);
 
+
+
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
 		glUseProgram(this->programID);
 
-		for (auto const &entity : entities){
+		for (auto const &handle : handles){
 
+			Entity* entity = this->entityManager->getEntity(handle);
 			if(entity->visible) this->drawEntity(entity);
 
 		}
@@ -122,10 +125,10 @@ GLFWwindow* GraphicSystem::initWindow(int width, int height){
 
 void GraphicSystem::drawEntity(Entity* entity){
 
-	GraphicsComponent* graph = entity->graphics;
+	GraphicsComponent* graph = &entity->graphics;
 	
 	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph->modelMat[0][0]);
-	for (auto const &mesh : graph->meshes){
+	for (auto const &mesh : graph->model.meshes){
 
 		this->drawMesh(graph, mesh);	
 		
@@ -133,7 +136,7 @@ void GraphicSystem::drawEntity(Entity* entity){
 }
 
 void GraphicSystem::drawMesh(GraphicsComponent* graph, const Mesh& mesh){
-	struct Texture texture = graph->textures[mesh.materialId];
+	struct Texture texture = graph->model.textures[mesh.materialId];
 			
 	texture.bind(this->DiffuseTexID, this->NormalTexID);
 	mesh.bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	

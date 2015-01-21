@@ -52,11 +52,11 @@ namespace Soul{
 		void drawMesh(GraphicsComponent* graph,const Mesh& mesh);
 
 		public:
-			GraphicSystem();
+			GraphicSystem(EntityManager* entityManager);
 			GLFWwindow* window;
 			glm::vec3 cameraPos;
 			glm::mat4 viewMat;
-			virtual void update (float dt, std::vector<Entity*> entities);
+			virtual void update (float dt, std::vector<Handle> handles);
 			
 	};
 
