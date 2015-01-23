@@ -122,8 +122,6 @@ int main()
 
 		graphics.update(dt, entities);
 
-		std::cout << "Not crashed yet" << std::endl;
-
 	 
 	} // Check if the ESC key was pressed or the window was closed
 	while( glfwGetKey(graphics.window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
