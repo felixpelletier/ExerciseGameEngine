@@ -2,13 +2,13 @@
 
 namespace Soul { 
 
-GraphicsComponent::GraphicsComponent(Model model){
+GraphicsComponent::GraphicsComponent(ModelInstance model){
 
 	this->model = model;
 
 }
 
-InstancedGraphicsComponent::InstancedGraphicsComponent(Model model, std::vector<glm::vec3> positions)
+InstancedGraphicsComponent::InstancedGraphicsComponent(ModelInstance model, std::vector<glm::vec3> positions)
 : GraphicsComponent(model)
 {
 	this->positions = positions;
@@ -24,11 +24,11 @@ InstancedGraphicsComponent::InstancedGraphicsComponent(Model model, std::vector<
 
 //unsigned int Entity::counter = 0;
 
-Entity::Entity(GraphicsComponent graphics){
+Entity::Entity(GraphicsComponent graphics, ModelManager modelManager){
 
 	this->graphics = graphics;
 
-	for (auto &shape : this->graphics.model.shapes){
+	for (auto &shape : modelManager.getModel(this->graphics.model.model)->shapes){
 
 		tinyobj::mesh_t mesh = shape.mesh;
 		
@@ -50,7 +50,7 @@ void Entity::collision(Entity* other){
 
 }
 
-CollectibleObject::CollectibleObject(GraphicsComponent graphics) : Entity::Entity(graphics){}
+CollectibleObject::CollectibleObject(GraphicsComponent graphics, ModelManager modelManager) : Entity::Entity(graphics, modelManager){}
 
 void CollectibleObject::collision(Entity* other){
 
@@ -58,7 +58,7 @@ void CollectibleObject::collision(Entity* other){
 
 }
 
-Player::Player(GraphicsComponent graphics) : Entity::Entity(graphics){}
+Player::Player(GraphicsComponent graphics, ModelManager modelManager) : Entity::Entity(graphics, modelManager){}
 
 void Player::collision(Entity* other){
 
@@ -75,9 +75,10 @@ Entity* EntityManager::getEntity(Handle handle){
 
 Handle EntityManager::createEntity(Entity::Type type, std::string modelPath){
 
-	Model model = this->loadModel(modelPath);
-	GraphicsComponent graphics = GraphicsComponent(model);
-	Entity entity = Entity(graphics);
+	int model = modelManager.loadModel(modelPath);
+	ModelInstance modelInstance = ModelInstance(model);
+	GraphicsComponent graphics = GraphicsComponent(modelInstance);
+	Entity entity = Entity(graphics, this->modelManager);
 
 	this->entities.push_back(entity);
 	Handle handle = Handle(this->entities.size()-1, 0, type);
@@ -85,8 +86,42 @@ Handle EntityManager::createEntity(Entity::Type type, std::string modelPath){
 
 }
 
-Model EntityManager::loadModel(std::string inputfile){
-	//glBindVertexArray(VertexArrayID);
+GLuint TextureManager::getTexture(std::string name){
+
+	auto i_texture = textures.find(name);
+	if (i_texture == textures.end()){
+		return loadTexture(name);	
+	}
+	else{
+		return (*i_texture).second;
+	}
+}
+
+GLuint TextureManager::loadTexture(std::string path){
+
+	GLuint texture = loadDDS(path);
+
+	textures.insert(std::pair<std::string, GLuint>(path, texture)); 
+	
+	return texture;
+}
+
+int ModelManager::loadModel(std::string name){
+
+	auto i_model = models_n.find(name);
+	if (i_model == models_n.end()){
+		return _loadModel(name);	
+	}
+	else{
+		return (*i_model).second;
+	}
+}
+
+Model* ModelManager::getModel(int index){
+	return &models[index];
+}
+
+int ModelManager::_loadModel(std::string inputfile){
 
 	Model model;
 
@@ -106,7 +141,7 @@ Model EntityManager::loadModel(std::string inputfile){
 
 	for (auto &material : materials){
 		 struct Texture texture;
-		 texture.diffuse = loadDDS(material.diffuse_texname);
+		 texture.diffuse = loadDDS(material.diffuse_texname); //Shall be changed
 		 texture.normal = loadDDS(material.normal_texname);
 		 model.textures.push_back(texture);
 	}
@@ -139,7 +174,10 @@ Model EntityManager::loadModel(std::string inputfile){
 		model.meshes.push_back(newmesh);
 	}
 
-	return model;
+	models.push_back(model);
+	models_n.insert(std::pair<std::string, int>(inputfile, models.size() - 1)); 
+	
+	return models.size() - 1; 
 
 }
 

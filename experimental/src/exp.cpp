@@ -37,7 +37,7 @@ int main()
 	entities.push_back(h_player);
 
 	
-	for (int o = 0; o < 25; o++){
+	for (int o = 0; o < 50; o++){
 		Handle h_oildrum = entityGod.createEntity(Entity::Collectible, "oildrum.obj");
 		Entity* oildrum = entityGod.getEntity(h_oildrum);
 		glm::vec3 ranPos;
@@ -47,8 +47,8 @@ int main()
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
-		oildrum->graphics.modelMat = glm::rotate(oildrum->graphics.modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
-		oildrum->graphics.modelMat = glm::translate(oildrum->graphics.modelMat, ranPos);
+		oildrum->graphics.model.modelMat = glm::rotate(oildrum->graphics.model.modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
+		oildrum->graphics.model.modelMat = glm::translate(oildrum->graphics.model.modelMat, ranPos);
 		entities.push_back(h_oildrum);
 	}
 	
@@ -70,7 +70,7 @@ int main()
 		float dt = float(currentTime - lastTime);
 		lastTime = currentTime;
 		
-		if (1/dt < 55) std::cout << 1/dt << " FPS\n";
+		if (1/dt < 55) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
 
 		float speedBoost = 6.0f;
 		float orientationDampen = 0.2f;
@@ -104,7 +104,7 @@ int main()
 		playerMat = glm::translate(playerMat, position);
 		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		player->graphics.modelMat = playerMat;
+		player->graphics.model.modelMat = playerMat;
 
 		collisions.update(dt, entities);
 
@@ -119,7 +119,10 @@ int main()
 		    glm::vec3(0.0f,1.0f,0.0f)  // Head is up (set to 0,-1,0 to look upside-down)
 		);
 
+
 		graphics.update(dt, entities);
+
+		std::cout << "Not crashed yet" << std::endl;
 
 	 
 	} // Check if the ESC key was pressed or the window was closed

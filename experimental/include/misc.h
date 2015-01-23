@@ -108,12 +108,6 @@ struct Texture{
 	}
 };
 
-struct Model{
-	std::vector<Mesh> meshes;
-	std::vector<Texture> textures;
-	std::vector<tinyobj::shape_t> shapes;
-};
-
 }
 
 

@@ -54,7 +54,6 @@ GraphicSystem::GraphicSystem(EntityManager* entityManager) : System(entityManage
 	// Dark blue background
 	glClearColor(0.6f, 0.6f, 0.65f, 0.0f);
 
-
 }
 
 void GraphicSystem::update(float dt, std::vector<Handle> handles){
@@ -66,8 +65,6 @@ void GraphicSystem::update(float dt, std::vector<Handle> handles){
 		glUniform3fv(this->s_lightpos, 1, &this->light.position[0]);
 		glUniform3fv(this->s_lightdir, 1, &this->light.direction[0]);
 		glUniform3fv(this->s_lightcolor, 1, &this->light.color[0]);
-
-
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
@@ -127,8 +124,8 @@ void GraphicSystem::drawEntity(Entity* entity){
 
 	GraphicsComponent* graph = &entity->graphics;
 	
-	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph->modelMat[0][0]);
-	for (auto const &mesh : graph->model.meshes){
+	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph->model.modelMat[0][0]);
+	for (auto const &mesh : entityManager->modelManager.getModel(graph->model.model)->meshes){
 
 		this->drawMesh(graph, mesh);	
 		
@@ -136,7 +133,8 @@ void GraphicSystem::drawEntity(Entity* entity){
 }
 
 void GraphicSystem::drawMesh(GraphicsComponent* graph, const Mesh& mesh){
-	struct Texture texture = graph->model.textures[mesh.materialId];
+	
+	struct Texture texture = entityManager->modelManager.getModel(graph->model.model)->textures[mesh.materialId];
 			
 	texture.bind(this->DiffuseTexID, this->NormalTexID);
 	mesh.bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	

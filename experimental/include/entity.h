@@ -4,6 +4,7 @@
 #include <config.h>
 #include <cstdint>
 #include <vector>
+#include <map>
 #include <cstring>
 #include <string>
 #include <iostream>
@@ -14,6 +15,8 @@
 #include <tinyobjloader/tiny_obj_loader.h>
 #include <misc.h>
 #include <boundingbox.h>
+#include <model.h>
+
 
 namespace Soul { 
 
@@ -25,9 +28,9 @@ class GraphicsComponent{
 	public:
 		virtual GraphicComponentType getType() { return type; };
 		GraphicsComponent() {};
-		GraphicsComponent(Model model);
-		Model model;
-		glm::mat4 modelMat;
+		GraphicsComponent(ModelInstance model);
+		ModelInstance model;
+
 
 };
 
@@ -35,12 +38,21 @@ class InstancedGraphicsComponent : public GraphicsComponent{
 		static const GraphicComponentType type = Instanced;
 	public:
 		InstancedGraphicsComponent() {};
-		InstancedGraphicsComponent(Model model, std::vector<glm::vec3> positions);
+		InstancedGraphicsComponent(ModelInstance model, std::vector<glm::vec3> positions);
 		std::vector<glm::vec3> positions;
 		GLuint instPosBuf;
 		unsigned getInstanceCount() {return positions.size();};
 		virtual GraphicComponentType getType() { return type; };
 };
+
+class ModelManager{
+	std::map<std::string, GLuint> models_n;
+	std::vector<Model> models;
+	int _loadModel(std::string path);
+	public:
+		int loadModel(std::string name);
+		Model* getModel(int index);
+}; //This should be down with Texture Manager
 
 class Entity{
 	public: 
@@ -52,7 +64,7 @@ class Entity{
 		bool collidable = false;
 	public:
 		bool visible = true;
-		Entity (GraphicsComponent graphics);
+		Entity (GraphicsComponent graphics, ModelManager modelManager); //Do not pass modelManager
 		//static Entity::createEntity;
 		GraphicsComponent graphics;
 		BoundingBox boundingBox;
@@ -66,7 +78,7 @@ class CollectibleObject : public Entity{
 		int points = 100;
 		bool collidable = true;
 	public:
-		CollectibleObject(GraphicsComponent graphics);
+		CollectibleObject(GraphicsComponent graphics, ModelManager modelManager);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
@@ -80,7 +92,7 @@ class Player : public Entity{
 		int points = 0;
 
 	public:
-		Player(GraphicsComponent graphics);
+		Player(GraphicsComponent graphics, ModelManager modelManager);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
@@ -108,6 +120,14 @@ Handle::operator uint32_t() const
     return m_type << 27 | m_counter << 12 | m_index;
 }
 
+class TextureManager{
+	std::map<std::string, GLuint> textures;
+	GLuint loadTexture(std::string path);
+	public:
+		GLuint getTexture(std::string name);
+};
+
+
 
 class EntityManager{
 
@@ -117,9 +137,10 @@ class EntityManager{
 //	std::vector<Texture> textures;
 //	std::vector<tinyobj::shape_t> shapes;
 
-	Model loadModel(std::string inputfile);
+	TextureManager textureManager;
 
 	public:
+		ModelManager modelManager;
 		Entity* getEntity(Handle handle);
 		Handle createEntity(Entity::Type type, std::string modelPath);
 	
