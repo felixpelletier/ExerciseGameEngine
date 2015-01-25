@@ -19,16 +19,9 @@ InstancedGraphicsComponent::InstancedGraphicsComponent(ModelInstance model, std:
 	
 }
 
+CollisionComponent::CollisionComponent(Model* model){
 
-
-
-//unsigned int Entity::counter = 0;
-
-Entity::Entity(GraphicsComponent graphics, ModelManager modelManager){
-
-	this->graphics = graphics;
-
-	for (auto &shape : modelManager.getModel(this->graphics.model.model)->shapes){
+	for (auto &shape : model->shapes){
 
 		tinyobj::mesh_t mesh = shape.mesh;
 		
@@ -43,14 +36,19 @@ Entity::Entity(GraphicsComponent graphics, ModelManager modelManager){
 		}
 	}
 
-	
+}
+
+Entity::Entity(GraphicsComponent graphics, CollisionComponent collisions){
+
+	this->graphics = graphics;
+	this->collisions = collisions;
 }
 
 void Entity::collision(Entity* other){
 
 }
 
-CollectibleObject::CollectibleObject(GraphicsComponent graphics, ModelManager modelManager) : Entity::Entity(graphics, modelManager){}
+CollectibleObject::CollectibleObject(GraphicsComponent graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
 
 void CollectibleObject::collision(Entity* other){
 
@@ -58,7 +56,7 @@ void CollectibleObject::collision(Entity* other){
 
 }
 
-Player::Player(GraphicsComponent graphics, ModelManager modelManager) : Entity::Entity(graphics, modelManager){}
+Player::Player(GraphicsComponent graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
 
 void Player::collision(Entity* other){
 
@@ -78,7 +76,8 @@ Handle EntityManager::createEntity(Entity::Type type, std::string modelPath){
 	int model = modelManager.loadModel(modelPath);
 	ModelInstance modelInstance = ModelInstance(model);
 	GraphicsComponent graphics = GraphicsComponent(modelInstance);
-	Entity entity = Entity(graphics, this->modelManager);
+	CollisionComponent collisions = CollisionComponent(modelManager.getModel(model));
+	Entity entity = Entity(graphics, collisions);
 
 	this->entities.push_back(entity);
 	Handle handle = Handle(this->entities.size()-1, 0, type);
@@ -141,8 +140,8 @@ int ModelManager::_loadModel(std::string inputfile){
 
 	for (auto &material : materials){
 		 struct Texture texture;
-		 texture.diffuse = loadDDS(material.diffuse_texname); //Shall be changed
-		 texture.normal = loadDDS(material.normal_texname);
+		 texture.diffuse = this->textureManager.getTexture(material.diffuse_texname); //Shall be changed
+		 texture.normal = this->textureManager.getTexture(material.normal_texname);
 		 model.textures.push_back(texture);
 	}
 

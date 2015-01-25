@@ -45,14 +45,15 @@ class InstancedGraphicsComponent : public GraphicsComponent{
 		virtual GraphicComponentType getType() { return type; };
 };
 
-class ModelManager{
-	std::map<std::string, GLuint> models_n;
-	std::vector<Model> models;
-	int _loadModel(std::string path);
+class CollisionComponent{
+	private:
+		BoundingBox boundingBox;
 	public:
-		int loadModel(std::string name);
-		Model* getModel(int index);
-}; //This should be down with Texture Manager
+		CollisionComponent(){};
+		CollisionComponent(Model* model);
+		BoundingBox getBoundingBox(){return boundingBox;};
+
+};
 
 class Entity{
 	public: 
@@ -64,10 +65,9 @@ class Entity{
 		bool collidable = false;
 	public:
 		bool visible = true;
-		Entity (GraphicsComponent graphics, ModelManager modelManager); //Do not pass modelManager
-		//static Entity::createEntity;
+		Entity (GraphicsComponent graphics, CollisionComponent collisions); 
 		GraphicsComponent graphics;
-		BoundingBox boundingBox;
+		CollisionComponent collisions;
 		virtual bool isCollidable() {return collidable;};
 		virtual void collision(Entity* other); 
 };
@@ -78,7 +78,7 @@ class CollectibleObject : public Entity{
 		int points = 100;
 		bool collidable = true;
 	public:
-		CollectibleObject(GraphicsComponent graphics, ModelManager modelManager);
+		CollectibleObject(GraphicsComponent graphics, CollisionComponent collisions);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
@@ -92,7 +92,7 @@ class Player : public Entity{
 		int points = 0;
 
 	public:
-		Player(GraphicsComponent graphics, ModelManager modelManager);
+		Player(GraphicsComponent graphics, CollisionComponent collisions);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };
@@ -127,17 +127,19 @@ class TextureManager{
 		GLuint getTexture(std::string name);
 };
 
-
+class ModelManager{
+	std::map<std::string, GLuint> models_n;
+	std::vector<Model> models;
+	int _loadModel(std::string path);
+	TextureManager textureManager;
+	public:
+		int loadModel(std::string name);
+		Model* getModel(int index);
+}; 
 
 class EntityManager{
 
 	std::vector<Entity> entities;
-//	std::vector<Mesh> meshes;
-//	std::vector<tinyobj::material_t> materials;
-//	std::vector<Texture> textures;
-//	std::vector<tinyobj::shape_t> shapes;
-
-	TextureManager textureManager;
 
 	public:
 		ModelManager modelManager;
