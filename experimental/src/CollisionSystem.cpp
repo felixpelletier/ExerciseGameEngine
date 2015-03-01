@@ -1,9 +1,9 @@
-#include <systems/collisions.h>
+#include "systems/CollisionSystem.h"
 
 namespace Soul{
 
 CollisionSystem::CollisionSystem(EntityManager* entityManager) : System(entityManager){}
-void CollisionSystem::update(float dt, std::vector<Handle> handles){
+void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 
 	for (auto &handle1 : handles){
 		Entity* entity1 = this->entityManager->getEntity(handle1);

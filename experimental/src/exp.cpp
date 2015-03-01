@@ -10,10 +10,12 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <misc.h>
-#include <entity.h>
-#include <systems/graphics.h>
-#include <systems/collisions.h>
+#include "misc.h"
+#include "Entity.h"
+#include "Light.h"
+#include "Entity.h"
+#include "systems/GraphicSystem.h"
+#include "systems/CollisionSystem.h"
 #include <random>
 
 //#include <ScriptEngine.h>

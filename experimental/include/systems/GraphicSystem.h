@@ -8,8 +8,9 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <entity.h>
-#include <systems/base.h>
+#include "Entity.h"
+#include "systems/System.h"
+#include "Light.h"
 
 
 namespace Soul{
@@ -56,7 +57,7 @@ namespace Soul{
 			GLFWwindow* window;
 			glm::vec3 cameraPos;
 			glm::mat4 viewMat;
-			virtual void update (float dt, std::vector<Handle> handles);
+			virtual void update (float dt, std::vector<Handle> &handles);
 			
 	};
 

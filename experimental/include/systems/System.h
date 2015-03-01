@@ -1,5 +1,9 @@
 #pragma once
 
+#include "EntityManager.h"
+#include "Handle.h"
+#include <vector> 
+
 namespace Soul{
 	class System{
 
@@ -7,7 +11,7 @@ namespace Soul{
 			EntityManager* entityManager;
 		public:
 			System(EntityManager* entityManager) {this->entityManager = entityManager;};
-			virtual void update (float dt, std::vector<Handle> handles) = 0;
+			virtual void update (float dt, std::vector<Handle> &handles) = 0;
 
 	};
 }

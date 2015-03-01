@@ -1,4 +1,5 @@
-#include <systems/graphics.h>
+#include "systems/GraphicSystem.h"
+#include "InstancedGraphicsComponent.h"
 
 namespace Soul{
 
@@ -56,7 +57,7 @@ GraphicSystem::GraphicSystem(EntityManager* entityManager) : System(entityManage
 
 }
 
-void GraphicSystem::update(float dt, std::vector<Handle> handles){
+void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		// For each model you render, since the MVP will be different (at least the M part)
