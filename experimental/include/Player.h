@@ -13,7 +13,7 @@ class Player : public Entity{
 		int points = 0;
 
 	public:
-		Player(GraphicsComponent graphics, CollisionComponent collisions);
+		Player(Handle graphics, CollisionComponent collisions);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };

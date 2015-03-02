@@ -3,7 +3,7 @@
 namespace Soul { 
 
 
-Entity::Entity(GraphicsComponent graphics, CollisionComponent collisions){
+Entity::Entity(Handle graphics, CollisionComponent collisions){
 
 	this->graphics = graphics;
 	this->collisions = collisions;

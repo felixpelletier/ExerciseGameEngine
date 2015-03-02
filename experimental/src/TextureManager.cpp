@@ -1,7 +1,6 @@
 #include "TextureManager.h"
 #include <GL/glew.h>
 #include "misc.h"
-#include "InstancedGraphicsComponent.h"
 
 namespace Soul{
 

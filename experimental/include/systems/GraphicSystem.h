@@ -9,8 +9,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include "Entity.h"
+#include "GraphicsComponent.h"
 #include "systems/System.h"
 #include "Light.h"
+#include "ModelManager.h"
 
 
 namespace Soul{
@@ -46,18 +48,24 @@ namespace Soul{
 
 		Light light;
 
-		void drawEntity(Entity* entity);
+		void drawComponent(const GraphicsComponent& graph);
 
-		void drawMeshSimple(const Mesh& mesh);
-		void drawMeshInstanced(GraphicsComponent* graph, const Mesh& mesh);
-		void drawMesh(GraphicsComponent* graph,const Mesh& mesh);
+		void drawMeshSimple(Mesh* mesh);
+		void drawMesh(const GraphicsComponent& graph,Mesh* mesh);
+
+		std::vector<GraphicsComponent> components;
+
+		ModelManager modelManager;
 
 		public:
-			GraphicSystem(EntityManager* entityManager);
+			GraphicSystem();
 			GLFWwindow* window;
 			glm::vec3 cameraPos;
 			glm::mat4 viewMat;
 			virtual void update (float dt, std::vector<Handle> &handles);
+			Handle addComponent(GraphicsComponent component);
+			GraphicsComponent* getComponent(Handle handle);
+			ModelManager* getModelManager(){return &modelManager;};
 			
 	};
 

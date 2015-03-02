@@ -14,6 +14,8 @@
 #include "Entity.h"
 #include "Light.h"
 #include "Entity.h"
+#include "EntityManager.h"
+#include "GraphicsComponent.h"
 #include "systems/GraphicSystem.h"
 #include "systems/CollisionSystem.h"
 #include <random>
@@ -26,18 +28,16 @@ void makeGrid(std::vector<glm::vec3>* list, int size,float tileHalfSize);
 
 int main()
 {
-	EntityManager entityGod;
-	GraphicSystem graphics = GraphicSystem(&entityGod);
-	CollisionSystem collisions = CollisionSystem(&entityGod);
+	GraphicSystem graphics = GraphicSystem();
+	CollisionSystem collisions = CollisionSystem();
+	EntityManager entityGod = EntityManager(&graphics);
 
 	std::vector<Handle> entities;
 
 	Handle h_floor = entityGod.createEntity(Entity::Standard, "ice.obj");
 	Handle h_player = entityGod.createEntity(Entity::Player, "Snowmobile.obj");
 
-	entities.push_back(h_floor);
 	entities.push_back(h_player);
-
 	
 	for (int o = 0; o < 50; o++){
 		Handle h_oildrum = entityGod.createEntity(Entity::Collectible, "oildrum.obj");
@@ -49,14 +49,26 @@ int main()
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
-		oildrum->graphics.model.modelMat = glm::rotate(oildrum->graphics.model.modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
-		oildrum->graphics.model.modelMat = glm::translate(oildrum->graphics.model.modelMat, ranPos);
+		GraphicsComponent* g_oildrum = graphics.getComponent(oildrum->graphics);
+		g_oildrum->modelMat = glm::rotate(g_oildrum->modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
+		g_oildrum->modelMat = glm::translate(g_oildrum->modelMat, ranPos);
 		entities.push_back(h_oildrum);
 	}
 	
 	std::vector<glm::vec3> tiles;
 
-	//makeGrid(&tiles, 180, floor.boundingBox.max.x - floor.boundingBox.min.x);
+	BoundingBox floorBox = entityGod.getEntity(h_floor)->collisions.getBoundingBox();
+	makeGrid(&tiles, 5, floorBox.max.x - floorBox.min.x);
+
+	for (auto &tile_pos : tiles){
+
+		Handle h_tile = entityGod.createEntity(Entity::Standard, "ice.obj");
+		Entity* e_tile = entityGod.getEntity(h_tile);
+		std::cout << tile_pos.x << " " << tile_pos.z << std::endl;
+		GraphicsComponent* g_tile = graphics.getComponent(e_tile->graphics);
+		g_tile->modelMat = glm::translate(g_tile->modelMat, tile_pos);
+		entities.push_back(h_tile);
+	}
 
 	//floor.graphics = InstancedGraphicsComponent(0, "ice.obj",tiles);//this is ugly as fuck, but temporary
 
@@ -106,7 +118,8 @@ int main()
 		playerMat = glm::translate(playerMat, position);
 		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
-		player->graphics.model.modelMat = playerMat;
+		GraphicsComponent* g_player = graphics.getComponent(player->graphics);
+		g_player->modelMat = playerMat;
 
 		collisions.update(dt, entities);
 

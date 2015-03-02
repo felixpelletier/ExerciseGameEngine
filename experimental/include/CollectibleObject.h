@@ -10,7 +10,7 @@ class CollectibleObject : public Entity{
 		int points = 100;
 		bool collidable = true;
 	public:
-		CollectibleObject(GraphicsComponent graphics, CollisionComponent collisions);
+		CollectibleObject(Handle graphics, CollisionComponent collisions);
 		virtual void collision(Entity* other);
 		virtual bool isCollidable() {return collidable;};
 		int getPoints(){ return points; };

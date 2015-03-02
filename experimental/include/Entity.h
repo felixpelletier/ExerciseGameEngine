@@ -13,10 +13,11 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include <tinyobjloader/tiny_obj_loader.h>
-#include <misc.h>
+#include "misc.h"
 
 #include "GraphicsComponent.h"
 #include "CollisionComponent.h"
+#include "Handle.h"
 
 namespace Soul { 
 
@@ -30,8 +31,8 @@ class Entity{
 		bool collidable = false;
 	public:
 		bool visible = true;
-		Entity (GraphicsComponent graphics, CollisionComponent collisions); 
-		GraphicsComponent graphics;
+		Entity (Handle graphics, CollisionComponent collisions); 
+		Handle graphics;
 		CollisionComponent collisions;
 		virtual bool isCollidable() {return collidable;};
 		virtual void collision(Entity* other); 

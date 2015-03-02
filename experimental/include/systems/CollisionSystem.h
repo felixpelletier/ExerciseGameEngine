@@ -11,7 +11,7 @@ namespace Soul{
 
 	class CollisionSystem : public System{
 		public:
-			CollisionSystem(EntityManager* entityManager);
+			CollisionSystem();
 			virtual void update (float dt, std::vector<Handle> &handles);
 	};
 

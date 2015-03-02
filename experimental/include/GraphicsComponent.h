@@ -5,16 +5,11 @@
 namespace Soul{
 
 class GraphicsComponent{
-	public : enum GraphicComponentType {Simple, Instanced}; 
-	
-	protected:
-		static const GraphicComponentType type = Simple;
 	public:
-		virtual GraphicComponentType getType() { return type; };
+		glm::mat4 modelMat;
+		int model_id;
 		GraphicsComponent() {};
-		GraphicsComponent(ModelInstance model);
-		ModelInstance model;
-
+		GraphicsComponent(int model);
 
 };
 

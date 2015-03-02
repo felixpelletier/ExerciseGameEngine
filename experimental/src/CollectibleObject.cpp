@@ -2,7 +2,7 @@
 
 namespace Soul{
 
-CollectibleObject::CollectibleObject(GraphicsComponent graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
+CollectibleObject::CollectibleObject(Handle graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
 
 void CollectibleObject::collision(Entity* other){
 

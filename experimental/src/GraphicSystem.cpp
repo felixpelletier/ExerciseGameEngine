@@ -1,9 +1,8 @@
 #include "systems/GraphicSystem.h"
-#include "InstancedGraphicsComponent.h"
 
 namespace Soul{
 
-GraphicSystem::GraphicSystem(EntityManager* entityManager) : System(entityManager){
+GraphicSystem::GraphicSystem() : System(){
 	window = initWindow(this->winWidth, this->winHeight);
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
@@ -19,7 +18,7 @@ GraphicSystem::GraphicSystem(EntityManager* entityManager) : System(entityManage
 	    (float) winWidth,
 	    (float) winHeight, // Aspect Ratio. Depends on the size of your window. Notice that 4/3 == 800/600 == 1280/960, sounds familiar ?
 	    0.1f,        // Near clipping plane. Keep as big as possible, or you'll get precision issues.
-	    500.0f       // Far clipping plane. Keep as little as possible.
+	    200.0f       // Far clipping plane. Keep as little as possible.
 	);
 
 	glGenVertexArrays(1, &this->VertexArrayID);
@@ -71,10 +70,9 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Use our shader
 		glUseProgram(this->programID);
 
-		for (auto const &handle : handles){
+		for (auto const &component : components){
 
-			Entity* entity = this->entityManager->getEntity(handle);
-			if(entity->visible) this->drawEntity(entity);
+			this->drawComponent(component);
 
 		}
 
@@ -85,6 +83,19 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+}
+
+GraphicsComponent* GraphicSystem::getComponent(Handle handle){
+	return &components[handle.m_index];
+}
+
+Handle GraphicSystem::addComponent(GraphicsComponent component){
+
+	int index = components.size();
+	components.push_back(component);
+
+	return Handle(index, 0, 0);
+
 }
 
 GLFWwindow* GraphicSystem::initWindow(int width, int height){
@@ -121,54 +132,45 @@ GLFWwindow* GraphicSystem::initWindow(int width, int height){
 	return window;
 }
 
-void GraphicSystem::drawEntity(Entity* entity){
-
-	GraphicsComponent* graph = &entity->graphics;
+void GraphicSystem::drawComponent(const GraphicsComponent& graph){
 	
-	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph->model.modelMat[0][0]);
-	for (auto const &mesh : entityManager->modelManager.getModel(graph->model.model)->meshes){
+	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph.modelMat[0][0]);
 
-		this->drawMesh(graph, mesh);	
+	Mesh* meshes = &modelManager.getModel(graph.model_id)->meshes[0];
+	unsigned long size = modelManager.getModel(graph.model_id)->meshes.size();
+
+	for (unsigned long i = 0; i < size; i++){
 		
+		this->drawMesh(graph, meshes + i);	
 	}
 }
 
-void GraphicSystem::drawMesh(GraphicsComponent* graph, const Mesh& mesh){
+void GraphicSystem::drawMesh(const GraphicsComponent& graph,Mesh* mesh){
 	
-	struct Texture texture = entityManager->modelManager.getModel(graph->model.model)->textures[mesh.materialId];
+	struct Texture texture = modelManager.getModel(graph.model_id)->textures[mesh->materialId];
 			
 	texture.bind(this->DiffuseTexID, this->NormalTexID);
-	mesh.bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	
+	mesh->bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	
 	
-	switch(graph->getType()){
-		case GraphicsComponent::Simple:
-			this->drawMeshSimple(mesh);	
-			break;
-
-		case GraphicsComponent::Instanced:
-			this->drawMeshInstanced(graph, mesh);
-			break;	
-
-	}
-
+	this->drawMeshSimple(mesh);	
 }
 
-void GraphicSystem::drawMeshSimple(const Mesh& mesh){
+void GraphicSystem::drawMeshSimple(Mesh* mesh){
 
 	// Draw the triangles !
 	glDrawElements(
 	    GL_TRIANGLES,      // mode
-	    mesh.indices,    // count
+	    mesh->indices,    // count
 	    GL_UNSIGNED_INT,   // type
 	    nullptr           // element array buffer offset
 	);
 
 }
-void GraphicSystem::drawMeshInstanced(GraphicsComponent* graph, const Mesh& mesh){
+/*  void GraphicSystem::drawMeshInstanced(const GraphicsComponent& graph, const Mesh& mesh) const{
 
-	InstancedGraphicsComponent* igraph = (InstancedGraphicsComponent*) graph;
+	InstancedGraphicsComponent& igraph = (InstancedGraphicsComponent&) graph;
 	glEnableVertexAttribArray(3);
-	glBindBuffer(GL_ARRAY_BUFFER, igraph->instPosBuf);
+	glBindBuffer(GL_ARRAY_BUFFER, igraph.instPosBuf);
 	glVertexAttribPointer(
 		this->s_offset,                  // attribute 0. No particular reason for 0, but must match the layout in the shader.
 		3,                  // size
@@ -189,9 +191,9 @@ void GraphicSystem::drawMeshInstanced(GraphicsComponent* graph, const Mesh& mesh
 	    mesh.indices,    // count
 	    GL_UNSIGNED_INT,   // type
 	    nullptr,		// element array buffer offset
-	    igraph->getInstanceCount() 
+	    igraph.getInstanceCount() 
 	); 
 
-}
+}*/
 
 }

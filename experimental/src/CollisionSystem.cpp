@@ -1,10 +1,11 @@
 #include "systems/CollisionSystem.h"
+#include "systems/System.h"
 
 namespace Soul{
 
-CollisionSystem::CollisionSystem(EntityManager* entityManager) : System(entityManager){}
+CollisionSystem::CollisionSystem() : System(){}
 void CollisionSystem::update(float dt, std::vector<Handle> &handles){
-
+/*  
 	for (auto &handle1 : handles){
 		Entity* entity1 = this->entityManager->getEntity(handle1);
 		if (handle1.m_type == Entity::Player && entity1->visible){
@@ -29,6 +30,7 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 		}
 
 	}
+*/
 }
 }
 

@@ -10,7 +10,7 @@ class CollisionComponent{
 		BoundingBox boundingBox;
 	public:
 		CollisionComponent(){};
-		CollisionComponent(Model* model);
+		CollisionComponent(BoundingBox box);
 		BoundingBox getBoundingBox(){return boundingBox;};
 
 };

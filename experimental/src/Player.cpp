@@ -6,7 +6,7 @@
 
 namespace Soul{
 
-Player::Player(GraphicsComponent graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
+Player::Player(Handle graphics, CollisionComponent collisions) : Entity::Entity(graphics, collisions){}
 
 void Player::collision(Entity* other){
 

@@ -3,9 +3,9 @@
 
 namespace Soul{
 
-GraphicsComponent::GraphicsComponent(ModelInstance model){
+GraphicsComponent::GraphicsComponent(int model){
 
-	this->model = model;
+	this->model_id = model;
 
 }
 
