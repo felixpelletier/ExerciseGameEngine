@@ -12,6 +12,7 @@
 #include "GraphicsComponent.h"
 #include "systems/System.h"
 #include "Light.h"
+#include "Texture.h"
 #include "ModelManager.h"
 
 
@@ -50,8 +51,8 @@ namespace Soul{
 
 		void drawComponent(const GraphicsComponent& graph);
 
-		void drawMeshSimple(Mesh* mesh);
-		void drawMesh(const GraphicsComponent& graph,Mesh* mesh);
+		void drawMeshSimple(const Mesh& mesh);
+		void drawMesh(const GraphicsComponent& graph, const Mesh& mesh, const Texture& texture);
 
 		std::vector<GraphicsComponent> components;
 

@@ -39,7 +39,7 @@ int main()
 
 	entities.push_back(h_player);
 	
-	for (int o = 0; o < 50; o++){
+	for (int o = 0; o < 100; o++){
 		Handle h_oildrum = entityGod.createEntity(Entity::Collectible, "oildrum.obj");
 		Entity* oildrum = entityGod.getEntity(h_oildrum);
 		glm::vec3 ranPos;
@@ -58,7 +58,7 @@ int main()
 	std::vector<glm::vec3> tiles;
 
 	BoundingBox floorBox = entityGod.getEntity(h_floor)->collisions.getBoundingBox();
-	makeGrid(&tiles, 5, floorBox.max.x - floorBox.min.x);
+	makeGrid(&tiles, 15, floorBox.max.x - floorBox.min.x);
 
 	for (auto &tile_pos : tiles){
 
@@ -84,7 +84,7 @@ int main()
 		float dt = float(currentTime - lastTime);
 		lastTime = currentTime;
 		
-		if (1/dt < 55) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
+		if (1/dt < 200) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
 
 		float speedBoost = 6.0f;
 		float orientationDampen = 0.2f;

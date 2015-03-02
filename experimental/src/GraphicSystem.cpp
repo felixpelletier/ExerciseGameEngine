@@ -129,6 +129,8 @@ GLFWwindow* GraphicSystem::initWindow(int width, int height){
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
+	glfwSwapInterval(0);
+
 	return window;
 }
 
@@ -136,31 +138,30 @@ void GraphicSystem::drawComponent(const GraphicsComponent& graph){
 	
 	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph.modelMat[0][0]);
 
-	Mesh* meshes = &modelManager.getModel(graph.model_id)->meshes[0];
-	unsigned long size = modelManager.getModel(graph.model_id)->meshes.size();
+	Model* model = modelManager.getModel(graph.model_id);
+	std::vector<Mesh>* meshes = &model->meshes;
 
-	for (unsigned long i = 0; i < size; i++){
+	for (auto &mesh : *meshes){
 		
-		this->drawMesh(graph, meshes + i);	
+		Texture* texture = &model->textures[mesh.materialId];
+		this->drawMesh(graph, mesh, *texture);	
 	}
 }
 
-void GraphicSystem::drawMesh(const GraphicsComponent& graph,Mesh* mesh){
+void GraphicSystem::drawMesh(const GraphicsComponent& graph,const Mesh& mesh, const Texture& texture){
 	
-	struct Texture texture = modelManager.getModel(graph.model_id)->textures[mesh->materialId];
-			
 	texture.bind(this->DiffuseTexID, this->NormalTexID);
-	mesh->bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	
+	mesh.bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	
 	
 	this->drawMeshSimple(mesh);	
 }
 
-void GraphicSystem::drawMeshSimple(Mesh* mesh){
+void GraphicSystem::drawMeshSimple(const Mesh& mesh){
 
 	// Draw the triangles !
 	glDrawElements(
 	    GL_TRIANGLES,      // mode
-	    mesh->indices,    // count
+	    mesh.indices,    // count
 	    GL_UNSIGNED_INT,   // type
 	    nullptr           // element array buffer offset
 	);
