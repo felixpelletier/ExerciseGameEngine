@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -13,7 +13,7 @@ namespace Soul{
 
 	class CollisionSystem : public System{
 
-		std::vector<CollisionComponent> components;
+		std::map<int, CollisionComponent> components;
 
 		public:
 			CollisionSystem();

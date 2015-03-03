@@ -72,7 +72,7 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 
 		for (auto const &component : components){
 
-			this->drawComponent(component);
+			this->drawComponent(component.second);
 
 		}
 
@@ -86,15 +86,14 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 }
 
 GraphicsComponent* GraphicSystem::getComponent(Handle handle){
-	return &components[handle.m_index];
+	return &components.find(handle.m_index)->second;
 }
 
 Handle GraphicSystem::addComponent(GraphicsComponent component){
 
-	int index = components.size();
-	components.push_back(component);
+	components.insert(std::pair<int, GraphicsComponent>(component.id, component));
 
-	return Handle(index, 0, Handle::Type::Graphic);
+	return Handle(component.id, 0, Handle::Type::Graphic);
 
 }
 
@@ -129,7 +128,7 @@ GLFWwindow* GraphicSystem::initWindow(int width, int height){
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
-	glfwSwapInterval(0);
+	glfwSwapInterval(1);
 
 	return window;
 }

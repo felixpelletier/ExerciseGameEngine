@@ -20,10 +20,12 @@ namespace Soul {
 
 class Entity{
 	public:
+		Entity();
 		Handle graphics;
 		Handle collisions;
-	private:
 		int id;
+	private:
+		static int id_counter;
 		std::vector<Handle> components;
 
 };

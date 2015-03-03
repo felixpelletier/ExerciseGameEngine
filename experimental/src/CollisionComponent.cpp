@@ -3,8 +3,9 @@
 
 namespace Soul{
 
-CollisionComponent::CollisionComponent(BoundingBox box){
+CollisionComponent::CollisionComponent(int id, BoundingBox box){
 
+	this->id = id;
 	boundingBox = box;
 
 }

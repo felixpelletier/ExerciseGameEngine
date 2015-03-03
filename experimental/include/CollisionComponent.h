@@ -9,8 +9,8 @@ class CollisionComponent{
 	private:
 		BoundingBox boundingBox;
 	public:
-		CollisionComponent(){};
-		CollisionComponent(BoundingBox box);
+		CollisionComponent(int id, BoundingBox box);
+		int id;
 		BoundingBox getBoundingBox(){return boundingBox;};
 
 };

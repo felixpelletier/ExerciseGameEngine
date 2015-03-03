@@ -4,6 +4,7 @@
 #include "Handle.h"
 #include "systems/GraphicSystem.h"
 #include "systems/CollisionSystem.h"
+#include <map>
 
 namespace Soul{
 
@@ -14,7 +15,7 @@ class EntityManager{
 		Handle createEntity(std::string modelPath);
 
 	private:
-		std::vector<Entity> entities;
+		std::map<int, Entity> entities;
 		GraphicSystem* graphic_system;
 		CollisionSystem* collision_system;
 	

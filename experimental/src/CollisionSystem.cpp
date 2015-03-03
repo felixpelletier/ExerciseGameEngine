@@ -35,15 +35,14 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 }
 
 CollisionComponent* CollisionSystem::getComponent(Handle handle){
-	return &components[handle.m_index];
+	return &components.find(handle.m_index)->second;
 }
 
 Handle CollisionSystem::addComponent(CollisionComponent component){
 
-	int index = components.size();
-	components.push_back(component);
+	components.insert(std::pair<int, CollisionComponent> (component.id, component));
 
-	return Handle(index, 0, Handle::Type::Collision);
+	return Handle(component.id, 0, Handle::Type::Collision);
 
 
 }

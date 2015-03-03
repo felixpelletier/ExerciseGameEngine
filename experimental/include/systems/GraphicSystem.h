@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <map>
 #include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -54,7 +54,7 @@ namespace Soul{
 		void drawMeshSimple(const Mesh& mesh);
 		void drawMesh(const GraphicsComponent& graph, const Mesh& mesh, const Texture& texture);
 
-		std::vector<GraphicsComponent> components;
+		std::map<int, GraphicsComponent> components;
 
 		ModelManager modelManager;
 

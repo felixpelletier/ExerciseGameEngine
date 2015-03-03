@@ -8,8 +8,8 @@ class GraphicsComponent{
 	public:
 		glm::mat4 modelMat;
 		int model_id;
-		GraphicsComponent() {};
-		GraphicsComponent(int model);
+		int id;
+		GraphicsComponent(int id, int model);
 
 };
 
