@@ -94,7 +94,7 @@ Handle GraphicSystem::addComponent(GraphicsComponent component){
 	int index = components.size();
 	components.push_back(component);
 
-	return Handle(index, 0, 0);
+	return Handle(index, 0, Handle::Type::Graphic);
 
 }
 

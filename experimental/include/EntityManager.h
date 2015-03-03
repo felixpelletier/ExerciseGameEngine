@@ -3,18 +3,20 @@
 #include "Entity.h"
 #include "Handle.h"
 #include "systems/GraphicSystem.h"
+#include "systems/CollisionSystem.h"
 
 namespace Soul{
 
 class EntityManager{
-
-	std::vector<Entity> entities;
-	GraphicSystem* graphic_system;
-
 	public:
-		EntityManager(GraphicSystem* graphics);
+		EntityManager(CollisionSystem* collisions, GraphicSystem* graphics);
 		Entity* getEntity(Handle handle);
-		Handle createEntity(Entity::Type type, std::string modelPath);
+		Handle createEntity(std::string modelPath);
+
+	private:
+		std::vector<Entity> entities;
+		GraphicSystem* graphic_system;
+		CollisionSystem* collision_system;
 	
 };
 

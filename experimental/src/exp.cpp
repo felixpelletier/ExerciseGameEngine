@@ -20,8 +20,6 @@
 #include "systems/CollisionSystem.h"
 #include <random>
 
-//#include <ScriptEngine.h>
-
 using namespace Soul;
 
 void makeGrid(std::vector<glm::vec3>* list, int size,float tileHalfSize);
@@ -30,17 +28,17 @@ int main()
 {
 	GraphicSystem graphics = GraphicSystem();
 	CollisionSystem collisions = CollisionSystem();
-	EntityManager entityGod = EntityManager(&graphics);
+	EntityManager entityGod = EntityManager(&collisions, &graphics);
 
 	std::vector<Handle> entities;
 
-	Handle h_floor = entityGod.createEntity(Entity::Standard, "ice.obj");
-	Handle h_player = entityGod.createEntity(Entity::Player, "Snowmobile.obj");
+	Handle h_floor = entityGod.createEntity("ice.obj");
+	Handle h_player = entityGod.createEntity("Snowmobile.obj");
 
 	entities.push_back(h_player);
 	
 	for (int o = 0; o < 100; o++){
-		Handle h_oildrum = entityGod.createEntity(Entity::Collectible, "oildrum.obj");
+		Handle h_oildrum = entityGod.createEntity("oildrum.obj");
 		Entity* oildrum = entityGod.getEntity(h_oildrum);
 		glm::vec3 ranPos;
 		const float low = -100.0f;
@@ -57,12 +55,12 @@ int main()
 	
 	std::vector<glm::vec3> tiles;
 
-	BoundingBox floorBox = entityGod.getEntity(h_floor)->collisions.getBoundingBox();
+	BoundingBox floorBox = collisions.getComponent(entityGod.getEntity(h_floor)->collisions)->getBoundingBox();
 	makeGrid(&tiles, 15, floorBox.max.x - floorBox.min.x);
 
 	for (auto &tile_pos : tiles){
 
-		Handle h_tile = entityGod.createEntity(Entity::Standard, "ice.obj");
+		Handle h_tile = entityGod.createEntity("ice.obj");
 		Entity* e_tile = entityGod.getEntity(h_tile);
 		std::cout << tile_pos.x << " " << tile_pos.z << std::endl;
 		GraphicsComponent* g_tile = graphics.getComponent(e_tile->graphics);

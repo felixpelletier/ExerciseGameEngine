@@ -1,9 +1,13 @@
 #pragma once
 
+#include <cstdint>
+
 namespace Soul{
+
 
 struct Handle
 {
+    enum Type{Entity, Graphic, Collision};
     Handle() : m_index(0), m_counter(0), m_type(0)
     {}
 

@@ -1,5 +1,6 @@
 #include "systems/CollisionSystem.h"
 #include "systems/System.h"
+#include "CollisionComponent.h"
 
 namespace Soul{
 
@@ -32,5 +33,21 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 	}
 */
 }
+
+CollisionComponent* CollisionSystem::getComponent(Handle handle){
+	return &components[handle.m_index];
+}
+
+Handle CollisionSystem::addComponent(CollisionComponent component){
+
+	int index = components.size();
+	components.push_back(component);
+
+	return Handle(index, 0, Handle::Type::Collision);
+
+
+}
+
+
 }
 
