@@ -1,0 +1,18 @@
+## Define de build of the main engine
+
+Import('env debug') # also legal Import('*')
+libs = [ 'tinyobj'
+        ,'GL'
+        ,'glfw'
+        ,'glew'
+        ,'glm'
+        ,'boost']
+env.Append(LIBS = libs)
+
+env.soul = env.Program('soul', ['exp.cpp'])
+Depends(env.soul, env.tinyobj)
+env.Install('#./bin', 'soul')
+env.Default('soul') # define a default target
+
+# use a pound (#) in path name to force interpretation from the sconstruct top level call
+# paths are normally relative to the sconscript (except for above statement)

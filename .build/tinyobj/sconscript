@@ -1,0 +1,6 @@
+Import('env debug') 
+
+env.tinyobj = env.StaticLibrary('tinyobj', ['tiny_obj_loader.cc'])
+env.Install('#./lib', 'tinyobj')
+env.Alias('full', '#./lib')
+Command('#./include/tiny_obj_loader.h', './tiny_obj_loader.h', Copy("$TARGET", "$SOURCE"))
