@@ -17,18 +17,17 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 		BoundingBox bb1 = component1.getBoundingBox();
 		bb1.min += component1.boundingBoxTransform;
 		bb1.max += component1.boundingBoxTransform;
+		bb1.center += component1.boundingBoxTransform;
 
 			for (auto &pair2 : components){
 				CollisionComponent component2 = pair2.second;
 				if (component2.enabled && component1.id != component2.id){
 					BoundingBox bb2 = component2.getBoundingBox();
-					bb2.min += component2.boundingBoxTransform;
-					bb2.max += component2.boundingBoxTransform;
+					//bb2.min += component2.boundingBoxTransform;
+					//bb2.max += component2.boundingBoxTransform;
+					bb2.center += component2.boundingBoxTransform;
 					
-					glm::vec3 center1 = (bb1.min + bb1.max) / 2.0f;
-					glm::vec3 center2 = (bb2.min + bb2.max) / 2.0f;
-					
-					if(glm::length(center2-center1) < 1.75f){
+					if(glm::distance(bb2.center, bb1.center) < 1.75f ){
 						
 						CollisionEvent event;
 						event.id1 = component1.id;
@@ -55,8 +54,6 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 	}
 
 	for (auto &event : events){
-		if (event.id1 == 1 || event.id2 == 1)
-		std::cout << event.id1 << ":" << event.id2 << std::endl;
 		fireEvent(event);
 	}
 

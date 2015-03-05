@@ -18,7 +18,10 @@ namespace Soul{
 				min.y = std::min(mesh.positions[p+1], min.y);
 				min.z = std::min(mesh.positions[p+2], min.z);
 			}
+
 		}
+
+		center = (max + min) / 2.0f;
 
 	}
 
