@@ -1,4 +1,6 @@
 Import("*")
-tinyobj = env.StaticLibrary('tinyobj', '#.tinyobjloader/tiny_obj_loader.cc')
+tiny_c = tiny.Library('tinyobj', '#.tinyobjloader/tiny_obj_loader.cc')
+tinyobj = Command('#lib/libtinyobj.a', 'libtinyobj.a', Copy('$TARGET', '$SOURCE'))
+Depends(tinyobj, tiny_c)
 Export('tinyobj')
 #env.Depends(env.tinyobj, env.tinyobj_copy)

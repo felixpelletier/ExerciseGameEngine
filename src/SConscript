@@ -4,15 +4,16 @@ Import('*') # everything
 libs = [ 'tinyobj'
         ,'GL'
         ,'glfw'
-        ,'glew'
-        ,'glm'
-        ,'boost']
-env.Append(LIBS = libs)
+        ,'GLEW'
+        ]
+soul.Append(LIBS = libs)
 
-soul = env.Program('soul', ['exp.cpp'])
-Depends(soul, tinyobj)
+print(str(soul_s))
+
+soul_b = soul.Program('soul', soul_s)
+Depends(soul_b, tinyobj)
 Install('#./bin', 'soul')
-Default('soul') # define a default target
+Default('#./bin') # define a default target
 
 # use a pound (#) in path name to force interpretation from the sconstruct top level call
 # paths are normally relative to the sconscript (except for above statement)

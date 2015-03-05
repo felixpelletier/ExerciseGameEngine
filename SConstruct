@@ -1,4 +1,5 @@
 import os
+import fnmatch
 
 ## Default flag of scons
 #SetOption('implicit_cache', 1)
@@ -12,28 +13,41 @@ import os
 
 platform = ARGUMENTS.get('OS', Platform())
 include = "#./include:."
-lib = "#./lib:/usr/lib:/usr/lib/mesa"
+lib = "/usr/lib:/usr/lib/mesa:#./lib"
 bin = "#./bin"
 
 default_flags = ['-std=c++11']
-env_flags = [ '-O1'] + default_flags
+soul_flags = [ '-O1'] + default_flags
 debug_flags = [ '-Wall'
                ,'-g'] + default_flags
 
 # semi deployment (dev)
-env = Environment( BINDIR = bin
+soul = Environment( BINDIR = bin
                   ,INCDIR = include
                   ,LIBDIR = lib
                   ,CPPPATH = include
-                  ,LIBPATH = [lib]) 
+                  ,LIBPATH = lib) 
 # full debug env
-debug = env.Clone()
-env.Append(CCFLAGS = env_flags)
+debug = soul.Clone()
+soul.Append(CCFLAGS = soul_flags)
 debug.Append(CCFLAGS = debug_flags)
+tiny = soul.Clone()
+tiny.Append(CCFLAGS = default_flags)
 # an environment holds a set of vars and rules to build a specific project, for our needs, env is the default environment
 # use Environment(ENV = {'PATH' : path}) to change PATH
 
-Export('env debug') # white space are illegal var name in python, this is auto split
+
+def list_src(dir):
+    matches = []
+    for root, dirnames, filenames in os.walk(dir):
+        for filename in fnmatch.filter(filenames, '*.cpp'):
+            matches.append(os.path.join(root, filename))
+    return matches
+
+soul_s = ["#" + i for i in list_src('src')]
+
+
+Export('soul debug tiny soul_s') # white space are illegal var name in python, this is auto split
 
 
 # actual building
