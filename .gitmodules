@@ -1,3 +1,0 @@
-[submodule "experimental/tinyobjloader"]
-	path = experimental/tinyobjloader
-	url = https://github.com/syoyo/tinyobjloader
