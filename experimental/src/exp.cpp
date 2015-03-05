@@ -35,11 +35,12 @@ int main()
 	Handle h_floor = entityGod.createEntity("ice.obj");
 	Handle h_player = entityGod.createEntity("Snowmobile.obj");
 
+	std::cout << "playa: " << h_player.m_index << std::endl;
+
 	entities.push_back(h_player);
 	
 	for (int o = 0; o < 100; o++){
 		Handle h_oildrum = entityGod.createEntity("oildrum.obj");
-		Entity* oildrum = entityGod.getEntity(h_oildrum);
 		glm::vec3 ranPos;
 		const float low = -100.0f;
 		const float high = 100.0f;
@@ -47,9 +48,8 @@ int main()
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
-		GraphicsComponent* g_oildrum = graphics.getComponent(oildrum->graphics);
-		g_oildrum->modelMat = glm::rotate(g_oildrum->modelMat, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
-		g_oildrum->modelMat = glm::translate(g_oildrum->modelMat, ranPos);
+		entityGod.translate(h_oildrum, ranPos);
+		entityGod.rotate(h_oildrum, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
 		entities.push_back(h_oildrum);
 	}
 	
@@ -60,7 +60,7 @@ int main()
 
 	for (auto &tile_pos : tiles){
 
-		Handle h_tile = entityGod.createEntity("ice.obj");
+		Handle h_tile = entityGod.createStaticEntity("ice.obj");
 		Entity* e_tile = entityGod.getEntity(h_tile);
 		std::cout << tile_pos.x << " " << tile_pos.z << std::endl;
 		GraphicsComponent* g_tile = graphics.getComponent(e_tile->graphics);
@@ -77,12 +77,11 @@ int main()
 	float speed = 0.0f;
 
 	do{
-		Entity* player = entityGod.getEntity(h_player);
 		double currentTime = glfwGetTime();
 		float dt = float(currentTime - lastTime);
 		lastTime = currentTime;
 		
-		if (1/dt < 200) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
+		if (1/dt < 55) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
 
 		float speedBoost = 6.0f;
 		float orientationDampen = 0.2f;
@@ -112,12 +111,8 @@ int main()
 		position[0] += speed * dt * glm::sin(orientation);
 		position[2] += speed * dt * glm::cos(orientation);
 
-		glm::mat4 playerMat;
-		playerMat = glm::translate(playerMat, position);
-		playerMat = glm::rotate(playerMat, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
-
-		GraphicsComponent* g_player = graphics.getComponent(player->graphics);
-		g_player->modelMat = playerMat;
+		entityGod.setToTranslation(h_player, position);
+		entityGod.rotate(h_player, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		collisions.update(dt, entities);
 

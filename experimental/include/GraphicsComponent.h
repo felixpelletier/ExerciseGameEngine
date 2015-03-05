@@ -9,6 +9,7 @@ class GraphicsComponent{
 		glm::mat4 modelMat;
 		int model_id;
 		int id;
+		bool enabled = true;
 		GraphicsComponent(int id, int model);
 
 };
