@@ -1,7 +1,7 @@
 import os
 
 ## Default flag of scons
-SetOption('implicit_cache', 1)
+#SetOption('implicit_cache', 1)
 # use --implicit-deps-changed to force a rebuild of deps
 
 
@@ -11,9 +11,9 @@ SetOption('implicit_cache', 1)
 #        ,'/usr/local/bin']
 
 platform = ARGUMENTS.get('OS', Platform())
-include = "./include:./src"
-lib = "./lib:/usr/lib:/usr/lib/mesa"
-bin = "./bin"
+include = "#./include:."
+lib = "#./lib:/usr/lib:/usr/lib/mesa"
+bin = "#./bin"
 
 default_flags = ['-std=c++11']
 env_flags = [ '-O1'] + default_flags
@@ -24,7 +24,7 @@ debug_flags = [ '-Wall'
 env = Environment( BINDIR = bin
                   ,INCDIR = include
                   ,LIBDIR = lib
-                  ,CPPPATH = [include]
+                  ,CPPPATH = include
                   ,LIBPATH = [lib]) 
 # full debug env
 debug = env.Clone()
@@ -39,8 +39,8 @@ Export('env debug') # white space are illegal var name in python, this is auto s
 # actual building
 tiny_build = './.build/tinyobj'
 soul_build = './.build/soul'
-SConscript('./.tinyobjloader/SConscript', variant_dir=tiny_build) # will duplicate the src code, will auto create dir
-SConscript('./src/SConscript', variant_dir=soul_build)
+SConscript('./scripts/.tinyobj/SConscript', variant_dir=tiny_build) 
+SConscript('./src/SConscript', variant_dir=soul_build) # duplicate source code
 
 
 ## Various useful command
