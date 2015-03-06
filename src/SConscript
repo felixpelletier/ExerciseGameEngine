@@ -11,6 +11,7 @@ soul.Append(LIBS = libs)
 print(str(soul_s))
 
 soul_b = soul.Program('soul', soul_s)
+Depends(soul_b, tiny_h)
 Depends(soul_b, tinyobj)
 Install('#./bin', 'soul')
 Default('#./bin') # define a default target
