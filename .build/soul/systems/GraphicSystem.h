@@ -14,6 +14,7 @@
 #include "Light.h"
 #include "Texture.h"
 #include "ModelManager.h"
+#include "Shader.h"
 
 
 namespace Soul{
@@ -23,36 +24,13 @@ namespace Soul{
 		const int winWidth = 1280;
 		const int winHeight = 720;
 
-		const GLuint s_vertexPosition = 0;
-		const GLuint s_vertexUV = 1;
-		const GLuint s_vertexNormal = 2;
-		const GLuint s_offset = 3;
-
-		GLuint programID;
 		GLuint VertexArrayID;
-
-		GLuint s_projMat;
-		GLuint s_viewMat;
-		GLuint s_modelMat;
-		
-		GLuint s_lightpos;
-		GLuint s_lightdir;
-		GLuint s_lightcolor;
-
-		glm::mat4 projMat;
-
-		// Get a handle for our "myTextureSampler" uniform
-        	GLuint DiffuseTexID;
-        	GLuint NormalTexID;
-	 
-		//Please make a shader object
 
 		Light light;
 
-		void drawComponent(const GraphicsComponent& graph);
+		glm::mat4 projMat;
 
-		void drawMeshSimple(const Mesh& mesh);
-		void drawMesh(const GraphicsComponent& graph, const Mesh& mesh, const Texture& texture);
+		Shader shader;
 
 		std::map<int, GraphicsComponent> components;
 

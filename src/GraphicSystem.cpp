@@ -24,32 +24,13 @@ GraphicSystem::GraphicSystem() : System(){
 	glGenVertexArrays(1, &this->VertexArrayID);
 	glBindVertexArray(this->VertexArrayID);
 
-	this->programID = LoadShaders( "vertex.glsl", "fragment.glsl" );
+	this->shader = Shader( "vertex.glsl", "fragment.glsl" );
 
-	glBindAttribLocation(this->programID, this->s_vertexPosition, "vertexPos");
-	glBindAttribLocation(this->programID, this->s_vertexUV, "vertexUV");
-	glBindAttribLocation(this->programID, this->s_vertexNormal, "vertexNormal");
-	glBindAttribLocation(this->programID, this->s_offset, "vertexOffset");
-
-	// Get a handle for our "MVP" uniform.
-	// Only at initialisation time.
-	this->s_projMat = glGetUniformLocation(this->programID, "projMat");
-	this->s_viewMat = glGetUniformLocation(this->programID, "viewMat");
-	this->s_modelMat = glGetUniformLocation(this->programID, "modelMat");
-	
-	this->s_lightpos = glGetUniformLocation(this->programID, "lightPos");
-	this->s_lightdir = glGetUniformLocation(this->programID, "lightDir");
-	this->s_lightcolor = glGetUniformLocation(this->programID, "lightColor");
-	
 	this->light.position = glm::vec3(-0.0f, 5.0f, 0.0f);
 	this->light.direction = glm::vec3(-0.0f, -1.0f, -0.0f);
 	this->light.color = glm::vec3(10.0f, 10.0f, 10.0f);
- 
-	// Get a handle for our "myTextureSampler" uniform
-        this->DiffuseTexID  = glGetUniformLocation(programID, "DiffuseSampler");
-        this->NormalTexID  = glGetUniformLocation(programID, "NormalSampler");
-	 
-	glUseProgram(this->programID); 
+
+	glUseProgram(this->shader.id); 
 
 	// Dark blue background
 	glClearColor(0.6f, 0.6f, 0.65f, 0.0f);
@@ -60,20 +41,18 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		// For each model you render, since the MVP will be different (at least the M part)
-		glUniformMatrix4fv(this->s_projMat, 1, GL_FALSE, &this->projMat[0][0]);
-		glUniformMatrix4fv(this->s_viewMat, 1, GL_FALSE, &this->viewMat[0][0]);
-		glUniform3fv(this->s_lightpos, 1, &this->light.position[0]);
-		glUniform3fv(this->s_lightdir, 1, &this->light.direction[0]);
-		glUniform3fv(this->s_lightcolor, 1, &this->light.color[0]);
+		glUniformMatrix4fv(shader.s_projMat, 1, GL_FALSE, &this->projMat[0][0]);
+		glUniformMatrix4fv(shader.s_viewMat, 1, GL_FALSE, &this->viewMat[0][0]);
+		glUniform3fv(shader.s_lightpos, 1, &this->light.position[0]);
+		glUniform3fv(shader.s_lightdir, 1, &this->light.direction[0]);
+		glUniform3fv(shader.s_lightcolor, 1, &this->light.color[0]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		// Use our shader
-		glUseProgram(this->programID);
+		glUseProgram(this->shader.id);
 
-		for (auto const &component : components){
-
-			this->drawComponent(component.second);
-
+		for (auto component : components){
+			component.second.draw(modelManager, shader);
 		}
 
 		glDisableVertexAttribArray(0);
@@ -133,39 +112,6 @@ GLFWwindow* GraphicSystem::initWindow(int width, int height){
 	return window;
 }
 
-void GraphicSystem::drawComponent(const GraphicsComponent& graph){
-	
-	glUniformMatrix4fv(s_modelMat, 1, GL_FALSE, &graph.modelMat[0][0]);
-
-	Model* model = modelManager.getModel(graph.model_id);
-	std::vector<Mesh>* meshes = &model->meshes;
-
-	for (auto &mesh : *meshes){
-		
-		Texture* texture = &model->textures[mesh.materialId];
-		this->drawMesh(graph, mesh, *texture);	
-	}
-}
-
-void GraphicSystem::drawMesh(const GraphicsComponent& graph,const Mesh& mesh, const Texture& texture){
-	
-	texture.bind(this->DiffuseTexID, this->NormalTexID);
-	mesh.bind(this->s_vertexPosition, this->s_vertexUV, this->s_vertexNormal);	
-	
-	this->drawMeshSimple(mesh);	
-}
-
-void GraphicSystem::drawMeshSimple(const Mesh& mesh){
-
-	// Draw the triangles !
-	glDrawElements(
-	    GL_TRIANGLES,      // mode
-	    mesh.indices,    // count
-	    GL_UNSIGNED_INT,   // type
-	    nullptr           // element array buffer offset
-	);
-
-}
 /*  void GraphicSystem::drawMeshInstanced(const GraphicsComponent& graph, const Mesh& mesh) const{
 
 	InstancedGraphicsComponent& igraph = (InstancedGraphicsComponent&) graph;
