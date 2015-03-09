@@ -32,3 +32,6 @@ syntax: glob
 CMakeLists.txt.user
 proto/src
 *.pyc
+
+# precise file
+.build/soul/soul
