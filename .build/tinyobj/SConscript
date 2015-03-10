@@ -1,7 +1,0 @@
-Import("*")
-tiny_h = Command('#./include/tinyobjloader/tiny_obj_loader.h','#./.tinyobjloader/tiny_obj_loader.h', Copy('$TARGET', '$SOURCE'))
-tiny_c = tiny.Library('tinyobj', '#.tinyobjloader/tiny_obj_loader.cc')
-tinyobj = Command('#lib/libtinyobj.a', 'libtinyobj.a', Copy('$TARGET', '$SOURCE'))
-Depends(tinyobj, tiny_c)
-Export('tinyobj tiny_h')
-#env.Depends(env.tinyobj, env.tinyobj_copy)
