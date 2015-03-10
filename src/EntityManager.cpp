@@ -54,36 +54,4 @@ Handle EntityManager::createStaticEntity(std::string modelPath){
 
 }
 
-void EntityManager::rotate(Handle h_entity, float orientation, glm::vec3 normal){
-
-	Entity* entity = getEntity(h_entity);
-	GraphicsComponent* g_entity = graphic_system->getComponent(entity->graphics);
-	g_entity->modelMat = glm::rotate(g_entity->modelMat, orientation, normal);
-	//CollisionComponent* c_entity = collision_system->getComponent(entity->collisions);
-
-}
-
-void EntityManager::translate(Handle h_entity, glm::vec3 translation){
-
-	Entity* entity = getEntity(h_entity);
-	GraphicsComponent* g_entity = graphic_system->getComponent(entity->graphics);
-	g_entity->modelMat = glm::translate(g_entity->modelMat, translation);
-	CollisionComponent* c_entity = collision_system->getComponent(entity->collisions);
-	c_entity->boundingBoxTransform += translation;
-
-}
-
-void EntityManager::setToTranslation(Handle h_entity, glm::vec3 translation){
-
-	Entity* entity = getEntity(h_entity);
-	GraphicsComponent* g_entity = graphic_system->getComponent(entity->graphics);
-	glm::mat4x4 mat;
-	mat = glm::translate(mat,translation);
-	g_entity->modelMat = mat;
-	CollisionComponent* c_entity = collision_system->getComponent(entity->collisions);
-	c_entity->boundingBoxTransform = translation;
-
-}
-
-
 }

@@ -37,6 +37,22 @@ GraphicSystem::GraphicSystem() : System(){
 
 }
 
+void GraphicSystem::receiveMovementEvent(MovementEvent event){
+	movementEvents.push_back(event);
+}
+
+void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementEvent event){
+	if (event.absolute){
+		component->modelMat = glm::mat4();
+	}
+	
+	if (glm::length(event.translation) > 0.00001f)
+	component->modelMat = glm::translate(component->modelMat, event.translation);
+
+	if (event.rotation != 0.0f)
+		component->modelMat = glm::rotate(component->modelMat, event.rotation, event.rotationAxis);
+}
+
 void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
@@ -51,7 +67,16 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Use our shader
 		glUseProgram(this->shader.id);
 
-		for (auto component : components){
+		std::cout << movementEvents.size() << std::endl;
+		
+		for (auto &event : movementEvents){
+			GraphicsComponent* component = getComponent(event.id);
+			processMovementEvent(component, event);
+		}
+
+		movementEvents.clear();
+
+		for (auto &component : components){
 			drawComponent(component.second);
 		}
 
@@ -88,7 +113,11 @@ void GraphicSystem::drawComponent(const GraphicsComponent& component){
 }
 
 GraphicsComponent* GraphicSystem::getComponent(Handle handle){
-	return &components.find(handle.m_index)->second;
+	return getComponent(handle.m_index);
+}
+
+GraphicsComponent* GraphicSystem::getComponent(int id){
+	return &components.find(id)->second;
 }
 
 Handle GraphicSystem::addComponent(GraphicsComponent component){

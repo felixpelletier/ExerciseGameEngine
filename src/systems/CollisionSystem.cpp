@@ -86,6 +86,19 @@ Handle CollisionSystem::addComponent(CollisionComponent component){
 
 }
 
+void CollisionSystem::receiveMovementEvent(MovementEvent event){
+	movementEvents.push_back(event);
+}
+
+void CollisionSystem::processMovementEvent(CollisionComponent& component,MovementEvent event){
+	if (event.absolute){
+		component.boundingBoxTransform = event.translation;
+	}
+	else{
+		component.boundingBoxTransform += event.translation;
+	}
+}
+
 
 }
 

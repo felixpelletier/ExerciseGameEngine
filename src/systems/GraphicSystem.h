@@ -1,6 +1,7 @@
 #pragma once
 
 #include <map>
+#include <vector>
 #include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -15,10 +16,12 @@
 #include "Texture.h"
 #include "ModelManager.h"
 #include "Shader.h"
+#include "MovementEventListener.h"
+#include "MovementEvent.h"
 
 
 namespace Soul{
-	class GraphicSystem : public System{
+	class GraphicSystem : public System, public MovementEventListener{
 		GLFWwindow* initWindow(int width, int height);
 
 		const int winWidth = 1280;
@@ -37,6 +40,10 @@ namespace Soul{
 		ModelManager modelManager;
 
 		virtual void drawComponent(const GraphicsComponent& component);
+		void processMovementEvent(GraphicsComponent* component, MovementEvent event);
+
+		std::vector<MovementEvent> movementEvents;
+		GraphicsComponent* getComponent(int id);
 
 		public:
 			GraphicSystem();
@@ -44,6 +51,7 @@ namespace Soul{
 			glm::vec3 cameraPos;
 			glm::mat4 viewMat;
 			virtual void update (float dt, std::vector<Handle> &handles);
+			void receiveMovementEvent(MovementEvent event);
 			Handle addComponent(GraphicsComponent component);
 			GraphicsComponent* getComponent(Handle handle);
 			ModelManager* getModelManager(){return &modelManager;};

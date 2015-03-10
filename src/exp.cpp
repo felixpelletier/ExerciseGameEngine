@@ -18,6 +18,7 @@
 #include "GraphicsComponent.h"
 #include "systems/GraphicSystem.h"
 #include "systems/CollisionSystem.h"
+#include "systems/MovementSystem.h"
 #include <random>
 
 using namespace Soul;
@@ -28,14 +29,15 @@ int main()
 {
 	GraphicSystem graphics = GraphicSystem();
 	CollisionSystem collisions = CollisionSystem();
+	MovementSystem mover = MovementSystem();
+	mover.addListener(&graphics);
+	mover.addListener(&collisions);
 	EntityManager entityGod = EntityManager(&collisions, &graphics);
 
 	std::vector<Handle> entities;
 
 	Handle h_floor = entityGod.createEntity("ice.obj");
 	Handle h_player = entityGod.createEntity("Snowmobile.obj");
-
-	std::cout << "playa: " << h_player.m_index << std::endl;
 
 	entities.push_back(h_player);
 	
@@ -48,8 +50,8 @@ int main()
 		ranPos.z = low + static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(high-low))); 
 		float ranOrient = static_cast <float> (rand()) /( static_cast <float> (RAND_MAX/(glm::pi<float>())));
 		std::cout << "X: " << ranPos.x << " Z: " << ranPos.z << "\n";
-		entityGod.translate(h_oildrum, ranPos);
-		entityGod.rotate(h_oildrum, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
+		mover.translate(h_oildrum, ranPos);
+		mover.rotate(h_oildrum, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
 		entities.push_back(h_oildrum);
 	}
 	
@@ -111,8 +113,8 @@ int main()
 		position[0] += speed * dt * glm::sin(orientation);
 		position[2] += speed * dt * glm::cos(orientation);
 
-		entityGod.setToTranslation(h_player, position);
-		entityGod.rotate(h_player, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
+		mover.setToTranslation(h_player, position);
+		mover.rotate(h_player, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		collisions.update(dt, entities);
 
