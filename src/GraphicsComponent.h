@@ -12,7 +12,6 @@ class GraphicsComponent{
 		int model_id;
 		int id;
 		bool enabled = true;
-		virtual void draw(ModelManager& modelManager, const Shader& shader);
 		GraphicsComponent(int id, int model);
 
 	private:

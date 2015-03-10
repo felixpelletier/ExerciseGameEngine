@@ -36,6 +36,8 @@ namespace Soul{
 
 		ModelManager modelManager;
 
+		virtual void drawComponent(const GraphicsComponent& component);
+
 		public:
 			GraphicSystem();
 			GLFWwindow* window;

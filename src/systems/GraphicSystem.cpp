@@ -52,7 +52,7 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		glUseProgram(this->shader.id);
 
 		for (auto component : components){
-			component.second.draw(modelManager, shader);
+			drawComponent(component.second);
 		}
 
 		glDisableVertexAttribArray(0);
@@ -62,6 +62,29 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
+}
+
+void GraphicSystem::drawComponent(const GraphicsComponent& component){
+	
+	glUniformMatrix4fv(shader.s_modelMat, 1, GL_FALSE, &component.modelMat[0][0]);
+
+	Model* model = modelManager.getModel(component.model_id);
+	std::vector<Mesh>* meshes = &model->meshes;
+
+	for (auto &mesh : *meshes){
+		Texture* texture = &model->textures[mesh.materialId];
+		texture->bind(shader.DiffuseTexID, shader.NormalTexID);	
+		mesh.bind(shader.s_vertexPosition, shader.s_vertexUV, shader.s_vertexNormal);	
+	
+		// Draw the triangles !
+		glDrawElements(
+		    GL_TRIANGLES,      // mode
+		    mesh.indices,    // count
+		    GL_UNSIGNED_INT,   // type
+		    nullptr           // element array buffer offset
+		);
+
+	}
 }
 
 GraphicsComponent* GraphicSystem::getComponent(Handle handle){
