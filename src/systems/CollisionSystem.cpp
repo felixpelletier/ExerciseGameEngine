@@ -11,6 +11,13 @@ void CollisionSystem::update(float dt, std::vector<Handle> &handles){
 
 	std::vector<CollisionEvent> events;
 
+	for (auto &event : movementEvents){
+		CollisionComponent* component = getComponent(event.id);
+		processMovementEvent(component, event);
+	}
+
+	movementEvents.clear();
+
 	for (auto &pair1 : components){
 		CollisionComponent& component1 = pair1.second;
 		if (component1.enabled){
@@ -73,8 +80,12 @@ void CollisionSystem::fireEvent(CollisionEvent event){
 
 }
 
+CollisionComponent* CollisionSystem::getComponent(int id){
+	return &components.find(id)->second;
+}
+
 CollisionComponent* CollisionSystem::getComponent(Handle handle){
-	return &components.find(handle.m_index)->second;
+	return getComponent(handle.m_index);
 }
 
 Handle CollisionSystem::addComponent(CollisionComponent component){
@@ -90,12 +101,12 @@ void CollisionSystem::receiveMovementEvent(MovementEvent event){
 	movementEvents.push_back(event);
 }
 
-void CollisionSystem::processMovementEvent(CollisionComponent& component,MovementEvent event){
+void CollisionSystem::processMovementEvent(CollisionComponent* component,MovementEvent event){
 	if (event.absolute){
-		component.boundingBoxTransform = event.translation;
+		component->boundingBoxTransform = event.translation;
 	}
 	else{
-		component.boundingBoxTransform += event.translation;
+		component->boundingBoxTransform += event.translation;
 	}
 }
 

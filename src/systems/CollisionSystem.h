@@ -22,8 +22,10 @@ namespace Soul{
 		std::vector<CollisionEventListener*> listeners;
 		void fireEvent(CollisionEvent event);
 		
-		void processMovementEvent(CollisionComponent& component, MovementEvent event);
+		void processMovementEvent(CollisionComponent* component, MovementEvent event);
 		std::vector<MovementEvent> movementEvents;
+	
+		CollisionComponent* getComponent(int id);
 
 		public:
 			CollisionSystem();

@@ -67,8 +67,6 @@ void GraphicSystem::update(float dt, std::vector<Handle> &handles){
 		// Use our shader
 		glUseProgram(this->shader.id);
 
-		std::cout << movementEvents.size() << std::endl;
-		
 		for (auto &event : movementEvents){
 			GraphicsComponent* component = getComponent(event.id);
 			processMovementEvent(component, event);
