@@ -7,7 +7,7 @@ GraphicSystem::GraphicSystem() : System(){
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
-	glDepthFunc(GL_LESS);
+	glDepthFunc(GL_LEQUAL);
 
 	// Cull triangles which normal is not towards the camera
 	glEnable(GL_CULL_FACE);
@@ -41,7 +41,7 @@ void GraphicSystem::receiveMovementEvent(MovementEvent event){
 	movementEvents.push_back(event);
 }
 
-void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementEvent event){
+void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementEvent& event){
 	if (event.absolute){
 		component->modelMat = glm::mat4();
 	}

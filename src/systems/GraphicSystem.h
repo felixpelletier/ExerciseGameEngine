@@ -40,7 +40,7 @@ namespace Soul{
 		ModelManager modelManager;
 
 		virtual void drawComponent(const GraphicsComponent& component);
-		void processMovementEvent(GraphicsComponent* component, MovementEvent event);
+		void processMovementEvent(GraphicsComponent* component, MovementEvent& event);
 
 		std::vector<MovementEvent> movementEvents;
 		GraphicsComponent* getComponent(int id);
