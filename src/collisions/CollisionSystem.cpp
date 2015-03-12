@@ -1,5 +1,5 @@
-#include "systems/CollisionSystem.h"
-#include "systems/System.h"
+#include "CollisionSystem.h"
+#include "System.h"
 #include "CollisionComponent.h"
 #include "CollisionEvent.h"
 #include "CollisionEventListener.h"

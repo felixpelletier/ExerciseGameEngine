@@ -2,8 +2,8 @@
 
 #include "Entity.h"
 #include "Handle.h"
-#include "systems/GraphicSystem.h"
-#include "systems/CollisionSystem.h"
+#include "graphics/GraphicSystem.h"
+#include "collisions/CollisionSystem.h"
 #include <map>
 
 namespace Soul{

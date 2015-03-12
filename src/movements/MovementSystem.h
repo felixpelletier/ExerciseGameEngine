@@ -8,7 +8,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "MovementEventListener.h"
 #include "MovementEvent.h"
-#include "systems/System.h"
+#include "System.h"
 
 namespace Soul{
 class MovementSystem : public System{

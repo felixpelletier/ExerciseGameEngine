@@ -1,7 +1,7 @@
 #pragma once
 
 #include "BoundingBox.h"
-#include "Model.h"
+#include "graphics/Model.h"
 
 namespace Soul{
 

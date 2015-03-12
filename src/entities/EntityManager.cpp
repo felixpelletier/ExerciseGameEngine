@@ -1,10 +1,10 @@
 #include "EntityManager.h"
 #include "Entity.h"
 #include "Handle.h"
-#include "GraphicsComponent.h"
-#include "CollisionComponent.h"
-#include "systems/GraphicSystem.h"
-#include "systems/CollisionSystem.h"
+#include "graphics/GraphicsComponent.h"
+#include "collisions/CollisionComponent.h"
+#include "graphics/GraphicSystem.h"
+#include "collisions/CollisionSystem.h"
 #include <string> 
 
 namespace Soul{

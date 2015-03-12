@@ -5,14 +5,14 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "Handle.h"
 #include "CollisionComponent.h"
 #include "CollisionEvent.h"
 #include "CollisionEventListener.h"
-#include "MovementEventListener.h"
-#include "MovementEvent.h"
-#include "systems/System.h"
+#include "movements/MovementEventListener.h"
+#include "movements/MovementEvent.h"
+#include "System.h"
 
 namespace Soul{
 

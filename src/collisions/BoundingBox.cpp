@@ -1,5 +1,5 @@
 #include "BoundingBox.h"
-#include "Model.h"
+#include "graphics/Model.h"
 #include "tinyobjloader/tiny_obj_loader.h"
 
 namespace Soul{

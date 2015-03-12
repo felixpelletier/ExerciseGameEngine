@@ -9,15 +9,15 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include "Entity.h"
+#include "entities/Entity.h"
 #include "GraphicsComponent.h"
-#include "systems/System.h"
+#include "System.h"
 #include "Light.h"
 #include "Texture.h"
 #include "ModelManager.h"
 #include "Shader.h"
-#include "MovementEventListener.h"
-#include "MovementEvent.h"
+#include "movements/MovementEventListener.h"
+#include "movements/MovementEvent.h"
 
 
 namespace Soul{

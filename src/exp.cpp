@@ -11,14 +11,13 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
 #include "misc.h"
-#include "Entity.h"
-#include "Light.h"
-#include "Entity.h"
-#include "EntityManager.h"
-#include "GraphicsComponent.h"
-#include "systems/GraphicSystem.h"
-#include "systems/CollisionSystem.h"
-#include "systems/MovementSystem.h"
+#include "graphics/Light.h"
+#include "entities/Entity.h"
+#include "entities/EntityManager.h"
+#include "graphics/GraphicsComponent.h"
+#include "graphics/GraphicSystem.h"
+#include "collisions/CollisionSystem.h"
+#include "movements/MovementSystem.h"
 #include <random>
 
 using namespace Soul;
