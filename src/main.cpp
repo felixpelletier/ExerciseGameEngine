@@ -60,7 +60,6 @@ int main()
 	makeGrid(&tiles, 15, floorBox.max.x - floorBox.min.x);
 
 	for (auto &tile_pos : tiles){
-
 		Handle h_tile = entityGod.createStaticEntity("ice.obj");
 		Entity* e_tile = entityGod.getEntity(h_tile);
 		std::cout << tile_pos.x << " " << tile_pos.z << std::endl;
@@ -68,8 +67,6 @@ int main()
 		g_tile->modelMat = glm::translate(g_tile->modelMat, tile_pos);
 		entities.push_back(h_tile);
 	}
-
-	//floor.graphics = InstancedGraphicsComponent(0, "ice.obj",tiles);//this is ugly as fuck, but temporary
 
 	double lastTime = glfwGetTime();
 	
@@ -90,19 +87,23 @@ int main()
 		if (glfwGetKey(graphics.window, GLFW_KEY_UP ) == GLFW_PRESS){
 		    speed += speedBoost * dt;
 		}
-		
+	
+		//Move backward
 		if (glfwGetKey(graphics.window, GLFW_KEY_DOWN ) == GLFW_PRESS){
 		    speed -= speedBoost * dt;
 		}
 
+		//Turn left
 		if (glfwGetKey(graphics.window, GLFW_KEY_LEFT ) == GLFW_PRESS){
 		   orientation  += glm::pow(glm::abs(speed), 0.5f) * orientationDampen * dt;
 		}
 		
+		//Turn right
 		if (glfwGetKey(graphics.window, GLFW_KEY_RIGHT ) == GLFW_PRESS){
 		   orientation -= glm::pow(glm::abs(speed), 0.5f) * orientationDampen * dt;
 		}
 		
+		//Speed damping
 		if (glm::abs(speed) < 3.0f){
 			speed = speed * glm::pow(0.2f, dt);
 		}
