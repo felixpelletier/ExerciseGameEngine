@@ -1,0 +1,21 @@
+Critical:
+-Logic System
+
+Major:
+-Camera as an entity
+-Position System instead of MovementSystem (storing physical position)?
+-Input System
+-Entities description (what collision model to use, what model to use, what shader to use, etc).
+-Is that handle thing really important or we just need the entity's id?
+
+Minor:
+-Deleting entities.
+
+Trivial:
+-Getting rid of that double floor model.
+
+As always:
+-Cleanup.
+-Clean that code up.
+-Make it clean.
+
