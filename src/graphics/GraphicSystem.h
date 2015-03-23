@@ -16,8 +16,8 @@
 #include "Texture.h"
 #include "ModelManager.h"
 #include "Shader.h"
-#include "movements/MovementEventListener.h"
-#include "movements/MovementEvent.h"
+#include "position/MovementEventListener.h"
+#include "position/MovementEvent.h"
 
 
 namespace Soul{

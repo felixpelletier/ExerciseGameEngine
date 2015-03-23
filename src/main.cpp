@@ -17,7 +17,7 @@
 #include "graphics/GraphicsComponent.h"
 #include "graphics/GraphicSystem.h"
 #include "collisions/CollisionSystem.h"
-#include "movements/MovementSystem.h"
+#include "position/PositionSystem.h"
 #include <random>
 
 using namespace Soul;
@@ -28,7 +28,7 @@ int main()
 {
 	GraphicSystem graphics = GraphicSystem();
 	CollisionSystem collisions = CollisionSystem();
-	MovementSystem mover = MovementSystem();
+	PositionSystem mover = PositionSystem();
 	mover.addListener(&graphics);
 	mover.addListener(&collisions);
 	EntityManager entityGod = EntityManager(&collisions, &graphics);

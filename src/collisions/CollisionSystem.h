@@ -10,8 +10,8 @@
 #include "CollisionComponent.h"
 #include "CollisionEvent.h"
 #include "CollisionEventListener.h"
-#include "movements/MovementEventListener.h"
-#include "movements/MovementEvent.h"
+#include "position/MovementEventListener.h"
+#include "position/MovementEvent.h"
 #include "System.h"
 
 namespace Soul{
