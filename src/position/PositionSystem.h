@@ -19,6 +19,8 @@ class PositionSystem : public System{
 	std::vector<MovementEventListener*> listeners;
 	std::map<int, PositionComponent> positions;
 
+	PositionComponent* _getComponent(int id);
+
 	public:
 		PositionSystem();
 		virtual void update (float dt, std::vector<Handle> &handles);
