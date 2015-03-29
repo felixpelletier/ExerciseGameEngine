@@ -3,12 +3,14 @@ Critical:
 
 Major:
 -Camera as an entity
--Input System
 -Entities description (what collision model to use, what model to use, what shader to use, etc).
--Replace handles with simple ids
+-Input System
+-HUD
 
 Minor:
 -Deleting entities.
+-Replace handles with simple ids
+-Animation System
 
 Trivial:
 -Getting rid of that double floor model.
