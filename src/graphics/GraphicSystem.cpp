@@ -53,7 +53,7 @@ void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementE
 		component->modelMat = glm::rotate(component->modelMat, event.rotation, event.rotationAxis);
 }
 
-void GraphicSystem::update(float dt, std::vector<Handle> &handles){
+void GraphicSystem::update(float dt){
 		// Send our transformation to the currently bound shader,
 		// in the "MVP" uniform
 		// For each model you render, since the MVP will be different (at least the M part)

@@ -7,7 +7,7 @@
 namespace Soul{
 
 CollisionSystem::CollisionSystem() : System(){}
-void CollisionSystem::update(float dt, std::vector<Handle> &handles){
+void CollisionSystem::update(float dt){
 
 	std::vector<CollisionEvent> events;
 

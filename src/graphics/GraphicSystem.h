@@ -50,7 +50,7 @@ namespace Soul{
 			GLFWwindow* window;
 			glm::vec3 cameraPos;
 			glm::mat4 viewMat;
-			virtual void update (float dt, std::vector<Handle> &handles);
+			virtual void update (float dt);
 			void receiveMovementEvent(MovementEvent event);
 			Handle addComponent(GraphicsComponent component);
 			GraphicsComponent* getComponent(Handle handle);

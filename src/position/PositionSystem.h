@@ -23,7 +23,7 @@ class PositionSystem : public System{
 
 	public:
 		PositionSystem();
-		virtual void update (float dt, std::vector<Handle> &handles);
+		virtual void update (float dt);
 		void addListener(MovementEventListener* listener);
 
 		void addComponent(PositionComponent component);

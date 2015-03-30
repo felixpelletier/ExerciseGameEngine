@@ -8,11 +8,9 @@ int ModelManager::loadModel(std::string name){
 	
 	auto i_model = models_n.find(MODELS_PATH + name);
 	if (i_model == models_n.end()){
-		std::cout << "gotta load" << std::endl;
 		return _loadModel(name);	
 	}
 	else{
-		std::cout << "found it!" << std::endl;
 		return (*i_model).second;
 	}
 }

@@ -8,7 +8,7 @@ namespace Soul{
 
 		public:
 			System() {};
-			virtual void update (float dt, std::vector<Handle> &handles) = 0;
+			virtual void update (float dt) = 0;
 
 	};
 }

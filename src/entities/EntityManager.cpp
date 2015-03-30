@@ -27,7 +27,6 @@ Handle EntityManager::createEntity(std::string modelPath){
 	Handle graphics = graphic_system->addComponent(GraphicsComponent(entity.id, model));
 
 	const Model* model_p = graphic_system->getModelManager()->getModel(model);
-	std::cout << graphic_system->getModelManager() << std::endl;
 	BoundingBox box = BoundingBox(model_p);
 	Handle collisions = collision_system->addComponent(CollisionComponent(entity.id, box));
 

@@ -4,7 +4,7 @@ namespace Soul{
 
 PositionSystem::PositionSystem() : System(){}
 
-void PositionSystem::update(float dt, std::vector<Handle> &handles){
+void PositionSystem::update(float dt){
 
 }
 

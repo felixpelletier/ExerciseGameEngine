@@ -29,7 +29,7 @@ namespace Soul{
 
 		public:
 			CollisionSystem();
-			virtual void update (float dt, std::vector<Handle> &handles);
+			virtual void update (float dt);
 			void addListener(CollisionEventListener* listener);
 			Handle addComponent(CollisionComponent component);
 			CollisionComponent* getComponent(Handle handle);
