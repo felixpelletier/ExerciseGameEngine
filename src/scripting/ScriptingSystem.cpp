@@ -4,10 +4,11 @@ namespace Soul{
 
 ScriptingSystem::ScriptingSystem() : System(){
 
-	lua_State *L = luaL_newstate();   /* opens Lua */
+	L = luaL_newstate();   /* opens Lua */
 	luaL_openlibs(L);             /* opens the libraries */
 
-	dofile(L, "game.lua");
+	dofile(L, "scripts/engine.lua");
+	dofile(L, "scripts/game.lua");
 
 }
 
@@ -56,18 +57,20 @@ void ScriptingSystem::iterate_events(lua_State* L){
 }
 
 void ScriptingSystem::process_event(lua_State* L){
-	int type = getfield(L, "type");
+	std::string type = getfield(L, "type");
 	std::cout << type << std::endl;
 	lua_pop(L, 1);
 }
 
-int ScriptingSystem::getfield (lua_State *L, const char *key) {
-      int result;
-      lua_pushstring(L, key);
-      lua_gettable(L, -2);  /* get dict[key] */
-      result = (int)lua_tonumber(L, -1);
-      lua_pop(L, 1);  /* remove number */
-      return result;
+std::string ScriptingSystem::getfield (lua_State *L, const char *key) {
+	std::string result;
+	lua_pushstring(L, key);
+	lua_gettable(L, -2);  /* get dict[key] */
+	size_t len;
+	const char* cstr = lua_tolstring(L, -1, &len);
+	result = std::string(cstr, len);
+	lua_pop(L, 1);  /* remove number */
+	return result;
 }
 
 void ScriptingSystem::addListener(ScriptingEventListener* listener){

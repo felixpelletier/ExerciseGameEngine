@@ -27,7 +27,7 @@ namespace Soul{
 		std::vector<MovementEvent> movementEvents;
 		std::vector<CollisionEvent> collisionEvents;
 
-		int getfield (lua_State *L, const char *key);
+		std::string getfield (lua_State *L, const char *key);
 		void iterate_events(lua_State* L);
 		int dofile(lua_State* L, const char *file);
 		int call(lua_State* L, const char *function, int nargs, int nresults);

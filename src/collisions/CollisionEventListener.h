@@ -5,6 +5,6 @@
 class CollisionEventListener{
 
 	public:
-		virtual void fireEvent(CollisionEvent event) = 0;
+		virtual void receiveCollisionEvent(CollisionEvent event) = 0;
 
 };

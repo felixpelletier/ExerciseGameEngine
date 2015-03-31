@@ -18,6 +18,7 @@
 #include "graphics/GraphicSystem.h"
 #include "collisions/CollisionSystem.h"
 #include "position/PositionSystem.h"
+#include "scripting/ScriptingSystem.h"
 #include <random>
 
 using namespace Soul;
@@ -31,6 +32,7 @@ int main()
 	PositionSystem* mover = new PositionSystem();
 	mover->addListener(graphics);
 	mover->addListener(collisions);
+	ScriptingSystem* scripting = new ScriptingSystem();
 	EntityManager entityGod = EntityManager(collisions, graphics);
 
 	std::vector<Handle> entities;
@@ -115,6 +117,8 @@ int main()
 		mover->rotate(h_player, orientation, glm::vec3(0.0f, 1.0f, 0.0f));
 
 		collisions->update(dt);
+
+		scripting->update(dt);
 
 		graphics->cameraPos = glm::vec3(position);
 		graphics->cameraPos.y = 3.0f;

@@ -75,7 +75,7 @@ void CollisionSystem::addListener(CollisionEventListener* listener){
 void CollisionSystem::fireEvent(CollisionEvent event){
 
 	for (auto &listener : listeners){
-		listener->fireEvent(event);
+		listener->receiveCollisionEvent(event);
 	}
 
 }
