@@ -5,6 +5,7 @@ libs = [ 'tinyobj'
         ,'GL'
         ,'glfw'
         ,'GLEW'
+        ,'lua'
         ]
 soul.Append(LIBS = libs)
 
