@@ -20,7 +20,7 @@ ScriptingSystem::~ScriptingSystem(){
 
 void ScriptingSystem::update(float dt){
 
-	if (!call(L, "update", 0, 1)) {
+	if (!call(L, "_update", 0, 1)) {
 		iterate_events(L);
 	}
 

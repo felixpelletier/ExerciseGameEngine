@@ -24,3 +24,9 @@ function Entity.__newindex(entity, key, value)
 	event.value = value
 	table.insert(events, event)
 end
+
+function _update()
+	events = {}
+	update()
+	return events
+end
