@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include "entities/Entity.h"
+#include "entities/EntityManager.h"
 #include "Handle.h"
 #include "ScriptingEvent.h"
 #include "ScriptingEventListener.h"
@@ -12,6 +13,7 @@
 #include "collisions/CollisionComponent.h"
 #include "collisions/CollisionEvent.h"
 #include "collisions/CollisionEventListener.h"
+#include "position/PositionSystem.h"
 #include "position/MovementEventListener.h"
 #include "position/MovementEvent.h"
 #include "System.h"
@@ -27,17 +29,24 @@ namespace Soul{
 		std::vector<MovementEvent> movementEvents;
 		std::vector<CollisionEvent> collisionEvents;
 
-		std::string getfield (lua_State *L, const char *key);
-		void iterate_events(lua_State* L);
-		int dofile(lua_State* L, const char *file);
-		int call(lua_State* L, const char *function, int nargs, int nresults);
-		void printError(lua_State *L);
-		void process_event(lua_State* L);
+		std::map<int, int> id_converter;
+
+		std::string getstrfield (const char *key);
+		double getnumfield (const char *key);
+		bool getboolfield (const char *key);
+		void iterate_events();
+		int dofile(const char *file);
+		int call(const char *function, int nargs, int nresults);
+		void printError();
+		void process_event();
 
 		lua_State* L;
+
+		EntityManager* entityManager;
+		PositionSystem* mover;
 	
 		public:
-			ScriptingSystem();
+			ScriptingSystem(EntityManager* entityManager, PositionSystem* mover);
 			~ScriptingSystem();
 			virtual void update (float dt);
 			void addListener(ScriptingEventListener* listener);

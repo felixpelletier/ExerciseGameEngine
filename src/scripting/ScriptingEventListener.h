@@ -5,6 +5,6 @@
 class ScriptingEventListener{
 
 	public:
-		virtual void fireEvent(ScriptingEvent event) = 0;
+		virtual void receiveScriptingEvent(ScriptingEvent event) = 0;
 
 };

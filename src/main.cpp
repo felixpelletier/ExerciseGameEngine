@@ -32,8 +32,9 @@ int main()
 	PositionSystem* mover = new PositionSystem();
 	mover->addListener(graphics);
 	mover->addListener(collisions);
-	ScriptingSystem* scripting = new ScriptingSystem();
 	EntityManager entityGod = EntityManager(collisions, graphics);
+	ScriptingSystem* scripting = new ScriptingSystem(&entityGod, mover);
+	scripting->addListener(graphics);
 
 	std::vector<Handle> entities;
 
@@ -42,7 +43,7 @@ int main()
 
 	entities.push_back(h_player);
 	
-	for (int o = 0; o < 100; o++){
+	/*for (int o = 0; o < 100; o++){
 		Handle h_oildrum = entityGod.createEntity("oildrum.obj");
 		glm::vec3 ranPos;
 		const float low = -100.0f;
@@ -53,7 +54,7 @@ int main()
 		mover->translate(h_oildrum, ranPos);
 		mover->rotate(h_oildrum, ranOrient, glm::vec3(0.0f, 1.0f, 0.0f));
 		entities.push_back(h_oildrum);
-	}
+	}*/
 	
 	std::vector<glm::vec3> tiles;
 

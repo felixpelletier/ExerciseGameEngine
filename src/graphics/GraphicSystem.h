@@ -18,10 +18,12 @@
 #include "Shader.h"
 #include "position/MovementEventListener.h"
 #include "position/MovementEvent.h"
+#include "scripting/ScriptingEventListener.h"
+#include "scripting/ScriptingEvent.h"
 
 
 namespace Soul{
-	class GraphicSystem : public System, public MovementEventListener{
+	class GraphicSystem : public System, public MovementEventListener, public ScriptingEventListener{
 		GLFWwindow* initWindow(int width, int height);
 
 		const int winWidth = 1280;
@@ -40,9 +42,12 @@ namespace Soul{
 		ModelManager modelManager;
 
 		virtual void drawComponent(const GraphicsComponent& component);
-		void processMovementEvent(GraphicsComponent* component, MovementEvent& event);
+		void processMovementEvent(MovementEvent& event);
+		void processScriptingEvent(ScriptingEvent& event);
 
 		std::vector<MovementEvent> movementEvents;
+		std::vector<ScriptingEvent> scriptingEvents;
+
 		GraphicsComponent* getComponent(int id);
 
 		public:
@@ -52,6 +57,7 @@ namespace Soul{
 			glm::mat4 viewMat;
 			virtual void update (float dt);
 			void receiveMovementEvent(MovementEvent event);
+			void receiveScriptingEvent(ScriptingEvent event);
 			Handle addComponent(GraphicsComponent component);
 			GraphicsComponent* getComponent(Handle handle);
 			ModelManager* getModelManager(){return &modelManager;};

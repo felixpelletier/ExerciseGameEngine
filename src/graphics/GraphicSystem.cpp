@@ -41,7 +41,12 @@ void GraphicSystem::receiveMovementEvent(MovementEvent event){
 	movementEvents.push_back(event);
 }
 
-void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementEvent& event){
+void GraphicSystem::receiveScriptingEvent(ScriptingEvent event){
+	scriptingEvents.push_back(event);
+}
+
+void GraphicSystem::processMovementEvent(MovementEvent& event){
+	GraphicsComponent* component = getComponent(event.id);
 	if (event.absolute){
 		component->modelMat = glm::mat4();
 	}
@@ -51,6 +56,17 @@ void GraphicSystem::processMovementEvent(GraphicsComponent* component, MovementE
 
 	if (event.rotation != 0.0f)
 		component->modelMat = glm::rotate(component->modelMat, event.rotation, event.rotationAxis);
+}
+
+void GraphicSystem::processScriptingEvent(ScriptingEvent& event){
+	if(event.param == "enabled"){
+		if(event.value == "true"){
+			getComponent(event.id)->enabled = true;
+		}
+		else{
+			getComponent(event.id)->enabled = false;
+		}
+	}
 }
 
 void GraphicSystem::update(float dt){
@@ -68,14 +84,21 @@ void GraphicSystem::update(float dt){
 		glUseProgram(this->shader.id);
 
 		for (auto &event : movementEvents){
-			GraphicsComponent* component = getComponent(event.id);
-			processMovementEvent(component, event);
+			processMovementEvent(event);
 		}
 
 		movementEvents.clear();
 
+		for (auto &event : scriptingEvents){
+			processScriptingEvent(event);
+		}
+
+		scriptingEvents.clear();
+
 		for (auto &component : components){
-			drawComponent(component.second);
+			if (component.second.enabled){
+				drawComponent(component.second);
+			}
 		}
 
 		glDisableVertexAttribArray(0);
