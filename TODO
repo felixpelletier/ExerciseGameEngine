@@ -1,8 +1,10 @@
 Critical:
--Logic System
+-Move everything to Logic System
+-Entity Id translation for Logic System
 
 Major:
 -Camera as an entity
+-Collision groups
 -Entities description (what collision model to use, what model to use, what shader to use, etc).
 -Input System
 -HUD
