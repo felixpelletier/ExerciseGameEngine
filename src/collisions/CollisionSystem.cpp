@@ -35,7 +35,6 @@ void CollisionSystem::update(float dt){
 					bb2.center += component2.boundingBoxTransform;
 					
 					if(glm::distance(bb2.center, bb1.center) < 1.75f ){
-						
 						CollisionEvent event;
 						event.id1 = component1.id;
 						event.id2 = component2.id;

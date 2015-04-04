@@ -29,9 +29,9 @@ function Entity.__newindex(entity, key, value)
 	table.insert(events, event)
 end
 
-function _update()
+function _update(inevents)
 	events = {}
-	update()
+	update(inevents)
 	return events
 end
 

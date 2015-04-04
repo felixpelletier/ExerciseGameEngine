@@ -44,6 +44,8 @@ namespace Soul{
 
 		EntityManager* entityManager;
 		PositionSystem* mover;
+
+		void stackdump_g(lua_State* L);
 	
 		public:
 			ScriptingSystem(EntityManager* entityManager, PositionSystem* mover);

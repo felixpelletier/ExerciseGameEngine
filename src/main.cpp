@@ -35,6 +35,7 @@ int main()
 	EntityManager entityGod = EntityManager(collisions, graphics);
 	ScriptingSystem* scripting = new ScriptingSystem(&entityGod, mover);
 	scripting->addListener(graphics);
+	collisions->addListener(scripting);
 
 	std::vector<Handle> entities;
 
@@ -80,7 +81,7 @@ int main()
 		float dt = float(currentTime - lastTime);
 		lastTime = currentTime;
 		
-		if (1/dt < 55) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
+		if (1/dt < 999999) std::cout << 1/dt << " FPS\n"; //If FPS<55, notify
 
 		float speedBoost = 6.0f;
 		float orientationDampen = 0.2f;

@@ -5,8 +5,14 @@ function init()
 	end
 end
 
-function update()
-	local choice = math.random(2)
-	choice = choice == 2
-	entities[math.random(100)].enabled = choice;
+function update(in_events)
+	for index,event in pairs(in_events) do
+		print("Event " .. index)
+		for key,value in pairs(event) do
+			print("Key: " .. key .. " Value: " .. value)
+		end
+	end
+	--local choice = math.random(2)
+	--choice = choice == 2
+	--entities[math.random(100)].enabled = choice;
 end
