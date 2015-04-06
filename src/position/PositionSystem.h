@@ -19,7 +19,7 @@ class PositionSystem : public System{
 	std::vector<MovementEventListener*> listeners;
 	std::map<int, PositionComponent> positions;
 
-	PositionComponent* _getComponent(int id);
+	PositionComponent* _getComponent(Handle id);
 
 	public:
 		PositionSystem();
@@ -27,7 +27,7 @@ class PositionSystem : public System{
 		void addListener(MovementEventListener* listener);
 
 		void addComponent(PositionComponent component);
-		const PositionComponent& getComponent(int id);
+		const PositionComponent& getComponent(Handle id);
 
 		void rotate(Handle h_entity, float orientation, glm::vec3 normal);
 		void translate(Handle h_entity, glm::vec3 translation);

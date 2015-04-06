@@ -79,19 +79,15 @@ void CollisionSystem::fireEvent(CollisionEvent event){
 
 }
 
-CollisionComponent* CollisionSystem::getComponent(int id){
+CollisionComponent* CollisionSystem::getComponent(Handle id){
 	return &components.find(id)->second;
-}
-
-CollisionComponent* CollisionSystem::getComponent(Handle handle){
-	return getComponent(handle.m_index);
 }
 
 Handle CollisionSystem::addComponent(CollisionComponent component){
 
 	components.insert(std::pair<int, CollisionComponent> (component.id, component));
 
-	return Handle(component.id, 0, Handle::Type::Collision);
+	return component.id;
 
 
 }

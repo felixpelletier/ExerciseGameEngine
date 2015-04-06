@@ -48,8 +48,6 @@ namespace Soul{
 		std::vector<MovementEvent> movementEvents;
 		std::vector<ScriptingEvent> scriptingEvents;
 
-		GraphicsComponent* getComponent(int id);
-
 		public:
 			GraphicSystem();
 			GLFWwindow* window;

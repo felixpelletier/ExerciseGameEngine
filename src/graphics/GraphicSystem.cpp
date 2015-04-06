@@ -133,11 +133,7 @@ void GraphicSystem::drawComponent(const GraphicsComponent& component){
 	}
 }
 
-GraphicsComponent* GraphicSystem::getComponent(Handle handle){
-	return getComponent(handle.m_index);
-}
-
-GraphicsComponent* GraphicSystem::getComponent(int id){
+GraphicsComponent* GraphicSystem::getComponent(Handle id){
 	return &components.find(id)->second;
 }
 
@@ -145,7 +141,7 @@ Handle GraphicSystem::addComponent(GraphicsComponent component){
 
 	components.insert(std::pair<int, GraphicsComponent>(component.id, component));
 
-	return Handle(component.id, 0, Handle::Type::Graphic);
+	return component.id;
 
 }
 

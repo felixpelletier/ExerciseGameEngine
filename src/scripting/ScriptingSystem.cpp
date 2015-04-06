@@ -125,11 +125,9 @@ void ScriptingSystem::process_event(){
 		double x = getnumfield("x");
 		double y = getnumfield("y");
 		double z = getnumfield("z");
-		int real_id = entityManager->createEntity(model + ".obj").m_index;
+		Handle real_id = entityManager->createEntity(model + ".obj");
 		id_converter.insert(std::pair<int, int>(id, real_id));
-		Handle temp;
-		temp.m_index = real_id;
-		mover->setToTranslation(temp, glm::vec3(x,y,z));
+		mover->setToTranslation(real_id, glm::vec3(x,y,z));
 	}
 	else if (type == "parameter"){
 		ScriptingEvent event;

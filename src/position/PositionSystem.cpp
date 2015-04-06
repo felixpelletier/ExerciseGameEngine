@@ -14,11 +14,11 @@ void PositionSystem::addComponent(PositionComponent component){
 
 }
 
-const PositionComponent& PositionSystem::getComponent(int id){
+const PositionComponent& PositionSystem::getComponent(Handle id){
 	return *_getComponent(id);
 }
 
-PositionComponent* PositionSystem::_getComponent(int id){
+PositionComponent* PositionSystem::_getComponent(Handle id){
 	return &positions.find(id)->second;
 }
 
@@ -35,7 +35,7 @@ void PositionSystem::addListener(MovementEventListener* listener){
 void PositionSystem::rotate(Handle h_entity, float orientation, glm::vec3 normal){
 	
 	MovementEvent event;
-	event.id = h_entity.m_index;
+	event.id = h_entity;
 	event.rotation = orientation;
 	event.rotationAxis = normal;
 	fireEvent(event);
@@ -44,12 +44,11 @@ void PositionSystem::rotate(Handle h_entity, float orientation, glm::vec3 normal
 
 void PositionSystem::translate(Handle h_entity, glm::vec3 translation){
 
-	int id = h_entity.m_index;
-	PositionComponent* component = _getComponent(id);
+	PositionComponent* component = _getComponent(h_entity);
 	component->position += translation;
 
 	MovementEvent event;
-	event.id = h_entity.m_index;
+	event.id = h_entity;
 	event.translation = translation;
 	fireEvent(event);
 
@@ -57,12 +56,11 @@ void PositionSystem::translate(Handle h_entity, glm::vec3 translation){
 
 void PositionSystem::setToTranslation(Handle h_entity, glm::vec3 translation){
 
-	int id = h_entity.m_index;
-	PositionComponent* component = _getComponent(id);
+	PositionComponent* component = _getComponent(h_entity);
 	component->position = translation;
 
 	MovementEvent event;
-	event.id = h_entity.m_index;
+	event.id = h_entity;
 	event.absolute = true;
 	event.translation = translation;
 	fireEvent(event);
