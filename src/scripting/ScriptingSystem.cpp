@@ -11,7 +11,6 @@ ScriptingSystem::ScriptingSystem(EntityManager* entityManager, PositionSystem* m
 	dofile("scripts/engine.lua");
 	dofile("scripts/game.lua");
 	
-
 	if (!call("_init", 0, 1)) {
 		iterate_events();
 	}
@@ -28,8 +27,22 @@ void ScriptingSystem::update(float dt){
 
 	lua_getglobal(L, "_update");
 	
-	std::cout << "size: " << collisionEvents.size() << std::endl;
 	lua_createtable(L, collisionEvents.size(), 0);
+
+	dumpCollisionsEventsToStack();
+
+	if(!lua_pcall(L, 1, 1, 0)){
+		iterate_events();
+	}
+	else{
+		printError();
+	}
+
+}
+
+//Need to be a table at position -1
+void ScriptingSystem::dumpCollisionsEventsToStack(){
+
 	int i = 1;
 	for(auto &event : collisionEvents){
 		lua_createtable(L, 0, 3);
@@ -51,16 +64,9 @@ void ScriptingSystem::update(float dt){
 			lua_rawset(L, -3);
 		}
 
-		lua_rawseti(L, -2, ++i);	
+		lua_rawseti(L, -2, i++);	
 	}
 	collisionEvents.clear();
-
-	if(!lua_pcall(L, 1, 1, 0)){
-		iterate_events();
-	}
-	else{
-		printError();
-	}
 
 }
 

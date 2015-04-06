@@ -47,6 +47,8 @@ namespace Soul{
 		PositionSystem* mover;
 
 		void stackdump_g(lua_State* L);
+
+		void dumpCollisionsEventsToStack();
 	
 		public:
 			ScriptingSystem(EntityManager* entityManager, PositionSystem* mover);
