@@ -29,7 +29,8 @@ namespace Soul{
 		std::vector<MovementEvent> movementEvents;
 		std::vector<CollisionEvent> collisionEvents;
 
-		std::map<int, int> id_converter;
+		std::map<int, int> scriptToEngine;
+		std::map<int, int> engineToScript;
 
 		std::string getstrfield (const char *key);
 		double getnumfield (const char *key);

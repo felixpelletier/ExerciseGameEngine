@@ -36,12 +36,27 @@ void ScriptingSystem::update(float dt){
 		lua_pushstring(L, "type");
 		lua_pushstring(L, "collision");
 		lua_rawset(L, -3);
+
 		lua_pushstring(L, "id1");
-		lua_pushnumber(L, event.id1);
+		auto id1 = engineToScript.find(event.id1);
+		if (id1 != engineToScript.end()){
+			lua_pushnumber(L, id1->second);
+		}
+		else{
+			lua_pushnil(L);
+		}
 		lua_rawset(L, -3);
+
 		lua_pushstring(L, "id2");
-		lua_pushnumber(L, event.id2);
+		auto id2 = engineToScript.find(event.id2);
+		if (id2 != engineToScript.end()){
+			lua_pushnumber(L, id2->second);
+		}
+		else{
+			lua_pushnil(L);
+		}
 		lua_rawset(L, -3);
+
 		lua_rawseti(L, -2, ++i);	
 	}
 	collisionEvents.clear();
@@ -126,12 +141,13 @@ void ScriptingSystem::process_event(){
 		double y = getnumfield("y");
 		double z = getnumfield("z");
 		Handle real_id = entityManager->createEntity(model + ".obj");
-		id_converter.insert(std::pair<int, int>(id, real_id));
+		scriptToEngine.insert(std::pair<int, int>(id, real_id));
+		engineToScript.insert(std::pair<int, int>(real_id, id));
 		mover->setToTranslation(real_id, glm::vec3(x,y,z));
 	}
 	else if (type == "parameter"){
 		ScriptingEvent event;
-		event.id = (int)getnumfield("id");
+		event.id = scriptToEngine[(int)getnumfield("id")];
 		event.param = getstrfield("key");
 		event.value = getstrfield("value");
 		std::cout << event.value << std::endl;
