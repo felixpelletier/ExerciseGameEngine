@@ -37,25 +37,19 @@ void ScriptingSystem::update(float dt){
 		lua_pushstring(L, "collision");
 		lua_rawset(L, -3);
 
-		lua_pushstring(L, "id1");
 		auto id1 = engineToScript.find(event.id1);
 		if (id1 != engineToScript.end()){
+			lua_pushstring(L, "id1");
 			lua_pushnumber(L, id1->second);
+			lua_rawset(L, -3);
 		}
-		else{
-			lua_pushnil(L);
-		}
-		lua_rawset(L, -3);
 
-		lua_pushstring(L, "id2");
 		auto id2 = engineToScript.find(event.id2);
 		if (id2 != engineToScript.end()){
+			lua_pushstring(L, "id2");
 			lua_pushnumber(L, id2->second);
+			lua_rawset(L, -3);
 		}
-		else{
-			lua_pushnil(L);
-		}
-		lua_rawset(L, -3);
 
 		lua_rawseti(L, -2, ++i);	
 	}
