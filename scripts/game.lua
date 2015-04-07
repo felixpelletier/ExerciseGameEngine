@@ -11,6 +11,14 @@ function update(in_events)
 		for key,value in pairs(event) do
 			print("Key: " .. key .. " Value: " .. value)
 		end
+		if event.type == 'collision' then
+			if event.id1 then
+				entities[event.id1].enabled = false
+			end
+			if event.id2 then
+				entities[event.id2].enabled = false
+			end
+		end
 	end
 	--local choice = math.random(2)
 	--choice = choice == 2
