@@ -2,6 +2,7 @@
  
 // Interpolated values from the vertex shaders
 in vec2 UV;
+in vec3 pos_worldspace;
 in vec3 lightDir_camspace;
 in vec3 normal_camspace;
 in vec3 eyeDir_camspace;
@@ -13,6 +14,7 @@ out vec3 color;
 uniform sampler2D DiffuseSampler;
 uniform sampler2D NormalSampler;
 uniform vec3 lightColor;
+uniform vec3 lightPos;
  
 void main(){
  
@@ -28,7 +30,7 @@ void main(){
     float cosTheta = clamp( dot(normal,light), 0, 1 );
     float cosAlpha = clamp( dot(eye,ref), 0, 1 );
     
-    float dist = length(lightDir_camspace);
+    float dist = length(lightPos - pos_worldspace);
 
     vec3 ambient = vec3(0.5, 0.5, 0.5);
 

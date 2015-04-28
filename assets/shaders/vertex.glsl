@@ -14,13 +14,14 @@ out vec2 UV;
 out vec3 lightDir_camspace;
 out vec3 normal_camspace;
 out vec3 eyeDir_camspace;
+out vec3 pos_worldspace;
 
 void main(){
 	vec4 pos = vec4(vertexPos + vertexOffset,1);
 
 	gl_Position = projMat * viewMat * modelMat * pos;
 
-	vec3 pos_worldspace = (modelMat * pos).xyz;
+	pos_worldspace = (modelMat * pos).xyz;
 	
 	vec3 pos_camspace = (viewMat * modelMat * pos).xyz;
 	eyeDir_camspace = vec3(0,0,0) - pos_camspace;
