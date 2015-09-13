@@ -26,6 +26,15 @@
 *.out
 *.app
 
+CMakeFiles
+cmake_install.cmake
+Makefile
+CMakeCache.txt
+
+.glew
+.glfw
+.tinyobjloader
+
 syntax: glob
 [B|b]uild/
 .idea/
