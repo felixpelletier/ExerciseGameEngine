@@ -26,10 +26,15 @@
 *.out
 *.app
 
+#CMake stuff
 CMakeFiles
 cmake_install.cmake
 Makefile
 CMakeCache.txt
+
+#Waf stuff
+soul*.tar.gz
+.lock-waf_linux_build
 
 .glew
 .glfw
