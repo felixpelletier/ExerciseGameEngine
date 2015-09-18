@@ -45,7 +45,6 @@ task :main => [:get_glm] do
   env.append_flag(['-O2', '-std=c++11'])
   env.append_lib(['tinyobjloader', 'glfw', 'rt', 'm', 'dl', 'GLEW', 'GLEWmx', 'GL', 'lua'])
   env.append_include(['.glm', '.tinyobj'])
-  #env.append_libdir(['/usr/lib'])
   if $PLATFORM == 'win32'
     env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
   end
@@ -56,6 +55,10 @@ task :main => [:get_glm] do
   unless uptodate?(env.prepend_build(out), src)
     CXX.compile(src, out, env)
   end
+end
+
+task :run => :main do
+  sh "./build/soul"
 end
 
 task :default => :main
