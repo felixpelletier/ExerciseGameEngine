@@ -1,6 +1,7 @@
 require 'rake/clean'
 require './scripts/cxx'
 
+$TOP = `pwd`
 $PLATFORM = 'UNIX'
 
 CLEAN.include('lib/libtinyobjloader.a')
@@ -25,4 +26,11 @@ task :tinyobj => [:get_tinyobj, "build/tinyobj"] do
     tiny_env.src_dir = '.tinyobj'
     CXX.slib(src, 'tinyobjloader', tiny_env)
   end
+end
+
+task :get_glm do
+  unless File.directory?(".glm")
+    sh "git clone https://github.com/g-truc/glm.git .glm"
+  end
+  sh "git -C .glm pull"
 end
