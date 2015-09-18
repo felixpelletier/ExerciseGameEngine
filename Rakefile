@@ -2,11 +2,15 @@ require 'rake/clean'
 require './scripts/cxx'
 
 $TOP = `pwd`
-$PLATFORM = 'UNIX'
+if ENV['OS'] == "Windows_NT"
+  $PLATFORM = 'win32'
+else
+  $PLATFORM = 'unix'
+end
 
 CLEAN.include('lib/libtinyobjloader.a')
 #nuke the build directory
-CLOBBER.include(['build', '.tinyobj'])
+CLOBBER.include(['build', '.tinyobj', '.glm'])
 
 directory "build/tinyobj"
 
@@ -30,8 +34,8 @@ end
 task :get_glm do
   unless File.directory?(".glm")
     sh "git clone https://github.com/g-truc/glm.git .glm"
+    sh "git -C .glm checkout 8f39bb8730d4"
   end
-  sh "git -C .glm pull"
 end
 
 task :main => [:get_glm, :tinyobj] do
@@ -40,7 +44,10 @@ task :main => [:get_glm, :tinyobj] do
   env.build_dir = 'build'
   env.append_flag(['-O2', '-std=c++11'])
   env.append_lib(['tinyobjloader', 'glfw3', 'GLEW'])
-  env.append_include(['.glm/glm', '.tinyobj'])
+  env.append_include(['.glm', '.tinyobj'])
+  if $PLATFORM == 'win32'
+    env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
+  end
   Dir.chdir('src')
   src = Dir.glob('**/*.cpp')
   out = 'soul'

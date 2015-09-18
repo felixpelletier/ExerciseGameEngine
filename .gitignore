@@ -39,6 +39,8 @@ soul*.tar.gz
 .glew
 .glfw
 .tinyobjloader
+.tinyobj
+.glm
 
 syntax: glob
 [B|b]uild/

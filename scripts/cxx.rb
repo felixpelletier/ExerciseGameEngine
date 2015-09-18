@@ -89,17 +89,6 @@ module CXX
   end
 
   # generals utilities
-  # change to windows compliant path
-  def self.pathplatf(p)
-    if $PLATFORM == "UNIX"
-      pass
-    else
-      ps = p.split("/")
-      p = ps.join("\\")
-    end
-    return p
-  end
-
   # return a src file but terminated has a compilation object
   def self.tobj(f)
     fs = f.split('.')
@@ -110,13 +99,13 @@ module CXX
 
   # generate correct static lib name
   def self.slibplatf(o)
-    if $PLATFORM == "UNIX"
+    if $PLATFORM == "unix"
       so = o.split('/')
       so[so.length - 1] = "lib" + so.last() + ".a"
       o = so.join("/")
     else
       so = o.split("/")
-      so.last += ".lib"
+      so[so.length - 1] = so.last() + ".lib"
       o = so.join("/")
     end
     return o
