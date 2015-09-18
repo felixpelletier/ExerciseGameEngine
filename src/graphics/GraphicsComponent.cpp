@@ -1,5 +1,5 @@
-#include "GraphicsComponent.h"
-#include "ModelInstance.h"
+#include "graphics/GraphicsComponent.h"
+#include "graphics/ModelInstance.h"
 
 namespace Soul{
 

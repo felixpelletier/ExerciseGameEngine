@@ -11,7 +11,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include <tinyobjloader/tiny_obj_loader.h>
+#include "tiny_obj_loader.h"
 #include "misc.h"
 
 #include "Handle.h"

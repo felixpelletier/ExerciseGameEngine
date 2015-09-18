@@ -1,6 +1,6 @@
-#include "BoundingBox.h"
+#include "collisions/BoundingBox.h"
 #include "graphics/Model.h"
-#include "tinyobjloader/tiny_obj_loader.h"
+#include "tiny_obj_loader.h"
 
 namespace Soul{
 

@@ -1,5 +1,5 @@
-#include "EntityManager.h"
-#include "Entity.h"
+#include "entities/EntityManager.h"
+#include "entities/Entity.h"
 #include "Handle.h"
 #include "graphics/GraphicsComponent.h"
 #include "collisions/CollisionComponent.h"

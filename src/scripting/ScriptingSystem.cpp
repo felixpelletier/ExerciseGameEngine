@@ -1,4 +1,4 @@
-#include "ScriptingSystem.h"
+#include "scripting/ScriptingSystem.h"
 
 namespace Soul{
 

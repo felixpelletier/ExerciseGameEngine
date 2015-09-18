@@ -9,7 +9,7 @@ class Environment
     @build_dir = "build"
     @lib_dir = ["lib"]
     @libs = []
-    @include_dir = []
+    @include_dir = ['include']
     @src_dir = ''
   end
 
@@ -22,20 +22,16 @@ class Environment
     end
   end
 
+  def append_lib(l)
+    @libs += l
+  end
+
   def append_libdir(a)
-    begin
-      @lib_dir += a
-    rescue
-      @lib_dir += [a]
-    end
+    @lib_dir += a
   end
 
   def append_include(a)
-    begin
-      @include_dir += a
-    rescue
-      @include_dir += [a]
-    end
+    @include_dir += a
   end
 
   def prepend_src(f)
@@ -76,7 +72,8 @@ module CXX
   def self.compile(src, target, env)
     sources = src.map{|i| env.prepend_src(i)}.join(' ')
     out = env.prepend_build(target)
-    system "g++ #{env.cxx_flags} #{sources} #{env.get_includes()} #{env.get_libdir} #{env.get_lib()} -o #{out}"
+    puts "g++ #{env.cxx_flags} #{env.get_includes()} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
+    system "g++ #{env.cxx_flags} #{env.get_includes()} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
   end
 
   def self.ar(src, target, env)

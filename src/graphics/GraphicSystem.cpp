@@ -1,4 +1,4 @@
-#include "GraphicSystem.h"
+#include "graphics/GraphicSystem.h"
 
 namespace Soul{
 

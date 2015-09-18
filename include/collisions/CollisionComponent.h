@@ -1,6 +1,6 @@
 #pragma once
 
-#include "BoundingBox.h"
+#include "collisions/BoundingBox.h"
 #include "graphics/Model.h"
 
 namespace Soul{

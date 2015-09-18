@@ -1,5 +1,5 @@
-#include "CollisionComponent.h"
-#include "BoundingBox.h"
+#include "collisions/CollisionComponent.h"
+#include "collisions/BoundingBox.h"
 
 namespace Soul{
 

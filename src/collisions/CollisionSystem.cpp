@@ -1,8 +1,8 @@
-#include "CollisionSystem.h"
+#include "collisions/CollisionSystem.h"
 #include "System.h"
-#include "CollisionComponent.h"
-#include "CollisionEvent.h"
-#include "CollisionEventListener.h"
+#include "collisions/CollisionComponent.h"
+#include "collisions/CollisionEvent.h"
+#include "collisions/CollisionEventListener.h"
 
 namespace Soul{
 

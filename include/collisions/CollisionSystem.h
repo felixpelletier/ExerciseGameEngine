@@ -7,9 +7,9 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "entities/Entity.h"
 #include "Handle.h"
-#include "CollisionComponent.h"
-#include "CollisionEvent.h"
-#include "CollisionEventListener.h"
+#include "collisions/CollisionComponent.h"
+#include "collisions/CollisionEvent.h"
+#include "collisions/CollisionEventListener.h"
 #include "position/MovementEventListener.h"
 #include "position/MovementEvent.h"
 #include "System.h"

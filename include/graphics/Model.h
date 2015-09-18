@@ -3,7 +3,7 @@
 #include <vector>
 #include "Mesh.h"
 #include "Texture.h"
-#include <tinyobjloader/tiny_obj_loader.h>
+#include "tiny_obj_loader.h"
 
 namespace Soul{
 

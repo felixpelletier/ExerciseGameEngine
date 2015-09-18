@@ -1,4 +1,4 @@
-#include "PositionComponent.h"
+#include "position/PositionComponent.h"
 
 namespace Soul{
 
