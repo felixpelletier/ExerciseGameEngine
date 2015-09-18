@@ -13,8 +13,8 @@ directory "build/tinyobj"
 task :get_tinyobj do
   unless File.directory?(".tinyobj")
     sh 'git clone https://github.com/syoyo/tinyobjloader .tinyobj'
+    sh 'git -C .tinyobj checkout 475bc83ef319'
   end
-  sh "git -C .tinyobj pull"
 end
 
 task :tinyobj => [:get_tinyobj, "build/tinyobj"] do
@@ -49,3 +49,5 @@ task :main => [:get_glm, :tinyobj] do
     CXX.compile(src, out, env)
   end
 end
+
+task :default => :main
