@@ -22,11 +22,13 @@ task :get_tinyobj do
 end
 
 task :tinyobj => [:get_tinyobj, "build/tinyobj"] do
-  src = ['tiny_obj_loader.cc', 'test.cc']
+  src = ['tiny_obj_loader.cc']
   unless uptodate?(CXX.slibplatf('build/lib/tinyobjloader'), src)
     tiny_env = Environment.new
     tiny_env.build_dir = 'build/tinyobj'
     tiny_env.src_dir = '.tinyobj'
+    tiny_env.cxx_flags = []
+    tiny_env.include_dir = []
     CXX.slib(src, 'tinyobjloader', tiny_env)
   end
 end
@@ -38,7 +40,7 @@ task :get_glm do
   end
 end
 
-task :main => [:get_glm] do
+task :main => [:get_glm, :tinyobj] do
   env = Environment.new
   env.src_dir = 'src'
   env.build_dir = 'build'

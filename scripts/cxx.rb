@@ -69,11 +69,12 @@ module CXX
 
   require 'rake'
 
-  def self.compile(src, target, env)
+  def self.compile(src, target, env, object=false)
     sources = src.map{|i| env.prepend_src(i)}.join(' ')
     out = env.prepend_build(target)
-    puts "g++ #{env.cxx_flags} #{env.get_includes()} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
-    system "g++ #{env.cxx_flags} #{env.get_includes()} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
+    ex = "g++ #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
+    puts ex
+    system ex
   end
 
   def self.ar(src, target, env)
@@ -84,7 +85,7 @@ module CXX
 
   def self.slib(src, out, env)
     cout = tobj(src[0])
-    compile(src, cout, env)
+    compile(src, cout, env, true)
     ar(cout, out, env)
   end
 
