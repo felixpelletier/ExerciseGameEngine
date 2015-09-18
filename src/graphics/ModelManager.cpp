@@ -40,7 +40,7 @@ int ModelManager::_loadModel(std::string inputfile){
 	for (auto &material : materials){
 		 struct Texture texture;
 		 texture.diffuse = this->textureManager.getTexture(material.diffuse_texname);
-		 texture.normal = this->textureManager.getTexture(material.normal_texname);
+		 texture.normal = this->textureManager.getTexture(material.bump_texname);
 		 model.textures.push_back(texture);
 	}
 
