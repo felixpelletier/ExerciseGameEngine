@@ -8,7 +8,7 @@ else
   $PLATFORM = 'unix'
 end
 
-CLEAN.include('lib/libtinyobjloader.a')
+CLEAN.include(CXX.slibplatf('lib/tinyobjloader'))
 #nuke the build directory
 CLOBBER.include(['build', '.tinyobj', '.glm'])
 
@@ -38,13 +38,14 @@ task :get_glm do
   end
 end
 
-task :main => [:get_glm, :tinyobj] do
+task :main => [:get_glm] do
   env = Environment.new
   env.src_dir = 'src'
   env.build_dir = 'build'
   env.append_flag(['-O2', '-std=c++11'])
-  env.append_lib(['tinyobjloader', 'glfw3', 'GLEW'])
+  env.append_lib(['tinyobjloader', 'glfw', 'rt', 'm', 'dl', 'GLEW', 'GLEWmx', 'GL', 'lua'])
   env.append_include(['.glm', '.tinyobj'])
+  #env.append_libdir(['/usr/lib'])
   if $PLATFORM == 'win32'
     env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
   end
