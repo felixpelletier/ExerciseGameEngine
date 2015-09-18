@@ -42,6 +42,8 @@ soul*.tar.gz
 .tinyobj
 .glm
 
+*.*.swp
+
 syntax: glob
 [B|b]uild/
 .idea/

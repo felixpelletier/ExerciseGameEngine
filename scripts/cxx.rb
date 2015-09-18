@@ -80,7 +80,9 @@ module CXX
   def self.ar(src, target, env)
     sources = env.prepend_build(src)
     out = slibplatf(env.prepend_lib(target))
-    system "ar crf #{out} #{sources}"
+    ex = "ar crf #{out} #{sources}"
+    puts ex
+    system ex
   end
 
   def self.slib(src, out, env)

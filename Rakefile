@@ -4,8 +4,10 @@ require './scripts/cxx'
 $TOP = `pwd`
 if ENV['OS'] == "Windows_NT"
   $PLATFORM = 'win32'
+  puts "Platform is Windows NT"
 else
   $PLATFORM = 'unix'
+  puts "Platform is Unix like"
 end
 
 CLEAN.include(CXX.slibplatf('lib/tinyobjloader'))
@@ -44,11 +46,15 @@ task :main => [:get_glm, :tinyobj] do
   env = Environment.new
   env.src_dir = 'src'
   env.build_dir = 'build'
-  env.append_flag(['-O2', '-std=c++11'])
-  env.append_lib(['tinyobjloader', 'glfw', 'rt', 'm', 'dl', 'GLEW', 'GLEWmx', 'GL', 'lua'])
+  env.append_flag(['-O2', '-std=c++11', '--verbose', '-Wl,--verbose'])
+  env.append_lib(['tinyobjloader', 'GLEW', 'GLEWmx'])
   env.append_include(['.glm', '.tinyobj'])
   if $PLATFORM == 'win32'
     env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
+    env.append_libdir(['"C:\Program Files (x86)\Lua\5.1"', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
+    env.append_lib(['glfw3', 'lua51', 'opengl32', 'gdi32', 'glew32', 'glew32mx'])
+  else
+    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW', 'GLEWmx'])
   end
   Dir.chdir('src')
   src = Dir.glob('**/*.cpp')
