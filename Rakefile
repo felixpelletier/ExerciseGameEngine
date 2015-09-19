@@ -47,14 +47,14 @@ task :main => [:get_glm, :tinyobj] do
   env.src_dir = 'src'
   env.build_dir = 'build'
   env.append_flag(['-O2', '-std=c++11', '--verbose', '-Wl,--verbose'])
-  env.append_lib(['tinyobjloader', 'GLEW', 'GLEWmx'])
+  env.append_lib(['tinyobjloader'])
   env.append_include(['.glm', '.tinyobj'])
   if $PLATFORM == 'win32'
     env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
     env.append_libdir(['"C:\Program Files (x86)\Lua\5.1"', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
-    env.append_lib(['glfw3', 'lua51', 'opengl32', 'gdi32', 'glew32', 'glew32mx'])
+    env.append_lib(['glfw3', 'lua51', 'opengl32', 'gdi32', 'glew32'])
   else
-    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW', 'GLEWmx'])
+    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
   end
   Dir.chdir('src')
   src = Dir.glob('**/*.cpp')
