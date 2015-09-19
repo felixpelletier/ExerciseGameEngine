@@ -53,7 +53,7 @@ task :main => [:get_glm, :tinyobj] do
     env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
     env.append_libdir(['"C:\Program Files (x86)\Lua\5.1"', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
     env.append_lib(['glfw3', 'lua51', 'opengl32', 'gdi32', 'glew32'])
-  else
+  else # linux env
     env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
   end
   Dir.chdir('src')
