@@ -1,6 +1,6 @@
 class Environment
 
-  attr_accessor :cxx_flags, :build_dir, :lib_dir, :libs, :include_dir, :src_dir
+  attr_accessor :cxx_flags, :build_dir, :lib_dir, :libs, :include_dir, :src_dir, :compiler
 
   #init
   def initialize()
@@ -11,6 +11,7 @@ class Environment
     @libs = []
     @include_dir = ['include']
     @src_dir = ''
+    @compiler = 'clang++'
   end
 
   # Append one or multiple flags
@@ -72,7 +73,7 @@ module CXX
   def self.compile(src, target, env, object=false)
     sources = src.map{|i| env.prepend_src(i)}.join(' ')
     out = env.prepend_build(target)
-    ex = "g++ #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
+    ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
     puts ex
     system ex
   end

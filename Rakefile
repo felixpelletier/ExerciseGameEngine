@@ -4,13 +4,13 @@ require './scripts/cxx'
 $TOP = `pwd`
 if ENV['OS'] == "Windows_NT"
   $PLATFORM = 'win32'
-  puts "Platform is Windows NT"
+  puts "Platform is Windows NT."
 else
   $PLATFORM = 'unix'
-  puts "Platform is Unix like"
+  puts "Platform is Linux."
 end
 
-CLEAN.include(CXX.slibplatf('lib/tinyobjloader'))
+CLEAN.include([CXX.slibplatf('lib/tinyobjloader'), 'build/soul', 'build/soul.exe', 'build/tinyobj/tiny_obj_loader.o'])
 #nuke the build directory
 CLOBBER.include(['build', '.tinyobj', '.glm'])
 
