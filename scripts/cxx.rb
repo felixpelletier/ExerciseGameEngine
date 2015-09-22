@@ -1,3 +1,5 @@
+require 'rake'
+
 class Environment
 
   attr_accessor :cxx_flags, :build_dir, :lib_dir, :libs, :include_dir, :src_dir, :compiler
@@ -51,6 +53,12 @@ class Environment
     @cxx_flags.join(' ')
   end
 
+  def compile(src, out)
+    src.each{|s| CXX.compile(prepend_src(s), prepend_build(CXX.tobj(s)), self, true)}
+    src = src.map{|s| CXX.tobj(s)}
+    CXX.compile(src.map{|s| prepend_build(s)}, out, self, false)
+  end
+
   def get_includes()
     return @include_dir.map{|i| "-I#{i}"}.join(' ')
   end
@@ -68,11 +76,7 @@ end
 
 module CXX
 
-  require 'rake'
-
   def self.compile(src, target, env, object=false)
-    sources = src.map{|i| env.prepend_src(i)}.join(' ')
-    out = env.prepend_build(target)
     ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
     puts ex
     system ex

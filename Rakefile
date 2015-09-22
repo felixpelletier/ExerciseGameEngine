@@ -56,33 +56,27 @@ task :main => [:get_glm, :tinyobj] do
   else
     out = 'soul'
   end
+  out = env.prepend_build(out)
 
-  unless uptodate?(env.prepend_build(out), src)
-    env.src_dir = 'src'
-    env.build_dir = 'build'
-    env.append_flag(['-O2', '-std=c++11'])
-    if ENV['debug']
-      env.append.flag(['--verbose', 'Wl,-v'])
-    end
-    env.append_lib(['tinyobjloader'])
-    env.append_include(['.glm', '.tinyobj'])
-    if $PLATFORM == 'win32'
-      env.append_include(['"./include/lua"'])
-      #env.append_libdir(['""', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
-      env.append_lib(['glfw3', 'lua53', 'opengl32', 'gdi32', 'glew32'])
-      ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./build"
-      puts ex
-      system ex
-    else # linux env
-      env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
-    end
-    CXX.compile(src, out, env)
-    if $PLATFORM == "win32"
-      #ex = "mv ./build/soul ./build/soul.exe"
-      #puts ex
-      #system ex
-    end
+  env.src_dir = 'src'
+  env.build_dir = 'build'
+  env.append_flag(['-O2', '-std=c++11'])
+  if ENV['debug']
+    env.append.flag(['--verbose', 'Wl,-v', '-g'])
   end
+  env.append_lib(['tinyobjloader'])
+  env.append_include(['.glm', '.tinyobj'])
+  if $PLATFORM == 'win32'
+    env.append_include(['"./include/lua"'])
+    #env.append_libdir(['""', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
+    env.append_lib(['glfw3', 'lua53', 'opengl32', 'gdi32', 'glew32'])
+    ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./build"
+    puts ex
+    system ex
+  else # linux env
+    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
+  end
+  env.compile(src, out)
 end
 
 task :run => :main do
