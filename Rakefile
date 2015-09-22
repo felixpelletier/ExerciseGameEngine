@@ -25,7 +25,7 @@ end
 
 task :tinyobj => [:get_tinyobj, "build/tinyobj"] do
   src = ['tiny_obj_loader.cc']
-  unless uptodate?(CXX.slibplatf('build/lib/tinyobjloader'), src)
+  unless uptodate?(CXX.slibplatf('lib/tinyobjloader'), src)
     tiny_env = Environment.new
     tiny_env.build_dir = 'build/tinyobj'
     tiny_env.src_dir = '.tinyobj'
@@ -44,29 +44,55 @@ end
 
 task :main => [:get_glm, :tinyobj] do
   env = Environment.new
-  env.src_dir = 'src'
-  env.build_dir = 'build'
-  env.append_flag(['-O2', '-std=c++11', '--verbose', '-Wl,--verbose'])
-  env.append_lib(['tinyobjloader'])
-  env.append_include(['.glm', '.tinyobj'])
-  if $PLATFORM == 'win32'
-    env.append_include(['"C:\Program Files (x86)\Lua\5.1\include"'])
-    env.append_libdir(['"C:\Program Files (x86)\Lua\5.1"', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
-    env.append_lib(['glfw3', 'lua51', 'opengl32', 'gdi32', 'glew32'])
-  else # linux env
-    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
-  end
+
+  #def src
   Dir.chdir('src')
   src = Dir.glob('**/*.cpp')
-  out = 'soul'
   Dir.chdir('..')
+
+  #def out
+  if $PLATFORM == "win32"
+    out = 'soul.exe'
+  else
+    out = 'soul'
+  end
+
   unless uptodate?(env.prepend_build(out), src)
+    env.src_dir = 'src'
+    env.build_dir = 'build'
+    env.append_flag(['-O2', '-std=c++11'])
+    if ENV['debug']
+      env.append.flag(['--verbose', 'Wl,-v'])
+    end
+    env.append_lib(['tinyobjloader'])
+    env.append_include(['.glm', '.tinyobj'])
+    if $PLATFORM == 'win32'
+      env.append_include(['"./include/lua"'])
+      #env.append_libdir(['""', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
+      env.append_lib(['glfw3', 'lua53', 'opengl32', 'gdi32', 'glew32'])
+      ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./build"
+      puts ex
+      system ex
+    else # linux env
+      env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
+    end
     CXX.compile(src, out, env)
+    if $PLATFORM == "win32"
+      #ex = "mv ./build/soul ./build/soul.exe"
+      #puts ex
+      #system ex
+    end
   end
 end
 
 task :run => :main do
-  sh "./build/soul"
+  if $PLATFORM == 'win32'
+    exe = './build/soul.exe'
+  else
+    exe = './build/soul'
+  end
+  puts exe
+  system exe
 end
 
 task :default => :main
