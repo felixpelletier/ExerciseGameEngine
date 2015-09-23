@@ -1,7 +1,4 @@
-require 'rake'
-
 class Environment
-
   attr_accessor :cxx_flags, :build_dir, :lib_dir, :libs, :include_dir, :src_dir, :compiler
 
   #init
@@ -75,11 +72,16 @@ class Environment
 end
 
 module CXX
-
   def self.compile(src, target, env, object=false)
-    ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{sources} #{env.get_libdir} #{env.get_lib()} -o #{out}"
-    puts ex
-    system ex
+    puts "#{target} : #{dir?(target)}"
+    unless dir?(target)
+      create_dir(target)
+    end
+    unless not object or uptodate?(target, src)
+      ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{if not object then src.join(' ') else src end} #{env.get_libdir} #{env.get_lib()} -o #{target}"
+      puts ex
+      system ex
+    end
   end
 
   def self.ar(src, target, env)
@@ -117,5 +119,17 @@ module CXX
       o = so.join("/")
     end
     return o
+  end
+
+  def self.objtodir(p)
+    return p.split('/').slice(0, p.split('/').length - 1).join('/')
+  end
+
+  def self.dir?(p)
+    return File.directory?(objtodir(p))
+  end
+
+  def self.create_dir(p)
+    FileUtils.mkdir_p(objtodir(p))
   end
 end
