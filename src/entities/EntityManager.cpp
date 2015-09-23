@@ -30,8 +30,8 @@ Handle EntityManager::createEntity(std::string modelPath){
 	BoundingBox box = BoundingBox(model_p);
 	int collisions = collision_system->addComponent(CollisionComponent(entity.id, box));
 
-	entity.graphics = graphics;
-	entity.collisions = collisions;
+	//entity.graphics = graphics;
+	//entity.collisions = collisions;
 
 	this->entities.insert(std::pair<int, Entity>(entity.id, entity));
 	Handle handle = entity.id;

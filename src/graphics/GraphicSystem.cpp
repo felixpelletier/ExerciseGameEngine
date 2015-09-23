@@ -51,11 +51,13 @@ void GraphicSystem::processMovementEvent(MovementEvent& event){
 		component->modelMat = glm::mat4();
 	}
 	
-	if (glm::length(event.translation) > 0.00001f)
-	component->modelMat = glm::translate(component->modelMat, event.translation);
+	if (glm::length(event.translation) > 0.00001f){
+		component->modelMat = glm::translate(component->modelMat, event.translation);
+	}
 
-	if (event.rotation != 0.0f)
+	if (event.rotation != 0.0f){
 		component->modelMat = glm::rotate(component->modelMat, event.rotation, event.rotationAxis);
+	}
 }
 
 void GraphicSystem::processScriptingEvent(ScriptingEvent& event){

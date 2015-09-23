@@ -64,9 +64,7 @@ int main()
 
 	for (auto &tile_pos : tiles){
 		Handle h_tile = entityGod.createStaticEntity("ice.obj");
-		Entity* e_tile = entityGod.getEntity(h_tile);
-		GraphicsComponent* g_tile = graphics->getComponent(e_tile->graphics);
-		g_tile->modelMat = glm::translate(g_tile->modelMat, tile_pos);
+		mover->setToTranslation(h_tile, tile_pos);
 		entities.push_back(h_tile);
 	}
 
