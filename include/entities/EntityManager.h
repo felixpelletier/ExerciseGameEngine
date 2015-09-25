@@ -11,14 +11,14 @@ namespace Soul{
 class EntityManager{
 	public:
 		EntityManager(CollisionSystem* collisions, GraphicSystem* graphics);
-		Entity* getEntity(Handle handle);
 		Handle createEntity(std::string modelPath);
 		Handle createStaticEntity(std::string modelPath);
 
 	private:
-		std::map<int, Entity> entities;
 		GraphicSystem* graphic_system;
 		CollisionSystem* collision_system;
+		Handle id_counter;
+		Handle getNewHandle();
 	
 };
 

@@ -52,6 +52,7 @@ void GraphicSystem::processMovementEvent(MovementEvent& event){
 	}
 	
 	if (glm::length(event.translation) > 0.00001f){
+		//std::cout << event.translation.x << " + " << event.translation.z << std::endl;
 		component->modelMat = glm::translate(component->modelMat, event.translation);
 	}
 
