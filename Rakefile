@@ -62,7 +62,7 @@ task :main => [:get_glm, :tinyobj] do
     env.build_dir = 'build'
     env.append_flag(['-O2', '-std=c++11'])
     if ENV['debug']
-      env.append.flag(['--verbose', 'Wl,-v'])
+      env.append_flag(['--verbose', '-Wl,-v'])
     end
     env.append_lib(['tinyobjloader'])
     env.append_include(['.glm', '.tinyobj'])
