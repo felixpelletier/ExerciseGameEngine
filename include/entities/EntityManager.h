@@ -1,6 +1,5 @@
 #pragma once
 
-#include "Entity.h"
 #include "Handle.h"
 #include "graphics/GraphicSystem.h"
 #include "collisions/CollisionSystem.h"

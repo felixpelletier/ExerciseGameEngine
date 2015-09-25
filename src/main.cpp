@@ -12,7 +12,6 @@
 #include <GLFW/glfw3.h>
 #include "misc.h"
 #include "graphics/Light.h"
-#include "entities/Entity.h"
 #include "entities/EntityManager.h"
 #include "graphics/GraphicsComponent.h"
 #include "graphics/GraphicSystem.h"

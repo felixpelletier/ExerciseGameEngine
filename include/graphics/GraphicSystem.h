@@ -9,7 +9,6 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
-#include "entities/Entity.h"
 #include "GraphicsComponent.h"
 #include "System.h"
 #include "Light.h"

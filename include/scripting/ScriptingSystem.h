@@ -4,7 +4,6 @@
 #include <vector>
 #include <iostream>
 #include <string>
-#include "entities/Entity.h"
 #include "entities/EntityManager.h"
 #include "Handle.h"
 #include "ScriptingEvent.h"

@@ -5,7 +5,6 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/constants.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "entities/Entity.h"
 #include "Handle.h"
 #include "collisions/CollisionComponent.h"
 #include "collisions/CollisionEvent.h"
