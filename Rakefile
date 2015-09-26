@@ -70,7 +70,7 @@ task :main => [:get_glm, :tinyobj] do
       env.append_include(['"./include/lua"'])
       #env.append_libdir(['""', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
       env.append_lib(['glfw3', 'lua53', 'opengl32', 'gdi32', 'glew32'])
-      ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./build"
+      ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./lib/glfw3.dll ./build"
       puts ex
       system ex
     else # linux env
