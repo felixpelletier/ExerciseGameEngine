@@ -71,65 +71,62 @@ class Environment
   end
 end
 
-module CXX
-  def self.compile(src, target, env, object=false)
-    puts "#{target} : #{dir?(target)}"
-    unless dir?(target)
-      create_dir(target)
-    end
-    unless not object or uptodate?(target, src)
-      ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{if not object then src.join(' ') else src end} #{env.get_libdir} #{env.get_lib()} -o #{target}"
-      puts ex
-      system ex
-    end
+def self.compile(src, target, env, object=false)
+  puts "#{target} : #{dir?(target)}"
+  unless dir?(target)
+    create_dir(target)
   end
-
-  def self.ar(src, target, env)
-    sources = env.prepend_build(src)
-    out = slibplatf(env.prepend_lib(target))
-    ex = "ar crf #{out} #{sources}"
+  unless not object or uptodate?(target, src)
+    ex = "#{env.compiler} #{env.cxx_flags} #{env.get_includes()} #{if object then "-c" end} #{if not object then src.join(' ') else src end} #{env.get_libdir} #{env.get_lib()} -o #{target}"
     puts ex
     system ex
   end
+end
 
-  def self.slib(src, out, env)
-    cout = tobj(src[0])
-    compile(src, cout, env, true)
-    ar(cout, out, env)
-  end
+def self.ar(src, target, env)
+  sources = env.prepend_build(src)
+  out = slibplatf(env.prepend_lib(target))
+  ex = "ar crf #{out} #{sources}"
+  puts ex
+  system ex
+end
 
-  # generals utilities
-  # return a src file but terminated has a compilation object
-  def self.tobj(f)
-    fs = f.split('.')
-    len = f.split('.').length
-    ret = fs[len - 2] + '.o'
-    return ret
-  end
+def self.slib(src, out, env)
+  cout = tobj(src[0])
+  compile(src, cout, env, true)
+  ar(cout, out, env)
+end
 
-  # generate correct static lib name
-  def self.slibplatf(o)
-    if $PLATFORM == "unix"
-      so = o.split('/')
-      so[so.length - 1] = "lib" + so.last() + ".a"
-      o = so.join("/")
-    else
-      so = o.split("/")
-      so[so.length - 1] = so.last() + ".lib"
-      o = so.join("/")
-    end
-    return o
-  end
+# generals utilities
+def self.tobj(f)
+  fs = f.split('.')
+  len = f.split('.').length
+  ret = fs[len - 2] + '.o'
+  return ret
+end
 
-  def self.objtodir(p)
-    return p.split('/').slice(0, p.split('/').length - 1).join('/')
+# generate correct static lib name
+def self.slibplatf(o)
+  if $PLATFORM == "unix"
+    so = o.split('/')
+    so[so.length - 1] = "lib" + so.last() + ".a"
+    o = so.join("/")
+  else
+    so = o.split("/")
+    so[so.length - 1] = so.last() + ".lib"
+    o = so.join("/")
   end
+  return o
+end
 
-  def self.dir?(p)
-    return File.directory?(objtodir(p))
-  end
+def self.objtodir(p)
+  return p.split('/').slice(0, p.split('/').length - 1).join('/')
+end
 
-  def self.create_dir(p)
-    FileUtils.mkdir_p(objtodir(p))
-  end
+def self.dir?(p)
+  return File.directory?(objtodir(p))
+end
+
+def self.create_dir(p)
+  FileUtils.mkdir_p(objtodir(p))
 end
