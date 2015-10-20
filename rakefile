@@ -1,7 +1,7 @@
+require 'rake'
 require 'rake/clean'
-require './scripts/cxx'
 
-$TOP = `pwd`
+# env check
 if ENV['OS'] == "Windows_NT"
   $PLATFORM = 'win32'
   puts "Platform is Windows NT."
@@ -10,11 +10,35 @@ else
   puts "Platform is Linux."
 end
 
-CLEAN.include([CXX.slibplatf('lib/tinyobjloader'), 'build/soul', 'build/soul.exe', 'build/tinyobj/tiny_obj_loader.o'])
-#nuke the build directory
-CLOBBER.include(['build', '.tinyobj', '.glm'])
 
-directory "build/tinyobj"
+#define the compiler
+COMPILER = "clang++"
+
+#define src and object ouptus
+SRC_CPP = Rake::FileList["src/**/*.cpp"]
+SRC_OBJ = SRC_CPP.pathmap("%{src/,build/}X.o")
+
+task :default => SRC_OBJ
+
+directory "build"
+directory "build/lib"
+rule "*.o" => ->(f){source_for_obj(f)} do |t|
+  mkdir_p t.name.pathmap("d")
+  sh "#{COMPILER} #{CPP_FLAGS} -c -o #{t.target} #{t.src}"
+end
+
+def source_for_obj(obj)
+  all_src = SRC_CPP
+  all_src.detect{|f| f.pathmap("%X") == obj.pathmap("%X")}
+end
+
+def target_for_lib(lib)
+  if $PLATFORM == 'win32'
+    lib.pathmap("build/lib/%n.lib")
+  else
+    lib.pathmap("build/lib/lib%n.a")
+  end
+end
 
 task :get_tinyobj do
   unless File.directory?(".tinyobj")
@@ -23,15 +47,11 @@ task :get_tinyobj do
   end
 end
 
-task :tinyobj => [:get_tinyobj, "build/tinyobj"] do
-  src = ['tiny_obj_loader.cc']
-  unless uptodate?(CXX.slibplatf('lib/tinyobjloader'), src)
-    tiny_env = Environment.new
-    tiny_env.build_dir = 'build/tinyobj'
-    tiny_env.src_dir = '.tinyobj'
-    tiny_env.cxx_flags = []
-    tiny_env.include_dir = []
-    CXX.slib(src, 'tinyobjloader', tiny_env)
+task :tinyobj => [:get_tinyobj, "build", "build/lib"] do
+  target = target_for_lib('tinyobjloader')
+  src = [".tinyobj/tiny_obj_loader.cc"].join(' ')
+  unless uptodate?(target, src)
+    sh "#{COMPILER} -c -o #{target} #{src}"
   end
 end
 
@@ -90,3 +110,4 @@ task :run => :main do
 end
 
 task :default => :main
+# >> Platform is Linux.
