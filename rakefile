@@ -13,7 +13,8 @@ end
 
 
 #define the compiler and options
-COMPILER = "clang -x c++"
+COMPILER = "clang++"
+#COMPILER = "g++"
 $base_flags = ['-std=c++11',
                '-Iinclude',
                '-I.glm',
@@ -21,7 +22,7 @@ $base_flags = ['-std=c++11',
                ]
 
 if ENV['debug']
-  $base_flags << ['-Wall', '--verbose', 'Wl,-v', '-g',]
+  $base_flags << ['-Wall', '--verbose', '-Wl,-v', '-g',]
 end
 
 if $PLATFORM == 'win32'
@@ -36,7 +37,7 @@ if $PLATFORM == 'win32'
   ['./lib/lua53.dll', './lib/glew32.dll'].each{ |l| cp(l, './build') }
 else # linux env
   $libs_flags = ['-Llib',
-                 '-ltinyobjloader.a',
+                 '-ltinyobjloader',
                  '-lglfw',
                  '-lrt',
                  '-lm',
@@ -122,7 +123,7 @@ task :compile => :default do
   flags = $base_flags.flatten.join(' ')
   libs = $libs_flags.flatten.join(' ')
 
-  sh "#{COMPILER} #{flags} -c -o #{target} #{libs} #{src}" unless uptodate?(target, src)
+  sh "#{COMPILER} #{flags} #{libs} -o #{target} #{src}" unless uptodate?(target, src)
 end
 
 task :run => :compile do
