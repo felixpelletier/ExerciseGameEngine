@@ -1,5 +1,6 @@
 require 'rake'
 require 'rake/clean'
+Rake.application.options.trace_rules = true
 
 # env check
 if ENV['OS'] == "Windows_NT"
@@ -11,25 +12,66 @@ else
 end
 
 
-#define the compiler
-COMPILER = "clang++"
+#define the compiler and options
+COMPILER = "clang -x c++"
+$base_flags = ['-std=c++11',
+               '-Iinclude',
+               '-I.glm',
+               '-I.tinyobj',
+               ]
+
+if ENV['debug']
+  $base_flags << ['-Wall', '--verbose', 'Wl,-v', '-g',]
+end
+
+if $PLATFORM == 'win32'
+  $libs_flags = ['-Llib',
+                 '-I./include/lua',
+                 '-lglfw3',
+                 '-lua53',
+                 '-lopengl32',
+                 '-lgdi32',
+                 '-lglew32',]
+
+  ['./lib/lua53.dll', './lib/glew32.dll'].each{ |l| cp(l, './build') }
+else # linux env
+  $libs_flags = ['-Llib',
+                 '-ltinyobjloader.a',
+                 '-lglfw',
+                 '-lrt',
+                 '-lm',
+                 '-ldl',
+                 '-llua',
+                 '-lGL',
+                 '-lGLEW',]
+end
+
 
 #define src and object ouptus
 SRC_CPP = Rake::FileList["src/**/*.cpp"]
+SRC_CPP.exclude("**/main.cpp")
+MAIN = Rake::FileList["src/**/main.cpp"]
 SRC_OBJ = SRC_CPP.pathmap("%{src/,build/}X.o")
+CLEAN.include(SRC_OBJ)
 
-task :default => SRC_OBJ
+task :default => ["build", :tinyobj, :get_glm, SRC_OBJ].flatten
 
 directory "build"
+CLOBBER.include('build')
+
 directory "build/lib"
-rule "*.o" => ->(f){source_for_obj(f)} do |t|
-  mkdir_p t.name.pathmap("d")
-  sh "#{COMPILER} #{CPP_FLAGS} -c -o #{t.target} #{t.src}"
-end
 
 def source_for_obj(obj)
   all_src = SRC_CPP
-  all_src.detect{|f| f.pathmap("%X") == obj.pathmap("%X")}
+  all_src.detect{|f| f.pathmap("%n") == obj.pathmap("%n")}
+end
+
+rule ".o" => ->(f){source_for_obj(f)} do |t|
+  mkdir_p t.name.pathmap("%d")
+  target = t.name
+  src = t.source
+  flags = $base_flags.flatten.join(' ')
+  sh "#{COMPILER} #{flags} -c -o #{target} #{src}"
 end
 
 def target_for_lib(lib)
@@ -46,14 +88,19 @@ task :get_tinyobj do
     sh 'git -C .tinyobj checkout 475bc83ef319'
   end
 end
+CLOBBER.include('.tinyobj')
 
 task :tinyobj => [:get_tinyobj, "build", "build/lib"] do
   target = target_for_lib('tinyobjloader')
-  src = [".tinyobj/tiny_obj_loader.cc"].join(' ')
+  src = ['.tinyobj/tiny_obj_loader.cc']
   unless uptodate?(target, src)
-    sh "#{COMPILER} -c -o #{target} #{src}"
+    sh "#{COMPILER} --std=c++11 -c -o #{target.join(' ')} #{src}"
+    cp(target, 'lib/')
   end
 end
+CLEAN.include(['build/tinyobjloader.o',
+               'build/lib/tinyobjloader.a',
+               'lib/tinyobjloader.a',])
 
 task :get_glm do
   unless File.directory?(".glm")
@@ -61,45 +108,24 @@ task :get_glm do
     sh "git -C .glm checkout 8f39bb8730d4"
   end
 end
+CLOBBER.include('.glm')
 
-task :main => [:get_glm, :tinyobj] do
-  env = Environment.new
+task :compile => :default do
 
-  #def src
-  Dir.chdir('src')
-  src = Dir.glob('**/*.cpp')
-  Dir.chdir('..')
-
-  #def out
   if $PLATFORM == "win32"
-    out = 'soul.exe'
+    target = 'build/soul.exe'
   else
-    out = 'soul'
+    target = 'build/soul'
   end
-  out = env.prepend_build(out)
 
-  env.src_dir = 'src'
-  env.build_dir = 'build'
-  env.append_flag(['-O2', '-std=c++11'])
-  if ENV['debug']
-    env.append.flag(['--verbose', 'Wl,-v', '-g'])
-  end
-  env.append_lib(['tinyobjloader'])
-  env.append_include(['.glm', '.tinyobj'])
-  if $PLATFORM == 'win32'
-    env.append_include(['"./include/lua"'])
-    #env.append_libdir(['""', '"C:\tools\mingw64\lib\gcc\x86_64-w64-mingw32\lib"'])
-    env.append_lib(['glfw3', 'lua53', 'opengl32', 'gdi32', 'glew32'])
-    ex = "cp ./lib/lua53.dll ./lib/glew32.dll ./build"
-    puts ex
-    system ex
-  else # linux env
-    env.append_lib(['glfw', 'rt', 'm', 'dl', 'lua', 'GL', 'GLEW'])
-  end
-  env.compile(src, out)
+  src = SRC_OBJ + MAIN
+  flags = $base_flags.flatten.join(' ')
+  libs = $libs_flags.flatten.join(' ')
+
+  sh "#{COMPILER} #{flags} -c -o #{target} #{libs} #{src}" unless uptodate?(target, src)
 end
 
-task :run => :main do
+task :run => :compile do
   if $PLATFORM == 'win32'
     exe = './build/soul.exe'
   else
@@ -108,6 +134,3 @@ task :run => :main do
   puts exe
   system exe
 end
-
-task :default => :main
-# >> Platform is Linux.
