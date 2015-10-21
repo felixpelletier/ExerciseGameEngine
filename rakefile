@@ -1,6 +1,6 @@
 require 'rake'
 require 'rake/clean'
-Rake.application.options.trace_rules = true
+#Rake.application.options.trace_rules = true
 
 # env check
 if ENV['OS'] == "Windows_NT"
@@ -14,7 +14,6 @@ end
 
 #define the compiler and options
 COMPILER = "clang++"
-#COMPILER = "g++"
 $base_flags = ['-std=c++11',
                '-Iinclude',
                '-I.glm',
@@ -93,9 +92,9 @@ CLOBBER.include('.tinyobj')
 
 task :tinyobj => [:get_tinyobj, "build", "build/lib"] do
   target = target_for_lib('tinyobjloader')
-  src = ['.tinyobj/tiny_obj_loader.cc']
-  unless uptodate?(target, src)
-    sh "#{COMPILER} --std=c++11 -c -o #{target.join(' ')} #{src}"
+  src = '.tinyobj/tiny_obj_loader.cc'
+  unless uptodate?(target, [src])
+    sh "#{COMPILER} --std=c++11 -c -o #{target} #{src}"
     cp(target, 'lib/')
   end
 end
@@ -132,6 +131,5 @@ task :run => :compile do
   else
     exe = './build/soul'
   end
-  puts exe
   system exe
 end
