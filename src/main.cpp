@@ -12,7 +12,6 @@
 #include <GLFW/glfw3.h>
 #include "misc.h"
 #include "graphics/Light.h"
-#include "entities/Entity.h"
 #include "entities/EntityManager.h"
 #include "graphics/GraphicsComponent.h"
 #include "graphics/GraphicSystem.h"
@@ -39,7 +38,6 @@ int main()
 
 	std::vector<Handle> entities;
 
-	Handle h_floor = entityGod.createEntity("ice.obj");
 	Handle h_player = entityGod.createEntity("Snowmobile.obj");
 
 	entities.push_back(h_player);
@@ -59,15 +57,16 @@ int main()
 	
 	std::vector<glm::vec3> tiles;
 
-	BoundingBox floorBox = collisions->getComponent(entityGod.getEntity(h_floor)->collisions)->getBoundingBox();
+	int floor_model = graphics->getModelManager()->loadModel("ice.obj");
+	Model* floor_model_p = graphics->getModelManager()->getModel(floor_model);
+
+	//Generating the floor tiles
+	BoundingBox floorBox = BoundingBox(floor_model_p);
 	makeGrid(&tiles, 15, floorBox.max.x - floorBox.min.x);
 
 	for (auto &tile_pos : tiles){
 		Handle h_tile = entityGod.createStaticEntity("ice.obj");
-		Entity* e_tile = entityGod.getEntity(h_tile);
-		GraphicsComponent* g_tile = graphics->getComponent(e_tile->graphics);
-		g_tile->modelMat = glm::translate(g_tile->modelMat, tile_pos);
-		entities.push_back(h_tile);
+		mover->setToTranslation(h_tile, tile_pos);
 	}
 
 	double lastTime = glfwGetTime();

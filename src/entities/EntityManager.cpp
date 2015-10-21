@@ -1,5 +1,4 @@
 #include "entities/EntityManager.h"
-#include "entities/Entity.h"
 #include "Handle.h"
 #include "graphics/GraphicsComponent.h"
 #include "collisions/CollisionComponent.h"
@@ -13,43 +12,36 @@ EntityManager::EntityManager(CollisionSystem* collisions, GraphicSystem* graphic
 
 	this->graphic_system = graphics;
 	this->collision_system = collisions;
+	this->id_counter = 0;
 
 }
 
-Entity* EntityManager::getEntity(Handle handle){
-	return &entities.find(handle)->second;
+Handle EntityManager::getNewHandle(){
+	return id_counter++;
 }
 
 Handle EntityManager::createEntity(std::string modelPath){
 
-	Entity entity;
+	Handle entity = getNewHandle();
+	//Model loading should not be here.
 	int model = graphic_system->getModelManager()->loadModel(modelPath);
-	int graphics = graphic_system->addComponent(GraphicsComponent(entity.id, model));
+	graphic_system->addComponent(GraphicsComponent(entity, model));
 
 	const Model* model_p = graphic_system->getModelManager()->getModel(model);
 	BoundingBox box = BoundingBox(model_p);
-	int collisions = collision_system->addComponent(CollisionComponent(entity.id, box));
+	collision_system->addComponent(CollisionComponent(entity, box));
 
-	entity.graphics = graphics;
-	entity.collisions = collisions;
-
-	this->entities.insert(std::pair<int, Entity>(entity.id, entity));
-	Handle handle = entity.id;
-	return handle;
+	return entity;
 
 }
 
 Handle EntityManager::createStaticEntity(std::string modelPath){
 
-	Entity entity;
+	Handle entity = getNewHandle();
 	int model = graphic_system->getModelManager()->loadModel(modelPath);
-	Handle graphics = graphic_system->addComponent(GraphicsComponent(entity.id, model));
+	graphic_system->addComponent(GraphicsComponent(entity, model));
 
-	entity.graphics = graphics;
-
-	this->entities.insert(std::pair<int, Entity>(entity.id, entity));
-	Handle handle = entity.id;
-	return handle;
+	return entity;
 
 }
 
