@@ -4,7 +4,6 @@ from ttk import Button, Style, Entry
 from creatures import Character, Persona
 #import tkSimpleDialog
 import json_reader
-import lspellwindow
 
 class MainFrame():
 		
