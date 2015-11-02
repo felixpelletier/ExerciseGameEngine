@@ -1,21 +1,24 @@
 import json
-import json_reader
+#import json_reader
 
-def writeArray(array):
-	#a = [0, 1, 2, 3]
-	with open('temp.json', 'w') as outfile:
-		json.dump(array, outfile)
-	outfile.close()
+# def writeArray(array):
+#	a = [0, 1, 2, 3]
+	# with open('temp.json', 'w') as outfile:
+		# json.dump(array, outfile)
+	# outfile.close()
 
 def readArray():
-	with open('spells.json') as json_data:
+	with open('test.json') as json_data:
 		array = json.load(json_data)
 	json_data.close()
-	print array[0]["name"]
-	toRet = []
+	print array["Fool"]
+	print array["Magician"]
 	for item in array:
-		toRet.append(item["name"])
-	return toRet
+		print item
+	# toRet = []
+	# for item in array:
+		# toRet.append(item["name"])
+	# return toRet
 	#print array
 	#noU = []
 	#for item in array:
@@ -28,7 +31,7 @@ def readArray():
 	#		return persona["level"]
 
 #writeArray()
-writeArray(readArray())
+readArray()
 
 
 #print json_reader.arcana_names()

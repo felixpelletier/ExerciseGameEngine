@@ -2,7 +2,6 @@ from Tkinter import *
 from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
 from creatures import Character, Persona
-#import tkSimpleDialog
 import json_reader
 
 class MainFrame():
@@ -13,7 +12,7 @@ class MainFrame():
 	def main(self):
 		root = Tk()
 		root.overrideredirect(0)
-		#root.geometry("900x450+560+315")
+		root.resizable(width=FALSE, height=FALSE)
 		app = Base(root)
 		root.mainloop()
 
@@ -74,6 +73,7 @@ class SL_creator(Frame):
 		Frame.__init__(self)
 		self.parent = parent
 		self.variable = StringVar(self)
+		self.v = StringVar(self)
 		self.initUI()
 		
 	def initUI(self):
@@ -83,10 +83,8 @@ class SL_creator(Frame):
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 
 		list = json_reader.data_list("arcanas")
-		self.variable.set("Fool") # default value
-		#selection = OptionMenu(self, variable, "New")
-		w = apply(OptionMenu, (self, self.variable) + tuple(list))
-		w.bg = 'black'
+		self.variable.set("Fool")
+		w = OptionMenu(self, self.variable, *list, command=self.showText)
 		w.grid(row=0, column=1)
 		
 		select = Button(self, text="Select", command=self.begin)
@@ -94,6 +92,13 @@ class SL_creator(Frame):
 		
 		back = Button(self, text="Back", command=self.back)
 		back.grid(row=2, column=1)
+		
+		self.v.set("")
+		self.text = Label(self, textvariable=self.v, wraplength=500)
+		self.text.grid(row=0, column=0, rowspan=3)
+		
+	def showText(self, somthing):
+		self.v.set(json_reader.readArcDesc(self.variable.get()))
 		
 	def begin(self):
 		print "Entered SL creation mode for arcana " + self.variable.get()
@@ -148,7 +153,6 @@ class persona_creator(Frame):
 		self.iSpell30 = StringVar(self)
 		self.iSpell31 = StringVar(self)
 		
-		#self.parent.overrideredirect(0)
 		self.initUI(True)
 	
 	def initUI(self, infoDump):
@@ -220,9 +224,7 @@ class persona_creator(Frame):
 		nameL.grid(row=0, column=0)
 		self.nameT = Text(self.createFrame, height=1, width=15)
 		self.nameT.grid(row=0, column=1)
-		
-		#statL = Label(self.createFrame, text="Stats:")
-		#statL.grid(row=0, column=2)
+
 		strL = Label(self.createFrame, text="Str")
 		strL.grid(row=0, column=2)
 		self.strT = Text(self.createFrame, height=1, width=3)

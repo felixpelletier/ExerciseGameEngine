@@ -2,6 +2,11 @@ from creatures import Character
 import os
 import json
 
+def readArcDesc(arcana):
+	with open('arcanaDescription.json') as json_data:
+		array = json.load(json_data)
+	json_data.close()
+	return array[arcana]
 		
 def writeOne(character):
 	with open(character.getName() + '.json', 'w') as outfile:
