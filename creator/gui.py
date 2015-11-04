@@ -1,3 +1,4 @@
+import Tkinter
 from Tkinter import *
 from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
@@ -11,6 +12,10 @@ class MainFrame():
 		
 	def main(self):
 		root = Tk()
+		img = Tkinter.Image("photo", file="icon.gif")
+		root.tk.call('wm','iconphoto',root._w,img)
+		#program_directory=sys.path[0]
+		#root.iconphoto(True, PhotoImage(file=os.path.join(program_directory, "test.png")))
 		root.overrideredirect(0)
 		root.resizable(width=FALSE, height=FALSE)
 		app = Base(root)
@@ -83,7 +88,7 @@ class SL_creator(Frame):
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 
 		list = json_reader.data_list("arcanas")
-		self.variable.set("Fool")
+		self.variable.set("Select Arcana")
 		w = OptionMenu(self, self.variable, *list, command=self.showText)
 		w.grid(row=0, column=1)
 		
