@@ -1,4 +1,5 @@
 import Tkinter
+import FixTk ##Not sure why needed (only for build)
 from Tkinter import *
 from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
