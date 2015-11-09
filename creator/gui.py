@@ -5,6 +5,7 @@ from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
 from creatures import Character, Persona
 import json_reader
+import slgui
 
 class MainFrame():
 		
@@ -108,6 +109,7 @@ class SL_creator(Frame):
 		
 	def begin(self):
 		print "Entered SL creation mode for arcana " + self.variable.get()
+		sl = slgui.SLFrame()
 		
 	def back(self):
 		print "Returned to main screen"
