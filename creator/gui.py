@@ -109,7 +109,8 @@ class SL_creator(Frame):
 		
 	def begin(self):
 		print "Entered SL creation mode for arcana " + self.variable.get()
-		sl = slgui.SLFrame()
+		self.parent.withdraw()
+		sl = slgui.SLFrame(self.parent)
 		
 	def back(self):
 		print "Returned to main screen"
