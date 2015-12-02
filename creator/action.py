@@ -1,20 +1,15 @@
-class Action():
-
+class Info():
+	
 	def __init__(self):
-		self.hash = hash(self)
-		self.relations = []
-		self.trip_set = {}
+		self.text = ""
 		
-	def getRelations():
-		return relations
+	def setText(self, pText):
+		self.text = pText
 		
-	def hasRelation(relation):
-		return (relation in self.relations)
-		
-	def hash():
-		return self.hash
-		
-class Speak(Action):
+	def getText(self):
+		return self.text
+
+class Speak():
 	
 	def __init__(self):
 		self.text = ""
@@ -28,101 +23,74 @@ class Speak(Action):
 	def putAngle(self, arcana, angle):
 		self.angle[arcana] = angle
 		
-	def setSpeaker(person):
+	def setSpeaker(self, person):
 		self.speaker = person
 		
-	def setText(text_new):
+	def setText(self, text_new):
 		self.text = text_new
 		
-	def getText():
+	def getText(self):
 		return self.text
 		
-	def getSpeaker():
+	def getSpeaker(self):
 		return self.speaker
 		
-	def getPoints():
+	def getPoints(self):
 		return self.points
 		
-	def getAngle():
+	def getAngle(self):
 		return self.angle
 		
-	def display():
+	def display(self):
 		return None#
 		
-class Choice(Action):
-
-	def __init__(self):
-		self.choices = []
-		self.text = ""
-		self.speaker = None#
 		
-	def setText(textnew):
-		self.text = textnew
-		
-	def setSpeaker(person):
-		self.speaker = person
-		
-	def addChoice(choice):
-		self.choices.append(choice)
-		
-	def addChoice(choice, index)
-		self.choices.insert(index, choice)
-		
-	def getText():
-		return self.text
-		
-	def getSpeaker():
-		return self.speaker
-		
-	def getChoices():
-		return self.choices
-		
-class Camera(Action):
+class Camera():
 	
 	def __init__(self):
-		self.place = None#
+		self.place = ""
 		self.cameraPosition = []
 		self.lookAt = []
 		
-	def setPlace(placenew):
+	def setPlace(self, placenew):
 		self.place = placenew
 		
-	def setCameraPosition(position3):
+	def setCameraPosition(self, position3):
 		self.cameraPosition = position3
 		
-	def setLookAt(lookat3):
+	def setLookAt(self, lookat3):
 		self.lookAt = lookat3
 		
-	def getPlace():
+	def getPlace(self):
 		return self.place
 		
-	def getCameraPosition():
+	def getCameraPosition(self):
 		return self.cameraPosition
 		
-	def getLookAt():
+	def getLookAt(self):
 		return self.lookAt
 		
-class Movement(Action):
+class Movement():
 
 	def __init__(self):
 		self.subject = None#
 		self.destination = ()
 		self.animation = None#
 		
-	def setSubject(person):
+	def setSubject(self, person):
 		self.subject = person
 	
-	def setDestination(tuple):
+	def setDestination(self, tuple):
 		self.destination = tuple
 		
-	def setAnimation(aniname):
+	def setAnimation(self, aniname):
 		self.animation = aniname
 		
-	def getSubject():
+	def getSubject(self):
 		return self.subject
 		
-	def getDestination():
+	def getDestination(self):
 		return self.destination
 		
-	def getAnimation():
+	def getAnimation(self):
 		return self.animation

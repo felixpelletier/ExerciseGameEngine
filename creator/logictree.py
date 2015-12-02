@@ -2,24 +2,26 @@ class MathGraph:
 
 	def __init__(self, name):
 		self.id = name
-		self.first = None
 		self.items = DynamicList()
+		
+	def size(self):
+		return len(self.items)
 		
 	def setFirst(self, item):
 		self.first = item
 		
 	def getItem(self, index):
-		return self.items[index]
+		return self.items[index][0]
 		
 	def getRelations(self, index):
 		return self.items[index]
 		
-	def addItem(self, action):
-		self.items.append(action)
+	def addItem(self, action, index):
+		if not isinstance(self.items[index], DynamicList):
+			self.items[i] = DynamicList()
+		self.items[index][0]=action
 		
 	def addRelation(self, i, j):
-		if not isinstance(self.items[len(items)], DynamicList):
-			self.items[i] = DynamicList()
 		if j not in self.items[i]:
 			self.items[i].append(j)
 		
