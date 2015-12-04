@@ -17,7 +17,11 @@ class SLFrame(Toplevel):
 		Toplevel.__init__(self)
 		img = Tkinter.Image("photo", file="icon.gif")
 		self.tk.call('wm','iconphoto',self._w,img)
-		self.link = SocialLink(arcana).startLink(level, angle)
+		self.arcana = arcana
+		self.level = level
+		self.angle = angle
+		self.linkstored = SocialLink(arcana)
+		self.link = self.linkstored.startLink(level, angle)
 		self.i = 0
 		self.initUI()
 		
@@ -32,9 +36,13 @@ class SLFrame(Toplevel):
 		SLBase(self)
 		
 	def back(self):
+		
 		self.destroy()
 		self.rootWindow.deiconify()
 		
+	def writeSave():
+		self.linkstored.setLink(self.link, self.level, self.angle)
+		self.linkstored.save()
 		
 class SLBase(Frame):
 	
@@ -43,15 +51,19 @@ class SLBase(Frame):
 		self.parent = parent
 		self.empty = True
 		self.index = StringVar(self)
+		self.load = 0
 		self.initUI()
 		self.grid(row=0, column=0, rowspan=2)
 		
 	def initUI(self):
-		self.actions = [""]	#load here (load the hash list from sls.py)
+		self.actions = self.parent.link.getIDs()
+		#self.actions.append("")#load here (load the hash list from sls.py)
 		self.index.set("")	#load here
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
-		if len(self.actions)!=1:
-			self.empty = False#Tests
+		if len(self.actions)>0:
+			self.empty = False
+		else:
+			self.actions.append("")
 		
 		if self.empty:
 			start = Button(self, text="Start New", command=self.changeFrame)
@@ -62,17 +74,17 @@ class SLBase(Frame):
 		actOM.grid(row=0, column=0, sticky="ew")
 			
 	def changeFrame(self):
-		print "Starting new Social Link"
 		self.destroy()
 		self.parent.i = self.actions.index(self.index.get())
 		print self.parent.i
-		CreationContainer(self.parent)
+		CreationContainer(self.parent, self)
 		
 	def enter(self, something):
 		if self.index.get() is "":
 			print "No valid action selected"
 			return
 		self.parent.i = self.actions.index(self.index.get())
+		self.load = self.parent.link.getItem(self.actions.index(self.index.get()))
 		enter = Button(self, text="Edit", command=self.changeFrame)
 		enter.grid(row=0, column=1)
 		
@@ -80,33 +92,39 @@ class SLBase(Frame):
 		
 class CreationContainer(Frame):
 	
-	def __init__(self, parent):
+	def __init__(self, parent, concF):
 		Frame.__init__(self, master=parent)
 		self.parent = parent
 		self.type = StringVar(self)
 		self.connection = StringVar(self)
-		self.load = 0
+		self.concF = concF
+		self.load = concF.load
 		self.initUI()
 		self.grid(row=0, column=0, rowspan=2)
 		
 	def initUI(self):
-		self.actions = ["New element"]
+		self.actions = self.parent.link.getIDs()
+		self.actions.append("New element")
 		types = ["Info", "Speak", "Camera Change", "Movement"]
 		self.type.set("Info")
 		self.connection.set("New element")
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 		
-		self.window = InfoFrame(self, self.load)
+		self.save = Button(self, text="Save")
+		self.save.grid(row=2, column=0)
+		
+		self.window = None
+		if self.load!=0:
+			self.connection.set(self.concF.index.get())
+		self.connect()
+		self.connection.set("New element")
 		
 		actOM = OptionMenu(self, self.type, *types, command=self.changeFrame)
-		actOM.config(width=5)
+		actOM.config(width=25)
 		actOM.grid(row=0, column=0, columnspan=2, sticky="ew")
 		
 		self.back = Button(self, text="Back", command=self.back)
 		self.back.grid(row=2, column=4)
-		
-		self.save = Button(self, text="Save", command=self.window.save)
-		self.save.grid(row=2, column=0)
 		
 		self.lead = Label(self, text="Leads to:")
 		self.lead.grid(row=2, column=1)
@@ -131,7 +149,7 @@ class CreationContainer(Frame):
 			self.changeFrame(0)
 		else:
 			self.parent.link.addRelation(self.parent.i, self.actions.index(self.connection.get()))
-			print "Linked to index " + self.actions.index(self.connection.get())
+			print "Linked to index " + str(self.actions.index(self.connection.get()))
 			self.parent.i = self.actions.index(self.connection.get())
 			if isinstance(self.parent.link.getItem(self.actions.index(self.connection.get())), Info):
 				self.type.set("Info")
@@ -146,7 +164,10 @@ class CreationContainer(Frame):
 		
 	def changeFrame(self, something):
 		print "Changed to " + self.type.get()
-		self.window.destroy()
+		try:
+			self.window.destroy()
+		except AttributeError:
+			pass		
 		if self.type.get() == "Speak":
 			self.window = SpeakFrame(self, self.load)
 		elif self.type.get() == "Camera Change":
@@ -164,11 +185,15 @@ class InfoFrame(Frame):
 		self.parent = parent
 		self.type = StringVar(self)
 		self.next = StringVar(self)
+		self.load = load
 		self.initUI()
 		self.grid(row=1, column=0, columnspan=5)
 		
 	def initUI(self):		
 		self.infoBox = Text(self, height=4, width=50)
+		if self.load!=0:
+			self.infoBox.insert(1.0, self.load.getText())
+		
 		self.infoBox.grid(row=1, column=0, columnspan=5)
 		
 			
@@ -179,7 +204,8 @@ class InfoFrame(Frame):
 		infoSlide.setText(self.infoBox.get(1.0, END).replace("\n", ""))
 		self.parent.parent.link.addItem(infoSlide, self.parent.parent.i)
 		print "Saved"
-		
+		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
+		self.parent.parent.linkstored.save()
 		
 class SpeakFrame(Frame):
 	
@@ -193,6 +219,7 @@ class SpeakFrame(Frame):
 		poina = StringVar(self)
 		poina.set("")
 		self.pointvec = []
+		self.load = load
 		self.pointvar = [poina]
 		self.anglevec = []
 		self.anglevar = [anga]
@@ -211,6 +238,8 @@ class SpeakFrame(Frame):
 		self.textl.grid(row=1, column=0)
 		
 		self.infoBox = Text(self, height=3, width=40)
+		if self.load!=0:
+			self.infoBox.insert(1.0, self.load.getText())
 		self.infoBox.grid(row=1, column=1, columnspan=3, rowspan=3)
 		
 		self.textl = Label(self, text="Points:")
@@ -238,6 +267,8 @@ class SpeakFrame(Frame):
 		self.speakerl = Label(self, text="Speaker:")
 		self.speakerl.grid(row=1, column=4)
 		
+		if self.load!=0:
+			self.speakerv.set(self.load.getSpeaker())
 		speaker = OptionMenu(self, self.speakerv, *characs)
 		speaker.config(width=10)
 		speaker.grid(row=1, column=5, sticky='ew')
@@ -290,6 +321,8 @@ class SpeakFrame(Frame):
 					print "Amount must be an integer"
 		self.parent.parent.link.addItem(speakSlide, self.parent.parent.i)
 		print "Saved"
+		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
+		self.parent.parent.linkstored.save()
 		
 		
 class CameraFrame(Frame):
@@ -371,6 +404,8 @@ class CameraFrame(Frame):
 		cameraSlide.setCameraPosition(((int)(self.cx.get(1.0, END)),(int)(self.cy.get(1.0, END)),(int)(self.cz.get(1.0, END))))
 		self.parent.parent.link.addItem(cameraSlide, self.parent.parent.i)
 		print "Saved"
+		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
+		self.parent.parent.linkstored.save()
 		
 		
 class MoveFrame(Frame):
@@ -434,6 +469,8 @@ class MoveFrame(Frame):
 		
 		self.parent.parent.link.addItem(moveSlide, self.parent.parent.i)
 		print "Saved"
+		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
+		self.parent.parent.linkstored.save()
 		
 		
 		

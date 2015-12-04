@@ -1,3 +1,36 @@
+def load(action):
+	o=None
+	try:
+		o = Camera()
+		o.setPlace(action["place"])
+		return o
+	except:
+		pass
+	try:
+		o = Movement()
+		o.setSubject(action["subject"])
+		return o
+	except:
+		pass
+	try:
+		o = Speak()
+		o.setSpeaker(action["speaker"])
+		o.setText(action["text"])
+		for arcana, points in action["points"].iteritems():
+			o.putPoints(arcana, points)
+		for arcana, angle in action["angle"].iteritems():
+			o.putAngle(arcana, angle)
+		return o
+	except:
+		pass
+	try:
+		o = Info()
+		o.setText(action["text"])
+		return o
+	except:
+		pass
+	
+		
 class Info():
 	
 	def __init__(self):
@@ -13,7 +46,7 @@ class Speak():
 	
 	def __init__(self):
 		self.text = ""
-		self.speaker = None#
+		self.speaker = ""
 		self.points = {}
 		self.angle = {}
 		

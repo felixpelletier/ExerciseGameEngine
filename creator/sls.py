@@ -1,4 +1,5 @@
 from logictree import *
+import json
 import json_reader
 
 class SocialLink():
@@ -8,14 +9,20 @@ class SocialLink():
 		self.cutscenes = {}#[level][angle]
 		self.loadLinks()
 		
-	def setLink(graph):
+	def setLink(self, graph, level, angle):
 		self.cutscenes[str(level)+str(angle)] = graph
 		
 	def loadLinks(self):
-		self.cutscenes = json_reader.readLink(self.arcana)
+		try:
+			tempdic = json_reader.readLink(self.arcana)["cutscenes"]
+			for id, graph in tempdic.iteritems():
+				self.cutscenes[id] = MathGraph(graph["id"]).loadGraph(graph["items"])
+		except:
+			print "No existing link"
+		print self.cutscenes
 		print "Loaded"
 		
-	def getLink(self, level, angle):
+	def getLink(self, level, angle):#Not used
 		try:
 			return self.cutscenes.pop(str(level)+str(angle))
 		except:
@@ -24,13 +31,16 @@ class SocialLink():
 			
 	def startLink(self, level, angle):
 		try:
-			self.cutscenes.pop(str(level)+str(angle))
+			toreturn = self.cutscenes[(str(level)+str(angle))]
 			print "Link already exists!"
 		except:
-			self.cutscenes[str(level)+str(angle)]= MathGraph(self.arcana+str(level)+str(angle))
+			toreturn = self.cutscenes[str(level)+str(angle)]= MathGraph(self.arcana+str(level)+str(angle))
 					
-		return self.cutscenes.pop(str(level)+str(angle))
+		return toreturn
 		
+	def save(self):
+		json_reader.writeLink(self)
+		print "Saved to to file"
 		
 		
 #test = SocialLink("Fool")

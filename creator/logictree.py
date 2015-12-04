@@ -1,14 +1,38 @@
+import action
+
 class MathGraph:
 
 	def __init__(self, name):
 		self.id = name
 		self.items = DynamicList()
 		
+	def loadGraph(self, value):
+		index = 0
+		jndex = 0
+		for io in value:
+			for jo in io:
+				print jo
+				if jndex == 0:
+					self.addItem(action.load(jo), index)
+					print self.getItem(index)
+				else:
+					self.addRelation(index, ((int)(jo)))
+				jndex+=1
+			index+=1
+			jndex = 0
+		return self
+		
 	def size(self):
 		return len(self.items)
 		
-	def setFirst(self, item):
+	def setFirst(self, item):#Not useful (index 0 always first element). Only useful if I do a full overhaul to a pure hashmap structure
 		self.first = item
+		
+	def getIDs(self):
+		temp = []
+		for e in self.items:
+			temp.append(e[0].text)#NOT SAFE
+		return temp
 		
 	def getItem(self, index):
 		return self.items[index][0]
@@ -25,7 +49,7 @@ class MathGraph:
 		if j not in self.items[i]:
 			self.items[i].append(j)
 		
-	def delRelation(self, i, j):
+	def delRelation(self, i, j):#Not working
 		try:
 			self.items[i].remove(j)
 		except:
@@ -39,7 +63,7 @@ class MathGraph:
 		if not jfound:
 			self.delItem(j)
 		
-	def delItem(self, i):
+	def delItem(self, i):#Not working
 		array = self.items.pop(i)
 		for item in self.items:
 			for relation in item:

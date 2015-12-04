@@ -2,9 +2,14 @@ from creatures import Character
 import os
 import json
 
+def writeLink(link):
+	with open('data/' + link.arcana + '_link.json', 'w') as outfile:
+		json.dump(link, outfile, default=lambda o: o.__dict__, sort_keys=True)
+	outfile.close()
+
 def readLink(arcana):
 	try:
-		with open('data/' + arcana + '.json') as json_data:
+		with open('data/' + arcana + '_link.json') as json_data:
 			array = json.load(json_data)
 		json_data.close()
 		return array
