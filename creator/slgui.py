@@ -409,12 +409,14 @@ class CameraFrame(Frame):
 			self.location.set(self.load.getPlace())
 			cp = self.load.getCameraPosition()
 			la = self.load.getLookAt()
-			cx.insert(1.0, cp[0])
-			cy.insert(1.0, cp[1])
-			cz.insert(1.0, cp[2])
-			lx.insert(1.0, la[0])
-			ly.insert(1.0, la[1])
-			lz.insert(1.0, la[2])
+			print cp
+			print la
+			self.cx.insert(1.0, cp[0])
+			self.cy.insert(1.0, cp[1])
+			self.cz.insert(1.0, cp[2])
+			self.lx.insert(1.0, la[0])
+			self.ly.insert(1.0, la[1])
+			self.lz.insert(1.0, la[2])
 		
 			
 	def save(self):

@@ -10,7 +10,7 @@ class SocialLink():
 		self.loadLinks()
 		
 	def setLink(self, graph, level, angle):
-		self.cutscenes[str(level)+str(angle)] = graph
+		self.cutscenes[str(level)+"_"+str(angle)] = graph
 		
 	def loadLinks(self):
 		try:
@@ -24,17 +24,17 @@ class SocialLink():
 		
 	def getLink(self, level, angle):#Not used
 		try:
-			return self.cutscenes.pop(str(level)+str(angle))
+			return self.cutscenes.pop(str(level)+"_"+str(angle))
 		except:
 			print "No such link"
 			return 0
 			
 	def startLink(self, level, angle):
 		try:
-			toreturn = self.cutscenes[(str(level)+str(angle))]
+			toreturn = self.cutscenes[(str(level)+"_"+str(angle))]
 			print "Link already exists!"
 		except:
-			toreturn = self.cutscenes[str(level)+str(angle)]= MathGraph(self.arcana+str(level)+str(angle))
+			toreturn = self.cutscenes[str(level)+"_"+str(angle)]= MathGraph(self.arcana+str(level)+"_"+str(angle))
 					
 		return toreturn
 		

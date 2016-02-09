@@ -3,12 +3,16 @@ def load(action):
 	try:
 		o = Camera()
 		o.setPlace(action["place"])
+		o.setCameraPosition(action["cameraPosition"])
+		o.setLookAt(action["lookAt"])
 		return o
 	except:
 		pass
 	try:
 		o = Movement()
 		o.setSubject(action["subject"])
+		o.setAnimation(action["animation"])
+		o.setDestination(action["destination"])
 		return o
 	except:
 		pass

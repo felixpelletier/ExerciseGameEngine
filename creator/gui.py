@@ -36,10 +36,10 @@ class Base(Frame):
 		
 		Style().configure("TButton", padding=(0,5,0,5), background='black')
 		
-		logo = ImageTk.PhotoImage(Image.open("creator_logo.png"))
-		logolabel = Label(self, image=logo, bg='black')
-		logolabel.image = logo
-		logolabel.grid(row=0, column=0)
+		#logo = ImageTk.PhotoImage(Image.open("creator_logo.png"))
+		#logolabel = Label(self, image=logo, bg='black')
+		#logolabel.image = logo
+		#logolabel.grid(row=0, column=0)
 		
 		intframe = Frame(self)
 		intframe.configure(bg='black')
@@ -57,7 +57,7 @@ class Base(Frame):
 		quit = Button(intframe, text="Quit", command=self.quit)
 		quit.grid(row=3, column=0)
 		
-		logolabel.config(highlightthickness=0)
+		#logolabel.config(highlightthickness=0)
 		
 	def actionP(self):
 		print "Changed frame to Persona creator"
@@ -81,6 +81,8 @@ class SL_creator(Frame):
 		self.parent = parent
 		self.variable = StringVar(self)
 		self.v = StringVar(self)
+		self.level = StringVar(self)
+		self.angle = StringVar(self)
 		self.initUI()
 		
 	def initUI(self):
@@ -94,7 +96,7 @@ class SL_creator(Frame):
 		w = OptionMenu(self, self.variable, *list, command=self.showText)
 		w.grid(row=0, column=1)
 		
-		select = Button(self, text="Select", command=self.begin)
+		select = Button(self, text="Select", command=self.context)
 		select.grid(row=1, column=1)
 		
 		back = Button(self, text="Back", command=self.back)
@@ -103,6 +105,22 @@ class SL_creator(Frame):
 		self.v.set("")
 		self.text = Label(self, textvariable=self.v, wraplength=500)
 		self.text.grid(row=0, column=0, rowspan=3)
+		
+	def context(self):
+		levs = []
+		for x in range(1,11):
+			levs.append("Level " + str(x))
+		level = OptionMenu(self, self.level, *levs)
+		level.grid(row=1, column=2, columnspan=2)
+		
+		try:
+			tempLink = json_reader.readLink(self.variable)
+		except:
+			pass
+		#angle load
+		
+		go = Button(self, text="Go", command=self.begin)
+		go.grid(row=4, column=2, columnspan=2)
 		
 	def showText(self, somthing):
 		self.v.set(json_reader.readArcDesc(self.variable.get()))
