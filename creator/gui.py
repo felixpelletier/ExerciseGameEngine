@@ -107,28 +107,73 @@ class SL_creator(Frame):
 		self.text.grid(row=0, column=0, rowspan=3)
 		
 	def context(self):
+		if self.variable.get() == "Select Arcana":
+			return
 		levs = []
 		for x in range(1,11):
 			levs.append("Level " + str(x))
-		level = OptionMenu(self, self.level, *levs)
-		level.grid(row=1, column=2, columnspan=2)
+		self.level.set(levs[0])
+		self.levelOM = OptionMenu(self, self.level, *levs)
+		self.levelOM.grid(row=1, column=2, columnspan=2)
 		
+		self.angs = []
 		try:
-			tempLink = json_reader.readLink(self.variable)
+			tempLink = json_reader.readLink(self.variable.get())
+			for decon in tempLink["cutscenes"]:
+				self.angs.append("Angle " + str(decon)[str(decon).index("_")+1:] )
 		except:
 			pass
-		#angle load
+		if not self.angs:
+			self.angs.append("No angles")
+		self.angle.set(self.angs[0])
+		self.angleOM = OptionMenu(self, self.angle, *self.angs)
+		self.angleOM.grid(row=2, column=2, columnspan=2)
 		
-		go = Button(self, text="Go", command=self.begin)
-		go.grid(row=4, column=2, columnspan=2)
+		self.addAngB = Button(self, text="Add Angle", command=self.addAngle)
+		self.addAngB.grid(row=3, column=2)
+		
+		self.newAng = Text(self, height=1, width=5)
+		self.newAng.grid(row=3, column=3)
+		
+		self.go = Button(self, text="Go", command=self.begin)
+		self.go.grid(row=4, column=2, columnspan=2)
+		
+	def addAngle(self):
+		try:
+			(int)(self.newAng.get(1.0, END))
+			if self.angs[0] == "No angles":
+				self.angleOM["menu"].delete(0, "end")
+			self.angleOM["menu"].add_command(label="Angle "+self.newAng.get(1.0, END), command=Tkinter._setit(self.angle, ("Angle "+self.newAng.get(1.0, END)).replace("\n", "")))
+			self.angle.set(("Angle "+self.newAng.get(1.0, END)).replace("\n", ""))
+			self.newAng.delete(1.0, END)
+		except:
+			print "Angle must be an integer"
 		
 	def showText(self, somthing):
 		self.v.set(json_reader.readArcDesc(self.variable.get()))
+		self.destroyContext()
+		
+	def destroyContext(self):
+		try:
+			self.levelOM.destroy()
+			self.angleOM.destroy()
+			self.addAngB.destroy()
+			self.newAng.destroy()
+			self.go.destroy()
+		except:
+			pass
 		
 	def begin(self):
+		if self.angle.get() == "No angles":
+			return
+		enter_level = self.level.get()[self.level.get().index(" ")+1:]
+		print enter_level
+		enter_angle = self.angle.get()[self.angle.get().index(" ")+1:]
+		print enter_angle
 		print "Entered SL creation mode for arcana " + self.variable.get()
 		self.parent.withdraw()
-		sl = slgui.SLFrame(self.parent, self.variable.get(), 0, 0)
+		self.destroyContext()
+		sl = slgui.SLFrame(self.parent, self.variable.get(), (int)(enter_level), (int)(enter_angle))
 		
 	def back(self):
 		print "Returned to main screen"
