@@ -118,6 +118,10 @@ class CreationContainer(Frame):
 			self.connection.set(self.concF.index.get())
 		self.connect()
 		self.connection.set("New element")
+		#Listbox
+		
+		self.connection_list = Listbox(self)
+		self.connection_list.grid(row=0, column=5)
 		
 		actOM = OptionMenu(self, self.type, *types, command=self.changeFrame)
 		actOM.config(width=25)
