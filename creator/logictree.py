@@ -28,10 +28,25 @@ class MathGraph:
 	def setFirst(self, item):#Not useful (index 0 always first element). Only useful if I do a full overhaul to a pure hashmap structure
 		self.first = item
 		
-	def getIDs(self):
+	def getIDs(self):#safe but UGLY AF
 		temp = []
 		for e in self.items:
-			temp.append(e[0].text)#NOT SAFE
+			try:
+				if e[0].text not in temp:
+					temp.append(e[0].text)
+				else:
+					temp.append(e[0].text+str(len(temp)))
+			except:
+				try:
+					if ("Camera at "+e[0].place) not in temp:
+						temp.append("Camera at "+e[0].place)
+					else:
+						temp.append("Camera at "+e[0].place + str(len(temp)))
+				except:
+					if ("Moving "+e[0].subject) not in temp:
+						temp.append("Moving "+e[0].subject)
+					else:
+						temp.append("Moving "+e[0].subject + str(len(temp)))
 		return temp
 		
 	def getItem(self, index):
@@ -83,7 +98,7 @@ class MathGraph:
 
 
 		
-class DynamicList(list):
+class DynamicList(list):#Needs relocating (theoretically)
 
     def __getslice__(self, i, j):
         return self.__getitem__(slice(i, j))

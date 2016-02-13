@@ -56,9 +56,8 @@ class SLBase(Frame):
 		self.grid(row=0, column=0, rowspan=2)
 		
 	def initUI(self):
-		self.actions = self.parent.link.getIDs()
-		#self.actions.append("")#load here (load the hash list from sls.py)
-		self.index.set("")	#load here
+		self.actions = self.parent.link.getIDs()#load here (load the hash list from sls.py)
+		self.index.set("")
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 		if len(self.actions)>0:
 			self.empty = False
@@ -76,7 +75,7 @@ class SLBase(Frame):
 	def changeFrame(self):
 		self.destroy()
 		self.parent.i = self.actions.index(self.index.get())
-		print self.parent.i
+		print "Current index: " + str(self.parent.i)
 		CreationContainer(self.parent, self)
 		
 	def enter(self, something):
@@ -116,7 +115,7 @@ class CreationContainer(Frame):
 		self.window = None
 		if self.load!=0:
 			self.connection.set(self.concF.index.get())
-		self.connect()
+		self.connect(True)
 		self.connection.set("New element")
 		#Listbox
 		
@@ -136,24 +135,26 @@ class CreationContainer(Frame):
 		self.next = OptionMenu(self, self.connection, *self.actions)
 		self.next.grid(row=2, column=2)
 		
-		self.connect = Button(self, text="Connect", command=self.connect)
-		self.connect.grid(row=2, column=3)
+		self.connectB = Button(self, text="Connect", command=(lambda:self.connect(False)))
+		self.connectB.grid(row=2, column=3)
 		
 	def back(self):
 		print "Back"
 		self.destroy()
 		SLBase(self.parent)
 		
-	def connect(self):
+	def connect(self, spawn):
 		if self.connection.get() == "New element":
-			self.parent.link.addRelation(self.parent.i, self.parent.link.size())
-			print "Linked to index " + str(self.parent.link.size())
+			if not spawn:
+				self.parent.link.addRelation(self.parent.i, self.parent.link.size())
+				print "Linked to index " + str(self.parent.link.size())
 			self.parent.i = self.parent.link.size()
 			self.load=0
 			self.changeFrame(0)
 		else:
-			self.parent.link.addRelation(self.parent.i, self.actions.index(self.connection.get()))
-			print "Linked to index " + str(self.actions.index(self.connection.get()))
+			if not spawn:
+				self.parent.link.addRelation(self.parent.i, self.actions.index(self.connection.get()))
+				print "Linked to index " + str(self.actions.index(self.connection.get()))
 			self.parent.i = self.actions.index(self.connection.get())
 			if isinstance(self.parent.link.getItem(self.actions.index(self.connection.get())), Info):
 				self.type.set("Info")
@@ -283,6 +284,26 @@ class SpeakFrame(Frame):
 		self.adda = Button(self, text="Add angles", command=self.extendA)
 		self.adda.grid(row=30, column=6, columnspan=2)
 		
+		if self.load != 0:
+			first = True
+			for arcana, points in self.load.getPoints().iteritems():
+				if first:
+					first = False
+				else:
+					self.extendP()
+				self.pointvec[-1].insert(1.0, points)
+				self.pointvar[-1].set(arcana)
+			first = True
+			for arcana, angle in self.load.getAngle().iteritems():
+				if first:
+					first = False
+				else:
+					self.extendA()
+				self.anglevec[-1].insert(1.0, angle)
+				self.anglevar[-1].set(arcana)
+			
+			
+		
 	def extendP(self):
 		self.pointvec.extend([Text(self, height=1, width=3)])
 		self.pointvar.extend([StringVar(self)])
@@ -334,6 +355,7 @@ class CameraFrame(Frame):
 	def __init__(self, parent, load):
 		Frame.__init__(self, master=parent)
 		self.parent = parent
+		self.load = load
 		self.type = StringVar(self)
 		self.location = StringVar(self)
 		self.initUI()
@@ -387,6 +409,19 @@ class CameraFrame(Frame):
 		locationO.config(width=5)
 		locationO.grid(row=1, column=5, sticky='ew')
 		
+		if self.load != 0:
+			self.location.set(self.load.getPlace())
+			cp = self.load.getCameraPosition()
+			la = self.load.getLookAt()
+			print cp
+			print la
+			self.cx.insert(1.0, cp[0])
+			self.cy.insert(1.0, cp[1])
+			self.cz.insert(1.0, cp[2])
+			self.lx.insert(1.0, la[0])
+			self.ly.insert(1.0, la[1])
+			self.lz.insert(1.0, la[2])
+		
 			
 	def save(self):
 		print "Saving"
@@ -417,6 +452,7 @@ class MoveFrame(Frame):
 	def __init__(self, parent, load):
 		Frame.__init__(self, master=parent)
 		self.parent = parent
+		self.load = load
 		self.type = StringVar(self)
 		self.speakerv = StringVar(self)
 		self.aniv = StringVar(self)
@@ -454,6 +490,12 @@ class MoveFrame(Frame):
 		ani = OptionMenu(self, self.aniv, *animations)
 		ani.config(width=10)
 		ani.grid(row=2, column=4, sticky='ew')
+		
+		if self.load != 0:
+			self.aniv.set(self.load.getAnimation())
+			self.speakerv.set(self.load.getSubject())
+			self.lx.insert(1.0, self.load.getDestination()[0])
+			self.ly.insert(1.0, self.load.getDestination()[1])
 		
 			
 	def save(self):
