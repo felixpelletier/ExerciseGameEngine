@@ -134,6 +134,15 @@ class CreationContainer(Frame):
 		self.connectB = Button(self, text="Connect", command=(lambda:self.connect(False)))
 		self.connectB.grid(row=2, column=3)
 		
+		self.existing_connections = Listbox(self, self.actions)
+		self.populateExistingConnections()
+		self.existing_connnections.grid(row=1, column=5)
+		
+	def populateExistingConnections(self):
+		self.existing_connnections.delete(0, END)
+		for relation in self.parent.link.getRelations(self.parent.i):
+			self.existing_connections.insert(END, self.parent.link.getOneID(self.parent.link.getItem(relation)))
+		
 	def back(self):
 		print "Back"
 		self.destroy()

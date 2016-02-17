@@ -31,23 +31,28 @@ class MathGraph:
 	def getIDs(self):#safe but UGLY AF
 		temp = []
 		for e in self.items:
-			try:
-				if e[0].text not in temp:
-					temp.append(e[0].text)
+			temp.append(self.getOne(e))
+		return temp
+		
+	def getOneID(self, element):#safe but UGLY AF
+		temp = None
+		try:
+				if element.text not in temp:
+					temp = element.text
 				else:
-					temp.append(e[0].text+str(len(temp)))
+					temp = element.text+str(len(temp))
 			except:
 				try:
-					if ("Camera at "+e[0].place) not in temp:
-						temp.append("Camera at "+e[0].place)
+					if ("Camera at "+element.place) not in temp:
+						temp = "Camera at "+element.place)
 					else:
-						temp.append("Camera at "+e[0].place + str(len(temp)))
+						temp = "Camera at "+element.place + str(len(temp)))
 				except:
-					if ("Moving "+e[0].subject) not in temp:
-						temp.append("Moving "+e[0].subject)
+					if ("Moving "+element.subject) not in temp:
+						temp = "Moving "+element.subject)
 					else:
-						temp.append("Moving "+e[0].subject + str(len(temp)))
-		return temp
+						temp = "Moving "+element.subject + str(len(temp)))
+		return temp[0]
 		
 	def getItem(self, index):
 		return self.items[index][0]
