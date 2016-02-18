@@ -31,7 +31,7 @@ class SLFrame(Toplevel):
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 
 		back = Button(self, text="Back to Arcana selection", command=self.back)
-		back.grid(row=1, column=1, rowspan=2)
+		back.grid(row=2, column=2)
 		
 		SLBase(self)
 		
@@ -53,10 +53,10 @@ class SLBase(Frame):
 		self.index = StringVar(self)
 		self.load = 0
 		self.initUI()
-		self.grid(row=0, column=0, rowspan=2)
+		self.grid(row=2, column=0, rowspan=2)
 		
 	def initUI(self):
-		self.actions = self.parent.link.getIDs()#load here (load the hash list from sls.py)
+		self.actions = self.parent.link.getIDs()#load here (load the hash list from sls.py) NOT LOADING FROM SLS BUT MATHGRAPH
 		self.index.set("")
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 		if len(self.actions)>0:
@@ -99,7 +99,7 @@ class CreationContainer(Frame):
 		self.concF = concF
 		self.load = concF.load
 		self.initUI()
-		self.grid(row=0, column=0, rowspan=2)
+		self.grid(row=0, column=2, rowspan=2, columnspan=10)
 		
 	def initUI(self):
 		self.actions = self.parent.link.getIDs()
@@ -112,6 +112,10 @@ class CreationContainer(Frame):
 		self.save = Button(self, text="Save")
 		self.save.grid(row=2, column=0)
 		
+		self.existing_connections = Listbox(self)
+		self.populateExistingConnections()
+		self.existing_connections.grid(row=1, rowspan=2, column=5)
+		
 		self.window = None
 		if self.load!=0:
 			self.connection.set(self.concF.index.get())
@@ -123,23 +127,31 @@ class CreationContainer(Frame):
 		actOM.grid(row=0, column=0, columnspan=2, sticky="ew")
 		
 		self.back = Button(self, text="Back", command=self.back)
-		self.back.grid(row=2, column=4)
+		self.back.grid(row=3, column=4)
 		
 		self.lead = Label(self, text="Leads to:")
-		self.lead.grid(row=2, column=1)
+		self.lead.grid(row=3, column=1)
 		
 		self.next = OptionMenu(self, self.connection, *self.actions)
-		self.next.grid(row=2, column=2)
+		self.next.grid(row=3, column=2)
 		
 		self.connectB = Button(self, text="Connect", command=(lambda:self.connect(False)))
-		self.connectB.grid(row=2, column=3)
+		self.connectB.grid(row=3, column=3)
 		
-		self.existing_connections = Listbox(self, self.actions)
-		self.populateExistingConnections()
-		self.existing_connnections.grid(row=1, column=5)
+		self.follow_path = Button(self, text="Enter linked element", command=self.follow)
+		self.follow_path.grid(row=0, column=6, rowspan=2)
 		
+		self.rmvRel = Button(self, text="Remove this connection", command=self.removeRelation)
+		self.rmvRel.grid(row=1, column=6, rowspan=2)
+		
+		self.conLab = Label(self, text="This action connects to:")
+		self.conLab.grid(row=0, column=5)
+		
+	def removeRelation(self):
+		pass
+	
 	def populateExistingConnections(self):
-		self.existing_connnections.delete(0, END)
+		self.existing_connections.delete(0, END)
 		for relation in self.parent.link.getRelations(self.parent.i):
 			self.existing_connections.insert(END, self.parent.link.getOneID(self.parent.link.getItem(relation)))
 		
@@ -147,6 +159,13 @@ class CreationContainer(Frame):
 		print "Back"
 		self.destroy()
 		SLBase(self.parent)
+		
+	def follow(self):
+		if not self.existing_connections.get(ANCHOR):
+			return
+		self.connection.set(self.existing_connections.get(ANCHOR))
+		self.connect(False)
+		self.connection.set("New element")
 		
 	def connect(self, spawn):
 		if self.connection.get() == "New element":
@@ -187,6 +206,7 @@ class CreationContainer(Frame):
 		else:# self.type.get() == "Info":
 			self.window = InfoFrame(self, self.load)
 		self.save.config(command=self.window.save)
+		self.populateExistingConnections()
 			
 class InfoFrame(Frame):
 

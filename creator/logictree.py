@@ -31,34 +31,30 @@ class MathGraph:
 	def getIDs(self):#safe but UGLY AF
 		temp = []
 		for e in self.items:
-			temp.append(self.getOne(e))
+			ret = self.getOneID(e[0])
+			if ret not in temp:
+				temp.append(ret)
+			else:
+				temp.append(ret+str(len(temp)))
 		return temp
 		
 	def getOneID(self, element):#safe but UGLY AF
 		temp = None
+		#print element
 		try:
-				if element.text not in temp:
-					temp = element.text
-				else:
-					temp = element.text+str(len(temp))
+			temp = element.text
+		except:
+			try:
+				temp = element.place
 			except:
-				try:
-					if ("Camera at "+element.place) not in temp:
-						temp = "Camera at "+element.place)
-					else:
-						temp = "Camera at "+element.place + str(len(temp)))
-				except:
-					if ("Moving "+element.subject) not in temp:
-						temp = "Moving "+element.subject)
-					else:
-						temp = "Moving "+element.subject + str(len(temp)))
-		return temp[0]
+				temp = element.subject
+		return temp
 		
 	def getItem(self, index):
 		return self.items[index][0]
 		
 	def getRelations(self, index):
-		return self.items[index]
+		return self.items[index][1:len(self.items[index])]
 		
 	def addItem(self, action, index):
 		if not isinstance(self.items[index], DynamicList):
