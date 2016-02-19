@@ -116,6 +116,9 @@ class CreationContainer(Frame):
 		self.populateExistingConnections()
 		self.existing_connections.grid(row=1, rowspan=2, column=5)
 		
+		self.next = OptionMenu(self, self.connection, *self.actions)
+		self.next.grid(row=3, column=2)
+		
 		self.window = None
 		if self.load!=0:
 			self.connection.set(self.concF.index.get())
@@ -126,17 +129,17 @@ class CreationContainer(Frame):
 		actOM.config(width=25)
 		actOM.grid(row=0, column=0, columnspan=2, sticky="ew")
 		
-		self.back = Button(self, text="Back", command=self.back)
-		self.back.grid(row=3, column=4)
+		self.backB = Button(self, text="Back", command=self.back)
+		self.backB.grid(row=3, column=4)
 		
 		self.lead = Label(self, text="Leads to:")
 		self.lead.grid(row=3, column=1)
 		
-		self.next = OptionMenu(self, self.connection, *self.actions)
-		self.next.grid(row=3, column=2)
-		
-		self.connectB = Button(self, text="Connect", command=(lambda:self.connect(False)))
+		self.connectB = Button(self, text="Connect", command=self.lightConnect)
 		self.connectB.grid(row=3, column=3)
+		
+		self.delete = Button(self, text="Delete", command=self.removeElement)
+		self.delete.grid(row=3, column=0)
 		
 		self.follow_path = Button(self, text="Enter linked element", command=self.follow)
 		self.follow_path.grid(row=0, column=6, rowspan=2)
@@ -148,7 +151,14 @@ class CreationContainer(Frame):
 		self.conLab.grid(row=0, column=5)
 		
 	def removeRelation(self):
-		pass
+		self.parent.link.delRelation(self.parent.i, self.actions.index(self.existing_connections.get(ANCHOR)))
+		self.populateExistingConnections()
+		self.updateElementList()
+		
+	def removeElement(self):
+		print "Deleting " + str(self.parent.i)
+		self.parent.link.delItem(self.parent.i)
+		self.back()
 	
 	def populateExistingConnections(self):
 		self.existing_connections.delete(0, END)
@@ -164,8 +174,23 @@ class CreationContainer(Frame):
 		if not self.existing_connections.get(ANCHOR):
 			return
 		self.connection.set(self.existing_connections.get(ANCHOR))
-		self.connect(False)
+		self.connect(True)
 		self.connection.set("New element")
+		
+	def lightConnect(self):
+		if self.connection.get() == "New element":
+			self.parent.link.addRelation(self.parent.i, self.parent.link.size())
+			print "Linked to index " + str(self.parent.link.size())
+			self.parent.i = self.parent.link.size()
+			self.load=0
+			self.changeFrame(0)
+			self.populateExistingConnections()
+			self.updateElementList()
+		else:
+			self.parent.link.addRelation(self.parent.i, self.actions.index(self.connection.get()))
+			print "Linked to index " + str(self.actions.index(self.connection.get()))
+			self.window.save() #FUCKS EVERYTHING UP FSR
+			self.populateExistingConnections()
 		
 	def connect(self, spawn):
 		if self.connection.get() == "New element":
@@ -190,6 +215,14 @@ class CreationContainer(Frame):
 				self.type.set("Movement")
 			self.load = self.parent.link.getItem(self.actions.index(self.connection.get()))
 			self.changeFrame(0)
+			
+	def updateElementList(self):
+		self.next["menu"].delete(0, "end")
+		self.actions = self.parent.link.getIDs()
+		for action in self.actions:
+			self.next["menu"].add_command(label=action, command=Tkinter._setit(self.connection, action))
+		self.next["menu"].add_command(label="New element", command=Tkinter._setit(self.connection, "New element"))
+		#self.connection.set("New element") #(Necessary?)
 		
 	def changeFrame(self, something):
 		print "Changed to " + self.type.get()
@@ -207,6 +240,7 @@ class CreationContainer(Frame):
 			self.window = InfoFrame(self, self.load)
 		self.save.config(command=self.window.save)
 		self.populateExistingConnections()
+		self.updateElementList()
 			
 class InfoFrame(Frame):
 
@@ -236,6 +270,7 @@ class InfoFrame(Frame):
 		print "Saved"
 		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
 		self.parent.parent.linkstored.save()
+		self.parent.updateElementList()
 		
 class SpeakFrame(Frame):
 	
@@ -373,6 +408,7 @@ class SpeakFrame(Frame):
 		print "Saved"
 		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
 		self.parent.parent.linkstored.save()
+		self.parent.updateElementList()
 		
 		
 class CameraFrame(Frame):
@@ -470,6 +506,7 @@ class CameraFrame(Frame):
 		print "Saved"
 		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
 		self.parent.parent.linkstored.save()
+		self.parent.updateElementList()
 		
 		
 class MoveFrame(Frame):
@@ -542,6 +579,7 @@ class MoveFrame(Frame):
 		print "Saved"
 		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)
 		self.parent.parent.linkstored.save()
+		self.parent.updateElementList()
 		
 		
 		

@@ -32,6 +32,8 @@ class MathGraph:
 		temp = []
 		for e in self.items:
 			ret = self.getOneID(e[0])
+			if ret is None:
+				break
 			if ret not in temp:
 				temp.append(ret)
 			else:
@@ -40,14 +42,12 @@ class MathGraph:
 		
 	def getOneID(self, element):#safe but UGLY AF
 		temp = None
-		#print element
-		try:
+		if isinstance(element, action.Info) or isinstance(element, action.Speak):
 			temp = element.text
-		except:
-			try:
-				temp = element.place
-			except:
-				temp = element.subject
+		elif isinstance(element, action.Camera):
+			temp = element.place
+		elif isinstance(element, action.Movement):
+			temp = element.subject
 		return temp
 		
 	def getItem(self, index):
@@ -65,37 +65,23 @@ class MathGraph:
 		if j not in self.items[i]:
 			self.items[i].append(j)
 		
-	def delRelation(self, i, j):#Not working
-		try:
-			self.items[i].remove(j)
-		except:
-			print "Relation does not exist"
-			return
+	def delRelation(self, i, j):
+		self.items[i].remove(j)
 		jfound = False
-		for item in self.items:
-			for relation in item:
-				if relation is j:
-					jfound=True
+		print self.items[i]
+		for itemRelation in self.items:
+			if j in itemRelation:
+				jfound=True
 		if not jfound:
 			self.delItem(j)
 		
 	def delItem(self, i):#Not working
-		array = self.items.pop(i)
-		for item in self.items:
-			for relation in item:
-				if relation is i:#If edge leading to deleted item is found elsewhere, delete that edge
-					item.remove(i)
-				if relation in array:#If another edge leads to the same place as an item in array, that subtree need not be deleted therefore remove from array
-					array.remove(relation)
-		while i in array:#Remove self-referencing in array to prevent stackoverflow
-			array.remove(i)#could cause bug if element links to itself multiple times
-		array.pop(0)#Remove object
-		for index in array:#Delete full subtree of item
-			if index > i:#Adjusting index after repositioning in step one
-				self.delItem(index-1)
-			else:
-				self.delItem(index)
-						
+		for relation in self.items[i][1:len(self.items[i])]:
+			self.delRelation(i, relation)
+		for itemRelation in self.items:
+			if i in itemRelation:
+				itemRelation.remove(i)		
+		self.items.pop(i)
 
 
 		
