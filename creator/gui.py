@@ -36,10 +36,10 @@ class Base(Frame):
 		
 		Style().configure("TButton", padding=(0,5,0,5), background='black')
 		
-		#logo = ImageTk.PhotoImage(Image.open("creator_logo.png"))
-		#logolabel = Label(self, image=logo, bg='black')
-		#logolabel.image = logo
-		#logolabel.grid(row=0, column=0)
+		logo = ImageTk.PhotoImage(Image.open("creator_logo.png"))
+		logolabel = Label(self, image=logo, bg='black')
+		logolabel.image = logo
+		logolabel.grid(row=0, column=0)
 		
 		intframe = Frame(self)
 		intframe.configure(bg='black')
@@ -57,7 +57,7 @@ class Base(Frame):
 		quit = Button(intframe, text="Quit", command=self.quit)
 		quit.grid(row=3, column=0)
 		
-		#logolabel.config(highlightthickness=0)
+		logolabel.config(highlightthickness=0)
 		
 	def actionP(self):
 		print "Changed frame to Persona creator"
@@ -422,7 +422,7 @@ class persona_creator(Frame):
 		
 		textL = Label(self.createFrame, text="Info:")
 		textL.grid(row=10, column=0)
-		self.textT = Text(self.createFrame, height=5, width=40)
+		self.textT = Text(self.createFrame, height=5, width=40, wrap=WORD)
 		self.textT.grid(row=10, column=1, columnspan=5)
 		
 		self.lslevel = Text(self.createFrame, height=1, width=3)
@@ -608,7 +608,7 @@ class char_creator(Frame):
 		infoL = Label(self, text="Info:")
 		infoL.grid(row=2, column=1)
 		
-		self.infoT = Text(self, height=7, width=50)
+		self.infoT = Text(self, height=7, width=50, wrap=WORD)
 		self.infoT.grid(row=2, column=2, columnspan=2)
 		
 		save = Button(self, text="Save", command=self.save)

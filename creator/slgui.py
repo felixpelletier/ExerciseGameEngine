@@ -124,10 +124,6 @@ class CreationContainer(Frame):
 			self.connection.set(self.concF.index.get())
 		self.connect(True)
 		self.connection.set("New element")
-		#Listbox
-		
-		self.connection_list = Listbox(self)
-		self.connection_list.grid(row=0, column=5)
 		
 		actOM = OptionMenu(self, self.type, *types, command=self.changeFrame)
 		actOM.config(width=25)
@@ -258,7 +254,7 @@ class InfoFrame(Frame):
 		self.grid(row=1, column=0, columnspan=5)
 		
 	def initUI(self):		
-		self.infoBox = Text(self, height=4, width=50)
+		self.infoBox = Text(self, height=4, width=50, wrap=WORD)
 		if self.load!=0:
 			self.infoBox.insert(1.0, self.load.getText())
 		
@@ -306,7 +302,7 @@ class SpeakFrame(Frame):
 		self.textl = Label(self, text="Text:")
 		self.textl.grid(row=1, column=0)
 		
-		self.infoBox = Text(self, height=3, width=40)
+		self.infoBox = Text(self, height=3, width=40, wrap=WORD)
 		if self.load!=0:
 			self.infoBox.insert(1.0, self.load.getText())
 		self.infoBox.grid(row=1, column=1, columnspan=3, rowspan=3)
