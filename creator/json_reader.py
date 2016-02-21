@@ -17,7 +17,7 @@ def readLink(arcana):
 		return {}
 
 def readArcDesc(arcana):
-	with open('data/' + 'arcanaDescription.json') as json_data:
+	with open('lib/' + 'arcanaDescription.json') as json_data:
 		array = json.load(json_data)
 	json_data.close()
 	return array[arcana]
@@ -50,20 +50,20 @@ def readP(fetch):
 def writeCharNames(name):
 	list = readCharNames()
 	list.append(name)
-	with open('data/' + 'chars.json', 'w') as outfile:
+	with open('lib/' + 'chars.json', 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def writePerNames(name):
 	list = readPerNames()
 	list.append(name)
-	with open('data/' + 'pers.json', 'w') as outfile:
+	with open('lib/' + 'pers.json', 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def readPerNames():
 	try:
-		with open('data/' + 'pers.json') as json_data:
+		with open('lib/' + 'pers.json') as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -80,7 +80,7 @@ def readPerNames():
 def deleteChar(name):
 	list = readCharNames()
 	list.remove(name)
-	with open('data/' + 'chars.json', 'w') as outfile:
+	with open('lib/' + 'chars.json', 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	os.remove('data/' + name + '.json')
@@ -88,14 +88,14 @@ def deleteChar(name):
 def deletePer(name):
 	list = readPerNames()
 	list.remove(name)
-	with open('data/' + 'pers.json', 'w') as outfile:
+	with open('lib/' + 'pers.json', 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	os.remove(name + '.json')
 	
 def readCharNames():
 	try:
-		with open('data/' + 'chars.json') as json_data:
+		with open('lib/' + 'chars.json') as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -111,7 +111,7 @@ def readCharNames():
 		
 
 def data_list(fetch):
-	with open('data/' + 'data.json') as json_data:
+	with open('lib/' + 'data.json') as json_data:
 		temp = json.load(json_data)
 	json_data.close()
 	data = temp[fetch]
