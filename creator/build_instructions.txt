@@ -1,1 +1,8 @@
-pyinstaller --hiden-import=FixTk gui.py
+With spec files in creator/spec/
+
+Mac: pyinstaller —clean guiMac.spec
+
+
+Windows: pyinstaller --hidden-import=FixTk gui.py
+
+

@@ -1,15 +1,21 @@
 from creatures import Character
 import os
+import sys
 import json
 
+def buildPath(fileName):
+	if getattr(sys, 'frozen', False):
+		return os.path.join(os.path.dirname(sys.executable), fileName)
+	return fileName
+
 def writeLink(link):
-	with open('data/' + link.arcana + '_link.json', 'w') as outfile:
+	with open(buildPath('data/' + link.arcana + '_link.json', 'w')) as outfile:
 		json.dump(link, outfile, default=lambda o: o.__dict__, sort_keys=True)
 	outfile.close()
 
 def readLink(arcana):
 	try:
-		with open('data/' + arcana + '_link.json') as json_data:
+		with open(buildPath('data/' + arcana + '_link.json')) as json_data:
 			array = json.load(json_data)
 		json_data.close()
 		return array
@@ -17,32 +23,32 @@ def readLink(arcana):
 		return {}
 
 def readArcDesc(arcana):
-	with open('lib/' + 'arcanaDescription.json') as json_data:
+	with open(buildPath('lib/' + 'arcanaDescription.json')) as json_data:
 		array = json.load(json_data)
 	json_data.close()
 	return array[arcana]
 		
 def writeOne(character):
-	with open('data/' + character.getName() + '.json', 'w') as outfile:
+	with open(buildPath('data/' + character.getName() + '.json', 'w')) as outfile:
 		json.dump(character.__dict__, outfile)
 	outfile.close()
 	writeCharNames(character.getName())
 
 def writeOneP(persona):
-	with open('data/' + persona.getName() + '.json', 'w') as outfile:
+	with open(buildPath('data/' + persona.getName() + '.json', 'w')) as outfile:
 		json.dump(persona.__dict__, outfile)
 	outfile.close()
 	if persona.getName() not in readPerNames():
 		writePerNames(persona.getName())
 	
 def readOne(name):
-	with open('data/' + name+'.json') as json_data:
+	with open(buildPath('data/' + name+'.json')) as json_data:
 		characterL = json.load(json_data)
 	json_data.close()
 	return Character(characterL["name"], characterL["desc"], characterL["important"])
 	
 def readP(fetch):
-	with open('data/' + fetch+".json") as json_data:
+	with open(buildPath('data/' + fetch+".json")) as json_data:
 		persona = json.load(json_data)
 	json_data.close()
 	return persona
@@ -50,20 +56,20 @@ def readP(fetch):
 def writeCharNames(name):
 	list = readCharNames()
 	list.append(name)
-	with open('lib/' + 'chars.json', 'w') as outfile:
+	with open(buildPath('lib/' + 'chars.json', 'w')) as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def writePerNames(name):
 	list = readPerNames()
 	list.append(name)
-	with open('lib/' + 'pers.json', 'w') as outfile:
+	with open(buildPath('lib/' + 'pers.json', 'w')) as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def readPerNames():
 	try:
-		with open('lib/' + 'pers.json') as json_data:
+		with open(buildPath('lib/' + 'pers.json')) as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -80,7 +86,7 @@ def readPerNames():
 def deleteChar(name):
 	list = readCharNames()
 	list.remove(name)
-	with open('lib/' + 'chars.json', 'w') as outfile:
+	with open(buildPath('lib/' + 'chars.json', 'w')) as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	os.remove('data/' + name + '.json')
@@ -88,14 +94,14 @@ def deleteChar(name):
 def deletePer(name):
 	list = readPerNames()
 	list.remove(name)
-	with open('lib/' + 'pers.json', 'w') as outfile:
+	with open(buildPath('lib/' + 'pers.json', 'w')) as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	os.remove(name + '.json')
 	
 def readCharNames():
 	try:
-		with open('lib/' + 'chars.json') as json_data:
+		with open(buildPath('lib/' + 'chars.json')) as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -111,7 +117,7 @@ def readCharNames():
 		
 
 def data_list(fetch):
-	with open('lib/' + 'data.json') as json_data:
+	with open(buildPath('lib/' + 'data.json')) as json_data:
 		temp = json.load(json_data)
 	json_data.close()
 	data = temp[fetch]
@@ -123,7 +129,7 @@ def data_list(fetch):
 	return noU
 		
 def base_level_of(name):
-	with open('data/' + 'persona.json') as json_data:
+	with open(buildPath('data/' + 'persona.json')) as json_data:
 		personas = json.load(json_data)
 	json_data.close()
 	for persona in personas:
@@ -132,7 +138,7 @@ def base_level_of(name):
 
 
 def fused_persona(arcana, level):
-	with open('data/' + 'persona.json') as json_data:
+	with open(buildPath('data/' + 'persona.json')) as json_data:
 		personas = json.load(json_data)
 	json_data.close()
 	for persona in personas:
@@ -143,7 +149,7 @@ def fused_persona(arcana, level):
 	return temp
 
 def get_persona(name):
-	with open('data/' + 'persona.json') as json_data:
+	with open(buildPath('data/' + 'persona.json')) as json_data:
 		personas = json.load(json_data)
 	json_data.close()
 	for persona in personas:
@@ -151,10 +157,10 @@ def get_persona(name):
 			return persona
 	
 def read_combos(name1, name2):
-	with open('data/' + 'persona.json') as json_data:
+	with open(buildPath('data/' + 'persona.json')) as json_data:
 		personas = json.load(json_data)
 	json_data.close()
-	with open('data/' + 'fusion_combos.json') as json_data:
+	with open(buildPath('data/' + 'fusion_combos.json')) as json_data:
 		combos = json.load(json_data)
 	json_data.close()
 	for persona in personas:

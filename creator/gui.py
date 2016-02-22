@@ -1,5 +1,6 @@
 import Tkinter
-import FixTk ##Not sure why needed (only for build)
+import os
+import sys
 from Tkinter import *
 from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
@@ -8,13 +9,13 @@ import json_reader
 import slgui
 
 class MainFrame():
-		
+	
 	def __init__(self):
 		print "Application started"
 		
 	def main(self):
 		root = Tk()
-		img = Tkinter.Image("photo", file="icon.gif")
+		img = Tkinter.Image("photo", file=json_reader.buildPath("icon.gif"))
 		root.tk.call('wm','iconphoto',root._w,img)
 		#program_directory=sys.path[0]
 		#root.iconphoto(True, PhotoImage(file=os.path.join(program_directory, "test.png")))
@@ -36,7 +37,7 @@ class Base(Frame):
 		
 		Style().configure("TButton", padding=(0,5,0,5), background='black')
 		
-		logo = ImageTk.PhotoImage(Image.open("creator_logo.png"))
+		logo = ImageTk.PhotoImage(Image.open(json_reader.buildPath("creator_logo.png")))
 		logolabel = Label(self, image=logo, bg='black')
 		logolabel.image = logo
 		logolabel.grid(row=0, column=0)
