@@ -55,4 +55,4 @@ proto/src
 bin/*
 .build/*
 
-!creator/dist/
+!creator/dist/*
