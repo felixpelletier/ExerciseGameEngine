@@ -437,13 +437,15 @@ class persona_creator(Frame):
 		self.chosenSpell = self.lsSpell.get()
 		try:
 			self.lstext = (int) (self.lslevel.get(1.0, END))
+			if self.lstext <= (int)(self.levelT.get(1.0, END)):
+				raise Exception("")
 			if not (self.chosenSpell == self.compareval):
 				print "Ok"
 				self.lsdic[self.chosenSpell] = self.lslevel.get(1.0, END).replace("\n", "")
 				self.listLS.insert(END, self.chosenSpell + " at level " + self.lslevel.get(1.0, END))
 				return
 		except:
-			print "Not an integer, not saved"
+			print "Not an integer or level smaller than Persona's level, not saved"
 			return
 		print "You must choose a spell"
 		
@@ -621,8 +623,9 @@ class char_creator(Frame):
 		back.grid(row=4, column=3)
 		
 		names = json_reader.readCharNames()
+		names.append("New")
 		self.variable.set("New") # default value
-		if names == []:
+		if len(names) == 1:
 			w = OptionMenu(self, self.variable, "New", command=self.loadChar)
 		else:
 			w = OptionMenu(self, self.variable, *names, command=self.loadChar)
@@ -630,13 +633,14 @@ class char_creator(Frame):
 	
 	def loadChar(self, name):
 		print "Loading..."
+		self.importantB.deselect()
+		self.nameT.delete(1.0, END)
+		self.infoT.delete(1.0, END)
+		if name == "New":
+			return
 		charTL = json_reader.readOne(name)
 		if(charTL.getImportant()):
 			self.importantB.select()
-		else:
-			self.importantB.deselect()
-		self.nameT.delete(1.0, END)
-		self.infoT.delete(1.0, END)
 		self.nameT.insert(1.0, charTL.getName())
 		self.infoT.insert(1.0, charTL.getDesc())
 		print "Loaded character " + self.variable.get()
