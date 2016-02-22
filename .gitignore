@@ -54,5 +54,3 @@ proto/src
 .tinyobjloader/*
 bin/*
 .build/*
-
-!creator/dist/*
