@@ -1,6 +1,10 @@
 With spec files in creator/spec/
 
-Mac: pyinstaller —clean guiMac.spec
+Mac:
+	pyinstaller -—clean spec/guiMac.spec
+	rm -rf build
+	rm -rf dist/gui
+
 
 
 Windows: pyinstaller --hidden-import=FixTk gui.py

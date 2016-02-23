@@ -9,7 +9,7 @@ def buildPath(fileName):
 	return fileName
 
 def writeLink(link):
-	with open(buildPath('data/' + link.arcana + '_link.json', 'w')) as outfile:
+	with open(buildPath('data/' + link.arcana + '_link.json'), 'w') as outfile:
 		json.dump(link, outfile, default=lambda o: o.__dict__, sort_keys=True)
 	outfile.close()
 
@@ -23,19 +23,19 @@ def readLink(arcana):
 		return {}
 
 def readArcDesc(arcana):
-	with open(buildPath('lib/' + 'arcanaDescription.json')) as json_data:
+	with open(buildPath('int/' + 'arcanaDescription.json')) as json_data:
 		array = json.load(json_data)
 	json_data.close()
 	return array[arcana]
 		
 def writeOne(character):
-	with open(buildPath('data/' + character.getName() + '.json', 'w')) as outfile:
+	with open(buildPath('data/' + character.getName() + '.json'), 'w') as outfile:
 		json.dump(character.__dict__, outfile)
 	outfile.close()
 	writeCharNames(character.getName())
 
 def writeOneP(persona):
-	with open(buildPath('data/' + persona.getName() + '.json', 'w')) as outfile:
+	with open(buildPath('data/' + persona.getName() + '.json'), 'w') as outfile:
 		json.dump(persona.__dict__, outfile)
 	outfile.close()
 	if persona.getName() not in readPerNames():
@@ -56,20 +56,20 @@ def readP(fetch):
 def writeCharNames(name):
 	list = readCharNames()
 	list.append(name)
-	with open(buildPath('lib/' + 'chars.json', 'w')) as outfile:
+	with open(buildPath('int/' + 'chars.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def writePerNames(name):
 	list = readPerNames()
 	list.append(name)
-	with open(buildPath('lib/' + 'pers.json', 'w')) as outfile:
+	with open(buildPath('int/' + 'pers.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def readPerNames():
 	try:
-		with open(buildPath('lib/' + 'pers.json')) as json_data:
+		with open(buildPath('int/' + 'pers.json')) as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -86,22 +86,22 @@ def readPerNames():
 def deleteChar(name):
 	list = readCharNames()
 	list.remove(name)
-	with open(buildPath('lib/' + 'chars.json', 'w')) as outfile:
+	with open(buildPath('int/' + 'chars.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
-	os.remove('data/' + name + '.json')
+	os.remove(buildPath('data/' + name + '.json'))
 	
 def deletePer(name):
 	list = readPerNames()
 	list.remove(name)
-	with open(buildPath('lib/' + 'pers.json', 'w')) as outfile:
+	with open(buildPath('int/' + 'pers.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
-	os.remove(name + '.json')
+	os.remove(buildPath(name + '.json'))
 	
 def readCharNames():
 	try:
-		with open(buildPath('lib/' + 'chars.json')) as json_data:
+		with open(buildPath('int/' + 'chars.json')) as json_data:
 			names = json.load(json_data)
 		json_data.close()
 		noU = []
@@ -117,7 +117,7 @@ def readCharNames():
 		
 
 def data_list(fetch):
-	with open(buildPath('lib/' + 'data.json')) as json_data:
+	with open(buildPath('int/' + 'data.json')) as json_data:
 		temp = json.load(json_data)
 	json_data.close()
 	data = temp[fetch]

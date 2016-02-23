@@ -15,7 +15,7 @@ class SLFrame(Toplevel):
 		self.rootWindow = pRootWindow
 		print "Application started"
 		Toplevel.__init__(self)
-		img = Tkinter.Image("photo", file="icon.gif")
+		img = Tkinter.Image("photo", file=json_reader.buildPath("icon.gif"))
 		self.tk.call('wm','iconphoto',self._w,img)
 		self.arcana = arcana
 		self.level = level
