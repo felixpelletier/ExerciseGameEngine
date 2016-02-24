@@ -1,5 +1,4 @@
 import Tkinter
-#import FixTk ##Not sure why needed (only for build)
 from Tkinter import *
 from PIL import Image, ImageTk
 from ttk import Button, Style, Entry
@@ -7,6 +6,7 @@ from creatures import Character, Persona
 from action import *
 from sls import *
 import json_reader
+#from simulate import Simulation
 
 
 class SLFrame(Toplevel):
@@ -30,16 +30,25 @@ class SLFrame(Toplevel):
 		
 		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
 
+		#simulate = Button(self, text="Simulate", command=self.simulate)
+		#simulate.grid(row=2, column=3)
+
 		back = Button(self, text="Back to Arcana selection", command=self.back)
 		back.grid(row=2, column=2)
 		
 		SLBase(self)
 		
 	def back(self):
-		
 		self.destroy()
 		self.rootWindow.deiconify()
-		
+	"""
+	def simulate(self):
+		self.withdraw()
+		Simulation(self.link, self.arcana, self.level, self.angle)
+		self.deiconify()
+		print "Simulation Over"
+	"""
+	
 	def writeSave():
 		self.linkstored.setLink(self.link, self.level, self.angle)
 		self.linkstored.save()
@@ -70,10 +79,11 @@ class SLBase(Frame):
 			
 		actOM = OptionMenu(self, self.index, *self.actions, command=self.enter)
 		actOM.config(width=5)
-		actOM.grid(row=0, column=0, sticky="ew")
+		actOM.grid(row=1, column=0, sticky="ew")
 			
 	def changeFrame(self):
 		self.destroy()
+		self.actions.index(self.index.get())
 		self.parent.i = self.actions.index(self.index.get())
 		print "Current index: " + str(self.parent.i)
 		CreationContainer(self.parent, self)

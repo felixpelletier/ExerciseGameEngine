@@ -11,10 +11,8 @@ class MathGraph:
 		jndex = 0
 		for io in value:
 			for jo in io:
-				print jo
 				if jndex == 0:
 					self.addItem(action.load(jo), index)
-					print self.getItem(index)
 				else:
 					self.addRelation(index, ((int)(jo)))
 				jndex+=1
@@ -54,9 +52,13 @@ class MathGraph:
 		return self.items[index][0]
 		
 	def getRelations(self, index):
-		return self.items[index][1:len(self.items[index])]
+		if len(self.items)!=0:
+			return self.items[index][1:len(self.items[index])]
+		else:
+			return []
 		
 	def addItem(self, action, index):
+		print "Adding item " + action.text + " at position " + str(index)
 		if not isinstance(self.items[index], DynamicList):
 			self.items[i] = DynamicList()
 		self.items[index][0]=action

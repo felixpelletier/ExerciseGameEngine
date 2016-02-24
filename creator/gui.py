@@ -74,6 +74,9 @@ class Base(Frame):
 		print "Changed frame to SL creator"
 		app = SL_creator(self.parent)
 		self.destroy()
+		
+	def quit(self):
+		sys.exit(0)
 
 class SL_creator(Frame):
 
@@ -120,6 +123,8 @@ class SL_creator(Frame):
 		self.angs = []
 		try:
 			tempLink = json_reader.readLink(self.variable.get())
+			print tempLink
+			print self.variable.get()
 			for decon in tempLink["cutscenes"]:
 				self.angs.append("Angle " + str(decon)[str(decon).index("_")+1:] )
 		except:
@@ -667,7 +672,6 @@ class char_creator(Frame):
 		print "Returned to main screen"
 		app = Base(self.parent)
 		self.destroy()
-	
 	
 mainframe = MainFrame()
 mainframe.main()

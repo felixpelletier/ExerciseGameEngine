@@ -15,6 +15,7 @@ class SocialLink():
 	def loadLinks(self):
 		try:
 			tempdic = json_reader.readLink(self.arcana)["cutscenes"]
+			print tempdic
 			for id, graph in tempdic.iteritems():
 				self.cutscenes[id] = MathGraph(graph["id"]).loadGraph(graph["items"])
 		except:
@@ -35,6 +36,7 @@ class SocialLink():
 			print "Link already exists!"
 		except:
 			toreturn = self.cutscenes[str(level)+"_"+str(angle)]= MathGraph(self.arcana+str(level)+"_"+str(angle))
+			print toreturn.items
 					
 		return toreturn
 		

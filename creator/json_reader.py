@@ -19,7 +19,8 @@ def readLink(arcana):
 			array = json.load(json_data)
 		json_data.close()
 		return array
-	except:
+	except Exception as e:
+		print(e)
 		return {}
 
 def readArcDesc(arcana):
