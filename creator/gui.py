@@ -1,5 +1,5 @@
 import Tkinter
-from PyQt4.QtGui import QApplication
+#from PyQt4.QtGui import QApplication
 import os
 import sys
 from Tkinter import *
@@ -697,6 +697,6 @@ class char_creator(Frame):
 		self.destroy()
 	
 # Create an PyQT4 application object.
-a = QApplication(sys.argv)
+#a = QApplication(sys.argv)
 mainframe = MainFrame()
 mainframe.main()

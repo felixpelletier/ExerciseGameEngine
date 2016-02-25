@@ -1,7 +1,9 @@
 import sys
-from PyQt4.QtGui import QApplication, QMessageBox
+#from PyQt4.QtGui import QApplication, QMessageBox
 
 def popup(message, type):
+	#if os = OSX
+	return True
 	icon = {"Information":QMessageBox.Information, "Warning":QMessageBox.Warning,
 			"Critical":QMessageBox.Critical, "Question":QMessageBox.Question,
 			"Default":QMessageBox.NoIcon}
