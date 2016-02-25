@@ -37,10 +37,10 @@ class Base(Frame):
 		
 		Style().configure("TButton", padding=(0,5,0,5), background='black')
 		
-		logo = ImageTk.PhotoImage(Image.open(json_reader.buildPath("creator_logo.png")))
-		logolabel = Label(self, image=logo, bg='black')
-		logolabel.image = logo
-		logolabel.grid(row=0, column=0)
+		#logo = ImageTk.PhotoImage(Image.open(json_reader.buildPath("creator_logo.png")))
+		#logolabel = Label(self, image=logo, bg='black')
+		#logolabel.image = logo
+		#logolabel.grid(row=0, column=0)
 		
 		intframe = Frame(self)
 		intframe.configure(bg='black')
@@ -58,7 +58,7 @@ class Base(Frame):
 		quit = Button(intframe, text="Quit", command=self.quit)
 		quit.grid(row=3, column=0)
 		
-		logolabel.config(highlightthickness=0)
+		#logolabel.config(highlightthickness=0)
 		
 	def actionP(self):
 		print "Changed frame to Persona creator"
