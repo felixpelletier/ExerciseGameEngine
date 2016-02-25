@@ -58,7 +58,6 @@ class MathGraph:
 			return []
 		
 	def addItem(self, action, index):
-		print "Adding item " + action.text + " at position " + str(index)
 		if not isinstance(self.items[index], DynamicList):
 			self.items[i] = DynamicList()
 		self.items[index][0]=action

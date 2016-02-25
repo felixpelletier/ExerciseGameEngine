@@ -6,6 +6,7 @@ from creatures import Character, Persona
 from action import *
 from sls import *
 import json_reader
+from popup import popup
 #from simulate import Simulation
 
 
@@ -161,11 +162,17 @@ class CreationContainer(Frame):
 		self.conLab.grid(row=0, column=5)
 		
 	def removeRelation(self):
+		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS RELATION WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)"+
+					"\n\ne.g.\nAction 1 => Action 2 => Action 3\nAction 1 =/> Action 2 => Action 3\nAction 1 => Nothing\n\nHowever:\nAction 1 => Action 2\nAction 5 => Action 2\n\n"+
+					"Action 1 =/> Action 2\nAction 5 => Action 2\n\nAction 1 => Nothing\nAction 5 => Action 2", "Warning"):
+			return
 		self.parent.link.delRelation(self.parent.i, self.actions.index(self.existing_connections.get(ANCHOR)))
 		self.populateExistingConnections()
 		self.updateElementList()
 		
 	def removeElement(self):
+		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS ACTION AND ITS RELATIONS WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)", "Warning"):
+			return
 		print "Deleting " + str(self.parent.i)
 		self.parent.link.delItem(self.parent.i)
 		self.back()
@@ -199,7 +206,7 @@ class CreationContainer(Frame):
 		else:
 			self.parent.link.addRelation(self.parent.i, self.actions.index(self.connection.get()))
 			print "Linked to index " + str(self.actions.index(self.connection.get()))
-			self.window.save() #FUCKS EVERYTHING UP FSR
+			self.window.save()
 			self.populateExistingConnections()
 		
 	def connect(self, spawn):
@@ -232,7 +239,6 @@ class CreationContainer(Frame):
 		for action in self.actions:
 			self.next["menu"].add_command(label=action, command=Tkinter._setit(self.connection, action))
 		self.next["menu"].add_command(label="New element", command=Tkinter._setit(self.connection, "New element"))
-		#self.connection.set("New element") #(Necessary?)
 		
 	def changeFrame(self, something):
 		print "Changed to " + self.type.get()
@@ -266,7 +272,10 @@ class InfoFrame(Frame):
 	def initUI(self):		
 		self.infoBox = Text(self, height=4, width=50, wrap=WORD)
 		if self.load!=0:
-			self.infoBox.insert(1.0, self.load.getText())
+			try:
+				self.infoBox.insert(1.0, self.load.getText())
+			except:
+				pass
 		
 		self.infoBox.grid(row=1, column=0, columnspan=5)
 		
@@ -314,7 +323,10 @@ class SpeakFrame(Frame):
 		
 		self.infoBox = Text(self, height=3, width=40, wrap=WORD)
 		if self.load!=0:
-			self.infoBox.insert(1.0, self.load.getText())
+			try:
+				self.infoBox.insert(1.0, self.load.getText())
+			except:
+				pass
 		self.infoBox.grid(row=1, column=1, columnspan=3, rowspan=3)
 		
 		self.textl = Label(self, text="Points:")
@@ -343,7 +355,10 @@ class SpeakFrame(Frame):
 		self.speakerl.grid(row=1, column=4)
 		
 		if self.load!=0:
-			self.speakerv.set(self.load.getSpeaker())
+			try:
+				self.speakerv.set(self.load.getSpeaker())
+			except:
+				pass
 		speaker = OptionMenu(self, self.speakerv, *characs)
 		speaker.config(width=10)
 		speaker.grid(row=1, column=5, sticky='ew')
@@ -355,22 +370,25 @@ class SpeakFrame(Frame):
 		self.adda.grid(row=30, column=6, columnspan=2)
 		
 		if self.load != 0:
-			first = True
-			for arcana, points in self.load.getPoints().iteritems():
-				if first:
-					first = False
-				else:
-					self.extendP()
-				self.pointvec[-1].insert(1.0, points)
-				self.pointvar[-1].set(arcana)
-			first = True
-			for arcana, angle in self.load.getAngle().iteritems():
-				if first:
-					first = False
-				else:
-					self.extendA()
-				self.anglevec[-1].insert(1.0, angle)
-				self.anglevar[-1].set(arcana)
+			try:
+				first = True
+				for arcana, points in self.load.getPoints().iteritems():
+					if first:
+						first = False
+					else:
+						self.extendP()
+					self.pointvec[-1].insert(1.0, points)
+					self.pointvar[-1].set(arcana)
+				first = True
+				for arcana, angle in self.load.getAngle().iteritems():
+					if first:
+						first = False
+					else:
+						self.extendA()
+					self.anglevec[-1].insert(1.0, angle)
+					self.anglevar[-1].set(arcana)
+			except:
+				pass
 			
 			
 		
@@ -406,6 +424,7 @@ class SpeakFrame(Frame):
 					amount = (int)(self.pointvec[i].get(1.0, END))
 					speakSlide.putPoints(self.pointvar[i].get(), amount)
 				except:
+					popup("All Points and Angles must be integers.\nTo discard one line, set empty the text field and set the arcana to blank.", "Critical")
 					print "Amount must be an integer"
 		for i in xrange(len(self.anglevec)):
 			if(self.anglevar[i].get()!=""):
@@ -413,6 +432,7 @@ class SpeakFrame(Frame):
 					amount = (int)(self.anglevec[i].get(1.0, END))
 					speakSlide.putAngle(self.anglevar[i].get(), amount)
 				except:
+					popup("All Points and Angles must be integers.\nTo discard one line, set empty the text field and set the arcana to blank.", "Critical")
 					print "Amount must be an integer"
 		self.parent.parent.link.addItem(speakSlide, self.parent.parent.i)
 		print "Saved"
@@ -481,17 +501,20 @@ class CameraFrame(Frame):
 		locationO.grid(row=1, column=5, sticky='ew')
 		
 		if self.load != 0:
-			self.location.set(self.load.getPlace())
-			cp = self.load.getCameraPosition()
-			la = self.load.getLookAt()
-			print cp
-			print la
-			self.cx.insert(1.0, cp[0])
-			self.cy.insert(1.0, cp[1])
-			self.cz.insert(1.0, cp[2])
-			self.lx.insert(1.0, la[0])
-			self.ly.insert(1.0, la[1])
-			self.lz.insert(1.0, la[2])
+			try:
+				self.location.set(self.load.getPlace())
+				cp = self.load.getCameraPosition()
+				la = self.load.getLookAt()
+				print cp
+				print la
+				self.cx.insert(1.0, cp[0])
+				self.cy.insert(1.0, cp[1])
+				self.cz.insert(1.0, cp[2])
+				self.lx.insert(1.0, la[0])
+				self.ly.insert(1.0, la[1])
+				self.lz.insert(1.0, la[2])
+			except:
+				pass
 		
 			
 	def save(self):
@@ -507,6 +530,7 @@ class CameraFrame(Frame):
 			(int)(self.cy.get(1.0, END))
 			(int)(self.cz.get(1.0, END))
 		except:
+			popup("Camera position (x, y, z) and look direction (x, y, z) must be entered as integers", "Critical")
 			print "Must be an integer"
 			return
 		
@@ -564,12 +588,15 @@ class MoveFrame(Frame):
 		ani.grid(row=2, column=4, sticky='ew')
 		
 		if self.load != 0:
-			self.aniv.set(self.load.getAnimation())
-			self.speakerv.set(self.load.getSubject())
-			self.lx.insert(1.0, self.load.getDestination()[0])
-			self.ly.insert(1.0, self.load.getDestination()[1])
+			try:
+				self.aniv.set(self.load.getAnimation())
+				self.speakerv.set(self.load.getSubject())
+				self.lx.insert(1.0, self.load.getDestination()[0])
+				self.ly.insert(1.0, self.load.getDestination()[1])
+			except:
+				pass
 		
-			
+		
 	def save(self):
 		print "Saving"
 		moveSlide = Movement()
@@ -580,11 +607,11 @@ class MoveFrame(Frame):
 			(int)(self.lx.get(1.0, END))
 			(int)(self.ly.get(1.0, END))
 		except:
+			popup("Destination coordinates (x, y) must be entered as integers", "Critical")
 			print "Numbers must be integers"
 			return
 		
 		moveSlide.setDestination(((int)(self.lx.get(1.0, END)),(int)(self.ly.get(1.0, END))))
-		
 		self.parent.parent.link.addItem(moveSlide, self.parent.parent.i)
 		print "Saved"
 		self.parent.parent.linkstored.setLink(self.parent.parent.link, self.parent.parent.level, self.parent.parent.angle)

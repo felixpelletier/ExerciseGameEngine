@@ -98,7 +98,7 @@ def deletePer(name):
 	with open(buildPath('int/' + 'pers.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
-	os.remove(buildPath(name + '.json'))
+	os.remove(buildPath('data/'+name + '.json'))
 	
 def readCharNames():
 	try:

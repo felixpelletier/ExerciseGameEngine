@@ -1,4 +1,5 @@
 import Tkinter
+from PyQt4.QtGui import QApplication
 import os
 import sys
 from Tkinter import *
@@ -7,6 +8,7 @@ from ttk import Button, Style, Entry
 from creatures import Character, Persona
 import json_reader
 import slgui
+from popup import popup
 
 class MainFrame():
 	
@@ -17,8 +19,6 @@ class MainFrame():
 		root = Tk()
 		img = Tkinter.Image("photo", file=json_reader.buildPath("icon.gif"))
 		root.tk.call('wm','iconphoto',root._w,img)
-		#program_directory=sys.path[0]
-		#root.iconphoto(True, PhotoImage(file=os.path.join(program_directory, "test.png")))
 		root.overrideredirect(0)
 		root.resizable(width=FALSE, height=FALSE)
 		app = Base(root)
@@ -153,6 +153,7 @@ class SL_creator(Frame):
 			self.angle.set(("Angle "+self.newAng.get(1.0, END)).replace("\n", ""))
 			self.newAng.delete(1.0, END)
 		except:
+			popup("The Angle must be an integer", "Critical")
 			print "Angle must be an integer"
 		
 	def showText(self, somthing):
@@ -171,6 +172,7 @@ class SL_creator(Frame):
 		
 	def begin(self):
 		if self.angle.get() == "No angles":
+			popup("An Angle must be selected.\nCreate angles by entering a number in the text box below and clicking \"Add Angle\"", "Critical")
 			return
 		enter_level = self.level.get()[self.level.get().index(" ")+1:]
 		print enter_level
@@ -451,8 +453,10 @@ class persona_creator(Frame):
 				self.listLS.insert(END, self.chosenSpell + " at level " + self.lslevel.get(1.0, END))
 				return
 		except:
+			popup("You must enter a level that is greater than the Persona's level.", "Critical")
 			print "Not an integer or level smaller than Persona's level, not saved"
 			return
+		popup("You must choose a spell", "Critical")
 		print "You must choose a spell"
 		
 		
@@ -523,18 +527,26 @@ class persona_creator(Frame):
 	
 	def edit(self):
 		try:
-			self.loadPer(self.listP.get(ANCHOR))
-		except:
+			if (self.listP.get(ANCHOR) != ""):
+				if self.createFrame and not popup("Override any unsaved changes?", "Warning"):
+					return
+				self.loadPer(self.listP.get(ANCHOR))
+		except:#To initialize createFrame UI before load
 			if(self.listP.get(ANCHOR) != ""):
 				temp = self.listP.get(ANCHOR)
 				self.infoFrame.destroy()
 				self.initUI(False)
 				self.loadPer(temp)
-			
-		
+			else:
+				return
 		print "Changed to edit frame"
 	
 	def save(self):
+		print json_reader.buildPath('data/'+self.nameT.get(1.0, END).replace("\n", "")+".json")
+		print os.path.exists(json_reader.buildPath('data/'+self.nameT.get(1.0, END).replace("\n", "")+".json"))
+		if os.path.exists(json_reader.buildPath('data/'+self.nameT.get(1.0, END).replace("\n", "")+".json")):
+			if not popup("Override existing Persona "+self.nameT.get(1.0, END).replace("\n", "")+"?", "Question"):
+				return
 		print "Saving"
 		spellDeck = [self.iSpell00.get(), self.iSpell01.get(), self.iSpell10.get(), self.iSpell11.get(), self.iSpell20.get(), self.iSpell21.get(), self.iSpell30.get(), self.iSpell31.get()]
 		stats = [self.strT.get(1.0, END).replace("\n", ""), self.magT.get(1.0, END).replace("\n", ""), self.endT.get(1.0, END).replace("\n", ""), self.agiT.get(1.0, END).replace("\n", ""), self.luckT.get(1.0, END).replace("\n", "")]
@@ -547,12 +559,12 @@ class persona_creator(Frame):
 			(int)(self.agiT.get(1.0, END))
 			(int)(self.luckT.get(1.0, END))
 		except:
-			print "Not an integer"
+			popup("There is a number entry that isn't valid.\nEntries requiring numbers are:\nLEVEL\nSTR\nMAG\nEND\nAGI\nLUCK", "Critical")
 			print "Not Saved"
 			return
 		if not (self.nameT.get(1.0, END) and not self.nameT.get(1.0, END).isspace()):
-			print "No Name"
-			print "Not Saved"
+			popup("No name entered for your Persona. Name is a required field.", "Critical")
+			print "No Name, not saved"
 			return
 		toWrite = Persona(self.nameT.get(1.0, END).replace("\n", ""), self.arcVar.get(), self.levelT.get(1.0, END).replace("\n", ""), self.textT.get(1.0, END).replace("\n", ""), spellDeck, self.lsdic, stats, res, [self.her1.get(), self.her2.get()])
 		json_reader.writeOneP(toWrite)
@@ -563,6 +575,10 @@ class persona_creator(Frame):
 		print "Saved Persona"
 	
 	def remove(self):
+		if self.listP.get(ANCHOR)=="":
+			return
+		if not popup("Are you certain you want to completely remove this Persona?\n(Cannot be undone)", "Warning"):
+			return
 		print "Removing Persona " + self.listP.get(ANCHOR)
 		json_reader.deletePer(self.listP.get(ANCHOR))
 		self.listP.delete(ANCHOR)
@@ -573,13 +589,15 @@ class persona_creator(Frame):
 		self.buttonFrame.destroy()
 		self.initUI(False)
 		print "Created"
-		
-	def cancel(self):	
-		print "Canceled editing"
+	"""LEGACY
+	def cancel(self):
+		if not popup("Cancelling will lose any unsaved changes. Continue?", "Warning"):
+			return
+		print "Cancelled editing"
 		self.createFrame.destroy()
 		self.buttonFrame.destroy()
 		self.initUI(True)
-		
+	"""	
 	def back(self):
 		print "Returned to main screen"
 		app = Base(self.parent)
@@ -652,6 +670,8 @@ class char_creator(Frame):
 		print "Loaded character " + self.variable.get()
 	
 	def remove(self):
+		if not popup("Are you certain you want to completely remove this character?\n(Cannot be undone)", "Warning"):
+			return
 		print "Removing character " + self.variable.get()
 		json_reader.deleteChar(self.variable.get())
 		self.initUI()
@@ -659,6 +679,9 @@ class char_creator(Frame):
 		print "Changed to edit frame"
 	
 	def save(self):
+		if self.nameT.get(1.0, END).replace("\n", "") in ["New", ""]:
+			popup("Sorry, your character cannot be called \""+self.nameT.get(1.0, END).replace("\n", "")+"\". That is a reserved keyword (and it's also a dumb name)", "Critical")
+			return
 		print "Saving"
 		toWrite = Character(self.nameT.get(1.0, END).replace("\n", ""), self.infoT.get(1.0, END).replace("\n", ""), self.var.get())
 		json_reader.writeOne(toWrite)
@@ -673,5 +696,7 @@ class char_creator(Frame):
 		app = Base(self.parent)
 		self.destroy()
 	
+# Create an PyQT4 application object.
+a = QApplication(sys.argv)
 mainframe = MainFrame()
 mainframe.main()
