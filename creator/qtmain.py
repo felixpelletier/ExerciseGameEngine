@@ -1,10 +1,10 @@
-from PyQt4.QtGui import QApplication, QWidget
+from PyQt4.QtGui import QApplication, QWidget, QIcon
 import sys
+import json_reader
 from qtgui import MainFrame
 
 app = QApplication(sys.argv)
-
-#Call to qtgui.py here
+app.setWindowIcon(QIcon(json_reader.buildPath('icon.gif')))
 m = MainFrame()
 
 sys.exit(app.exec_())

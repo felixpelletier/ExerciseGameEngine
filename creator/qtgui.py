@@ -1,11 +1,6 @@
 from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy
 from PyQt4.QtCore import Qt, QRect
-import os
-import sys
-from creatures import Character, Persona
 import json_reader
-import slgui
-from popup import popup
 
 class MainFrame(QWidget):
 	
