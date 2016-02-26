@@ -1,22 +1,23 @@
 from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy
 from PyQt4.QtCore import Qt, QRect
 import json_reader
+from chargui import char_creator
+from pergui import per_creator
 
-class MainFrame(QWidget):
+class OP(QWidget):
 	
-	def __init__(self):
+	def __init__(self, mainframe):
 		QWidget.__init__(self)
+		self.mainframe = mainframe
 		print "Application started"
 		self.setAutoFillBackground(True)
 		p = QPalette()
 		p.setColor(QPalette.Background, Qt.black)
 		self.setPalette(p)
 		self.initUI()
-		self.setFixedSize(self.sizeHint())
-		self.show()
 		
 	def initUI(self):
-		self.setWindowTitle("Story Creator")
+		self.mainframe.setWindowTitle("Story Creator")
 		
 		self.grid = QGridLayout()
 		self.setLayout(self.grid)
@@ -54,13 +55,12 @@ class MainFrame(QWidget):
 		
 	def actionP(self):
 		print "Changed frame to Persona creator"
-		#app = persona_creator(self.parent)
+		self.mainframe.changeState(per_creator(self.mainframe, self))
 		#self.destroy()
 	
 	def actionC(self):
 		print "Changed frame to Character creator"
-		#app = char_creator(self.parent)
-		#self.destroy()
+		self.mainframe.changeState(char_creator(self.mainframe, self))
 		
 	def actionS(self):
 		print "Changed frame to SL creator"
@@ -68,4 +68,5 @@ class MainFrame(QWidget):
 		#self.destroy()
 		
 	def quit(self):
-		self.close()
+		print "Exiting..."
+		self.mainframe.close()

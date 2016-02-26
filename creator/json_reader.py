@@ -56,6 +56,8 @@ def readP(fetch):
 	
 def writeCharNames(name):
 	list = readCharNames()
+	if name in list:
+		return
 	list.append(name)
 	with open(buildPath('int/' + 'chars.json'), 'w') as outfile:
 		json.dump(list, outfile)

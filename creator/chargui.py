@@ -1,4 +1,4 @@
-from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy
+from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy, QTextEdit, QComboBox, QCheckBox, QLineEdit
 from PyQt4.QtCore import Qt, QRect
 from creatures import Character, Persona
 import json_reader
@@ -6,92 +6,94 @@ from popup import popup
 
 class char_creator(QWidget):
 
-	def __init__(self, parent):
+	def __init__(self, mainframe, op):
+		print "Starting..."
 		QWidget.__init__(self)
-		self.parent = parent
-		self.var = IntVar()
-		self.variable = StringVar(self)
+		self.mainframe = mainframe
+		self.op = op
 		self.nameT = None
 		self.infoT = None
 		self.importantB = None
 		self.initUI()
 	
 	def initUI(self):
-		self.parent.title("Persona Creator")
-		self.grid(row=0, column=0)
+		self.mainframe.setWindowTitle("Character Creator")
 		
-		Style().configure("TButton", padding=(0,5,0,5), background='WhiteSmoke')
+		grid = QGridLayout()
+		self.setLayout(grid)
 		
-		nameL = Label(self, text="Name:")
-		nameL.grid(row=1, column=1)
+		nameL = QLabel(self, text="Name:")
+		grid.addWidget(nameL, 1, 1)
 		
-		self.nameT = Text(self, height=1, width=25)
-		self.nameT.grid(row=1, column=2)
+		self.nameT = QLineEdit(self)
+		self.nameT.setFixedSize(200, 20)
+		grid.addWidget(self.nameT, 1, 2, 1, 2)
 		
-		self.importantB = Checkbutton(self, text="Important?", variable=self.var)
-		self.importantB.grid(row=1, column=3)
+		self.importantB = QCheckBox(self, text="Important?")
+		grid.addWidget(self.importantB, 1, 4)
 		
-		infoL = Label(self, text="Info:")
-		infoL.grid(row=2, column=1)
+		infoL = QLabel(self, text="Info:")
+		grid.addWidget(infoL, 2, 1)
 		
-		self.infoT = Text(self, height=7, width=50, wrap=WORD)
-		self.infoT.grid(row=2, column=2, columnspan=2)
+		self.infoT = QTextEdit(self)
+		self.infoT.setFixedSize(300, 150)
+		grid.addWidget(self.infoT, 2, 2, 1, 3)
 		
-		save = Button(self, text="Save", command=self.save)
-		save.grid(row=4, column=1)
+		save = QPushButton(self, text="Save")
+		save.clicked.connect(self.save)
+		grid.addWidget(save, 4, 1)
 		
-		edit = Button(self, text="Remove", command=self.remove)
-		edit.grid(row=4, column=2)
+		remove = QPushButton(self, text="Remove")
+		remove.clicked.connect(self.remove)
+		grid.addWidget(remove, 4, 2)
 		
-		back = Button(self, text="Back", command=self.back)
-		back.grid(row=4, column=3)
+		back = QPushButton(self, text="Back")
+		back.clicked.connect(self.back)
+		grid.addWidget(back, 4, 3)
 		
 		names = json_reader.readCharNames()
 		names.append("New")
-		self.variable.set("New") # default value
-		if len(names) == 1:
-			w = OptionMenu(self, self.variable, "New", command=self.loadChar)
-		else:
-			w = OptionMenu(self, self.variable, *names, command=self.loadChar)
-		w.grid(row=4, column=4)
+		self.allChars = QComboBox(self)
+		self.allChars.activated.connect((lambda:self.loadChar(self.allChars.currentText())))
+		self.allChars.addItems(names)
+		self.allChars.setCurrentIndex(self.allChars.count()-1)
+		grid.addWidget(self.allChars, 4, 4)
 	
 	def loadChar(self, name):
 		print "Loading..."
-		self.importantB.deselect()
-		self.nameT.delete(1.0, END)
-		self.infoT.delete(1.0, END)
+		if self.importantB.isChecked():
+			self.importantB.toggle()
+		self.nameT.clear()
+		self.infoT.clear()
 		if name == "New":
 			return
 		charTL = json_reader.readOne(name)
 		if(charTL.getImportant()):
-			self.importantB.select()
-		self.nameT.insert(1.0, charTL.getName())
-		self.infoT.insert(1.0, charTL.getDesc())
-		print "Loaded character " + self.variable.get()
+			self.importantB.toggle()
+		self.nameT.setText(charTL.getName())
+		self.infoT.setText(charTL.getDesc())
+		print "Loaded character " + self.allChars.currentText()
 	
 	def remove(self):
 		if not popup("Are you certain you want to completely remove this character?\n(Cannot be undone)", "Warning"):
 			return
-		print "Removing character " + self.variable.get()
-		json_reader.deleteChar(self.variable.get())
-		self.initUI()
-		self.importantB.deselect()
-		print "Changed to edit frame"
+		print "Removing character " + self.allChars.currentText()
+		json_reader.deleteChar(self.allChars.currentText())
+		self.allChars.removeItem(self.allChars.currentIndex())
+		self.allChars.setCurrentIndex(self.allChars.count()-1)
+		self.loadChar("New")
 	
 	def save(self):
-		if self.nameT.get(1.0, END).replace("\n", "") in ["New", ""]:
-			popup("Sorry, your character cannot be called \""+self.nameT.get(1.0, END).replace("\n", "")+"\". That is a reserved keyword (and it's also a dumb name)", "Critical")
+		if self.nameT.text() in ["New", ""]:
+			popup("Sorry, your character cannot be called \""+self.nameT.text()+"\". That is a reserved keyword (and it's also a dumb name)", "Critical")
 			return
 		print "Saving"
-		toWrite = Character(self.nameT.get(1.0, END).replace("\n", ""), self.infoT.get(1.0, END).replace("\n", ""), self.var.get())
+		toWrite = Character(str(self.nameT.text()), str(self.infoT.toPlainText()), self.importantB.isChecked())
 		json_reader.writeOne(toWrite)
-		temp = self.nameT.get(1.0, END).replace("\n", "")
-		self.initUI()
-		self.loadChar(temp)
-		self.variable.set(temp)
+		if toWrite.getName() not in [self.allChars.itemText(i) for i in range(self.allChars.count())]:
+			self.allChars.insertItem(self.allChars.count()-1, self.nameT.text())
+			self.allChars.setCurrentIndex(self.allChars.count()-2)
 		print "Saved"
 		
 	def back(self):
-		self.close()
-		print "Returned to main screen"
-		self.parent.open()
+		self.mainframe.changeState(self.op)
