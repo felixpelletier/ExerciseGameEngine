@@ -5,7 +5,7 @@ import json
 
 def buildPath(fileName):
 	if getattr(sys, 'frozen', False):
-		return os.path.join(os.path.dirname(sys.executable), fileName)
+		return os.path.join(os.path.dirname(sys.executable), str(fileName))
 	return fileName
 
 def writeLink(link):

@@ -1,6 +1,6 @@
+from qtheader import *
 import sys
 from logictree import MathGraph
-from PyQt4.QtGui import QApplication, QWidget, QPushButton, QLabel, QGridLayout
 from action import *
 
 

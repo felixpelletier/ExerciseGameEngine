@@ -1,8 +1,7 @@
-from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy
-from PyQt4.QtCore import Qt, QRect
-import json_reader
+from qtheader import *
 from chargui import char_creator
 from pergui import per_creator
+from slcontextgui import SL_creator
 
 class OP(QWidget):
 	
@@ -56,7 +55,6 @@ class OP(QWidget):
 	def actionP(self):
 		print "Changed frame to Persona creator"
 		self.mainframe.changeState(per_creator(self.mainframe, self))
-		#self.destroy()
 	
 	def actionC(self):
 		print "Changed frame to Character creator"
@@ -64,8 +62,7 @@ class OP(QWidget):
 		
 	def actionS(self):
 		print "Changed frame to SL creator"
-		#app = SL_creator(self.parent)
-		#self.destroy()
+		self.mainframe.changeState(SL_creator(self.mainframe, self))
 		
 	def quit(self):
 		print "Exiting..."

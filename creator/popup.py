@@ -1,5 +1,5 @@
+from qtheader import *
 import sys
-from PyQt4.QtGui import QApplication, QMessageBox
 
 def popup(message, type):
 	icon = {"Information":QMessageBox.Information, "Warning":QMessageBox.Warning,

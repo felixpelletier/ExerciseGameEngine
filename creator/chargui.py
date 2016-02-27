@@ -1,8 +1,5 @@
-from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy, QTextEdit, QComboBox, QCheckBox, QLineEdit
-from PyQt4.QtCore import Qt, QRect
+from qtheader import *
 from creatures import Character, Persona
-import json_reader
-from popup import popup
 
 class char_creator(QWidget):
 

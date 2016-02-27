@@ -1,6 +1,4 @@
-from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QLayout
-from PyQt4.QtCore import Qt, QRect
-import json_reader
+from qtheader import *
 from qtop import OP
 from chargui import char_creator
 

@@ -1,9 +1,6 @@
-from PyQt4.QtGui import QApplication, QWidget, QGridLayout, QPushButton, QPixmap, QLabel, QPalette, QSizePolicy, QTextEdit, QComboBox, QCheckBox, QLineEdit, QListWidget
-from PyQt4.QtCore import Qt, QRect
+from qtheader import *
 import os
 from creatures import Character, Persona
-import json_reader
-from popup import popup
 
 class per_creator(QWidget):
 
@@ -34,15 +31,13 @@ class per_creator(QWidget):
 	def initUI(self, infoDump):
 		self.mainframe.setWindowTitle("Persona Creator")
 		
-		if (infoDump):
-			self.infoFrameDraw()
-		else:
+		if not infoDump:
 			self.createFrameDraw()
 						
 		self.initButtonFrame(infoDump)
 		
 		self.listP = QListWidget(self)
-		self.grid.addWidget(self.listP, 0, 3, 2, 3)
+		self.grid.addWidget(self.listP, 0, 3, 2, 1)
 		temp = json_reader.readPerNames()
 		self.listP.addItems(temp)
 		
@@ -304,16 +299,6 @@ class per_creator(QWidget):
 		
 		print "Loaded " + data["name"]
 	
-	def infoFrameDraw(self):
-		self.infoFrame = QWidget(self)
-		self.ifgrid = QGridLayout()
-		self.infoFrame.setLayout(self.ifgrid)
-		self.grid.addWidget(self.infoFrame, 0, 0, 2, 2)
-		
-		#FEATURE
-		"""infoP = Label(self.infoFrame, text="")
-		infoP.grid(row=0, column=0, rowspan=2, columnspan=2)"""
-	
 	def edit(self):
 		try:
 			if (self.listP.currentItem().text() != ""):
@@ -323,7 +308,6 @@ class per_creator(QWidget):
 		except:#To initialize createFrame UI before load
 			if(self.listP.currentItem().text() != ""):
 				temp = self.listP.currentItem().text()
-				self.infoFrame.close()
 				self.buttonFrame.close()
 				self.initUI(False)
 				self.loadPer(temp)
@@ -375,7 +359,6 @@ class per_creator(QWidget):
 		
 	
 	def new(self):
-		self.infoFrame.close()
 		self.buttonFrame.close()
 		self.initUI(False)
 		print "Created"

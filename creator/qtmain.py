@@ -1,6 +1,5 @@
-from PyQt4.QtGui import QApplication, QWidget, QIcon
+from qtheader import *
 import sys
-import json_reader
 from qtmainframe import MainFrame
 
 app = QApplication(sys.argv)
