@@ -24,4 +24,3 @@ class MainFrame(QWidget):
 		self.layout.addWidget(newWidgetState, 0, 0)
 		self.currentWidget = newWidgetState
 		newWidgetState.show()
-		self.setFixedSize(self.sizeHint())

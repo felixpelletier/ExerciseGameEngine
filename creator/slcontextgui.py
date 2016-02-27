@@ -1,4 +1,5 @@
 from qtheader import *
+from qtslgui import SLFrame
 
 class SL_creator(QWidget):
 
@@ -117,9 +118,8 @@ class SL_creator(QWidget):
 		enter_level = str(self.levelOM.currentText())[str(self.levelOM.currentText()).index(" ")+1:]
 		enter_angle = str(self.angleOM.currentText())[str(self.angleOM.currentText()).index(" ")+1:]
 		print "Entered SL creation mode for arcana " + str(self.arcSel.currentText())
-		self.destroyContext()
-		self.mainframe.changeState(self.op)
-		#sl = slgui.SLFrame(self.parent, self.variable.get(), (int)(enter_level), (int)(enter_angle))
+		#self.destroyContext()
+		self.mainframe.changeState(SLFrame(self.mainframe, self, str(self.arcSel.currentText()), (int)(enter_level), (int)(enter_angle)))
 		
 	def back(self):
 		print "Returned to main screen"

@@ -6,7 +6,7 @@ from creatures import Character, Persona
 from action import *
 from sls import *
 import json_reader
-from popup import popup
+#from popup import popup
 #from simulate import Simulation
 
 

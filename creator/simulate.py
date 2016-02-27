@@ -4,11 +4,10 @@ from logictree import MathGraph
 from action import *
 
 
-class Simulation(QApplication):
+class Simulation():
 	
 	def __init__(self, link, arcana, level, angle):
-		QApplication.__init__(self, sys.argv)
-		#self.quitOnLastWindowClosed()
+		self.fullLink = link
 		self.start(link, arcana, level, angle)
 
 	def start(self, link, arcana, level, angle):
@@ -19,7 +18,8 @@ class Simulation(QApplication):
 	
 		grid = QGridLayout()
 		w.setLayout(grid)
-		
+		#Causes UI to constantly resize...
+		#grid.setSizeConstraint(QLayout.SetFixedSize)
 		self.label = None
 		self.next = None
 		self.responses = []
@@ -33,15 +33,13 @@ class Simulation(QApplication):
 		# Show window
 		w.show()
 		
-		self.exec_()
-		
 	def shutdown(self, w):
 		w.close()
-		w.destroy()
-		self.quit()
-		del self
 		
 	def action(self, w, grid, link, currentIndex):
+		print "Action"
+		for response in self.responses:
+			response.close()
 		if not self.label:
 			self.label = QLabel(parent=w)
 		if isinstance(link[currentIndex][0], Info):
@@ -58,22 +56,24 @@ class Simulation(QApplication):
 		grid.addWidget(self.label, 0, 0)
 		
 		if len(link[currentIndex]) == 2:
-			if len(self.responses!=0):
+			if len(self.responses)!=0:
 				for button in self.responses:
 					button.destroy()
 				self.responses = []
 			if not self.next:
 				self.next = QPushButton("Next", w)
 				grid.addWidget(self.next, 1, 0)
+			else:
+				self.next.clicked.disconnect()
 			self.next.clicked.connect((lambda:self.action(w, grid, link, link[currentIndex][1])))
 		elif len(link[currentIndex]) > 2:
 			if self.next:
-				self.next.destroy()
+				self.next.close()
+				self.next.clicked.disconnect()
 				self.next = None
-			for relation in link[currentIndex][1:]:
-				self.responses.append(QPushButton(link.getOneID(link.getItem(relation)), w))
+			for relation in link[currentIndex][1:len(link[currentIndex])]:
+				self.responses.append(QPushButton(self.fullLink.getOneID(self.fullLink.getItem(relation)), w))
 				grid.addWidget(self.responses[-1], len(self.responses), 0)
 				self.responses[-1].clicked.connect((lambda:self.action(w, grid, link, link[relation][1])))
 		else:
 			pass
-			

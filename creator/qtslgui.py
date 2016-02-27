@@ -1,0 +1,627 @@
+from qtheader import *
+from sls import SocialLink
+from action import *
+from simulate import Simulation
+
+class SLFrame(QWidget):
+		
+	def __init__(self, mainframe, op, arcana, level, angle):
+		QWidget.__init__(self)
+		self.mainframe = mainframe
+		self.op = op
+		self.arcana = arcana
+		self.level = level
+		self.angle = angle
+		self.linkstored = SocialLink(arcana)
+		self.link = self.linkstored.startLink(level, angle)
+		self.i = 0
+		self.initUI()
+		
+	def initUI(self):
+		self.mainframe.setWindowTitle("Social Link Creator")
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		simulate = QPushButton(self, text="Simulate")
+		simulate.clicked.connect(self.simulate)
+		self.grid.addWidget(simulate, 2, 3)
+
+		back = QPushButton(self, text="Back to Arcana selection")
+		back.clicked.connect(self.back)
+		self.grid.addWidget(back, 2, 2)
+		
+		SLBase(self.mainframe, self)
+		
+	def back(self):
+		self.mainframe.changeState(self.op)
+	
+	def simulate(self):
+		Simulation(self.link, self.arcana, self.level, self.angle)
+	
+	
+	def writeSave():
+		self.linkstored.setLink(self.link, self.level, self.angle)
+		self.linkstored.save()
+		
+class SLBase(QWidget):
+	
+	def __init__(self, mainframe, op):
+		QWidget.__init__(self)
+		self.mainframe = mainframe
+		self.op = op
+		self.empty = True
+		self.load = 0
+		self.initUI()
+		self.op.grid.addWidget(self, 2, 0)
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.actions = self.op.link.getIDs()#load here (load the hash list from sls.py) NOT LOADING FROM SLS BUT MATHGRAPH
+		if len(self.actions)>0:
+			self.empty = False
+		else:
+			self.actions.append("")
+		
+		if self.empty:
+			start = QPushButton(self, text="Start New")
+			start.clicked.connect(self.changeFrame)
+			self.grid.addWidget(start, 0, 1)
+
+		self.actOM = QComboBox(self)
+		self.actOM.addItems(self.actions)
+		self.actOM.setCurrentIndex(0)
+		self.actOM.activated.connect(self.changeFrame)
+		self.actOM.setMaximumWidth(150)
+		self.grid.addWidget(self.actOM, 0, 0)
+			
+	def changeFrame(self):
+		print str(self.actOM.currentText())
+		if str(self.actOM.currentText()) is not "":
+			print "Set to load"
+			self.load = self.op.link.getItem(self.actions.index(str(self.actOM.currentText())))
+			print self.load
+		self.op.i = self.actions.index(str(self.actOM.currentText()))
+		self.close()
+		print "Current index: " + str(self.op.i)
+		CreationContainer(self.mainframe, self.op, self.load)
+		
+		
+class CreationContainer(QWidget):
+	
+	def __init__(self, mainframe, op, load):
+		QWidget.__init__(self)
+		self.mainframe = mainframe
+		self.op = op
+		self.load = load
+		self.initUI()
+		self.op.grid.addWidget(self, 0, 2, 2, 10)
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.actions = self.op.link.getIDs()
+		self.actions.append("New element")
+		types = ["Info", "Speak", "Camera Change", "Movement"]
+		
+		self.save = QPushButton(self, text="Save")
+		self.grid.addWidget(self.save, 2, 0)
+		
+		self.existing_connections = QListWidget(self)
+		self.populateExistingConnections()
+		self.grid.addWidget(self.existing_connections, 1, 5, 2, 1)
+		
+		self.next = QComboBox(self)
+		self.next.addItems(self.actions)
+		self.next.setMaximumWidth(150)
+		if self.load!=0:
+			self.next.setCurrentIndex(self.op.i)
+		self.grid.addWidget(self.next, 3, 2)
+		
+		self.window = None
+		
+		self.actOM = QComboBox(self)
+		self.actOM.addItems(types)
+		self.actOM.activated.connect(self.changeFrame)
+		self.grid.addWidget(self.actOM, 0, 0, 1, 2)
+		
+		self.connect(True)
+		self.next.setCurrentIndex(self.next.count()-1)
+		
+		self.backB = QPushButton(self, text="Back")
+		self.backB.clicked.connect(self.back)
+		self.grid.addWidget(self.backB, 3, 4)
+		
+		self.lead = QLabel(self, text="Leads to:")
+		self.lead.setAlignment(Qt.AlignRight)
+		self.grid.addWidget(self.lead, 3, 1)
+		
+		self.connectB = QPushButton(self, text="Connect")
+		self.connectB.clicked.connect(self.lightConnect)
+		self.grid.addWidget(self.connectB, 3, 3)
+		
+		self.delete = QPushButton(self, text="Delete")
+		self.delete.clicked.connect(self.removeElement)
+		self.grid.addWidget(self.delete, 3, 0)
+		
+		self.follow_path = QPushButton(self, text="Enter linked element")
+		self.follow_path.clicked.connect(self.follow)
+		self.grid.addWidget(self.follow_path, 0, 6, 2, 1)
+		
+		self.rmvRel = QPushButton(self, text="Remove this connection")
+		self.rmvRel.clicked.connect(self.removeRelation)
+		self.grid.addWidget(self.rmvRel, 1, 6, 2, 1)
+		
+		self.conLab = QLabel(self, text="This action connects to:")
+		self.grid.addWidget(self.conLab, 0, 5)
+		
+	def removeRelation(self):
+		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS RELATION WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)"+
+					"\n\ne.g.\nAction 1 => Action 2 => Action 3\nAction 1 =/> Action 2 => Action 3\nAction 1 => Nothing\n\nHowever:\nAction 1 => Action 2\nAction 5 => Action 2\n\n"+
+					"Action 1 =/> Action 2\nAction 5 => Action 2\n\nAction 1 => Nothing\nAction 5 => Action 2", "Warning"):
+			return
+		self.op.link.delRelation(self.op.i, self.actions.index(str(self.existing_connections.currentText())))
+		self.populateExistingConnections()
+		self.updateElementList()
+		
+	def removeElement(self):
+		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS ACTION AND ITS RELATIONS WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)", "Warning"):
+			return
+		print "Deleting " + str(self.op.i)
+		self.op.link.delItem(self.op.i)
+		self.back()
+	
+	def populateExistingConnections(self):
+		self.existing_connections.clear()
+		for relation in self.op.link.getRelations(self.op.i):
+			self.existing_connections.addItem(self.op.link.getOneID(self.op.link.getItem(relation)))
+		
+	def back(self):
+		print "Back"
+		self.close()
+		SLBase(self.mainframe, self.op)
+		
+	def follow(self):
+		if not self.existing_connections.currentItem().text() or self.existing_connections.currentItem().text() == "":
+			return
+		print [self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text())
+		self.next.setCurrentIndex([self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text()))
+		self.connect(True)
+		self.next.setCurrentIndex(self.next.count()-1)
+		
+	def lightConnect(self):
+		if str(self.next.currentText()) == "New element":
+			self.op.link.addRelation(self.op.i, self.op.link.size())
+			print "Linked to index " + str(self.op.link.size())
+			self.op.i = self.op.link.size()
+			self.load=0
+			self.changeFrame(0)
+			self.populateExistingConnections()
+			self.updateElementList()
+		else:
+			self.op.link.addRelation(self.op.i, self.actions.index(str(self.next.currentText())))
+			print "Linked to index " + str(self.actions.index(str(self.next.currentText())))
+			self.window.save()
+			self.populateExistingConnections()
+		
+	def connect(self, spawn):
+		if str(self.next.currentText()) == "New element":
+			if not spawn:
+				self.op.link.addRelation(self.op.i, self.op.link.size())
+				print "Linked to index " + str(self.op.link.size())
+			self.op.i = self.op.link.size()
+			self.load=0
+			self.changeFrame(0)
+		else:
+			if not spawn:
+				self.op.link.addRelation(self.op.i, self.actions.index(str(self.next.currentText())))
+				print "Linked to index " + str(self.actions.index(str(self.next.currentText())))
+			self.op.i = self.actions.index(str(self.next.currentText()))
+			if isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Info):
+				self.actOM.setCurrentIndex(0)
+			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Speak):
+				self.actOM.setCurrentIndex(1)
+			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Camera):
+				self.actOM.setCurrentIndex(2)
+			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Movement):
+				self.actOM.setCurrentIndex(3)
+			else:
+				raise Exception("Not a type!")
+			self.load = self.op.link.getItem(self.actions.index(str(self.next.currentText())))
+			self.changeFrame(0)
+			
+	def updateElementList(self):
+		self.next.clear()
+		self.actions = self.op.link.getIDs()
+		self.actions.append("New element")
+		self.next.addItems(self.actions)
+		
+	def changeFrame(self, something):
+		print "Changed to " + str(self.actOM.currentText())
+		try:
+			self.window.close()
+		except AttributeError:
+			pass#No window open
+		if str(self.actOM.currentText()) == "Speak":
+			self.window = SpeakFrame(self, self.load)
+		elif str(self.actOM.currentText()) == "Camera Change":
+			self.window = CameraFrame(self, self.load)
+		elif str(self.actOM.currentText()) == "Movement":
+			self.window = MoveFrame(self, self.load)
+		else:# self.type.get() == "Info":
+			self.window = InfoFrame(self, self.load)
+		self.save.clicked.connect(self.window.save)
+		self.populateExistingConnections()
+		self.updateElementList()
+			
+class InfoFrame(QWidget):
+
+	def __init__(self, op, load):
+		QWidget.__init__(self)
+		self.op = op
+		self.load = load
+		self.initUI()
+		self.op.grid.addWidget(self, 1, 0, 1, 5)
+		
+	def initUI(self):		
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.infoBox = QTextEdit(self)
+		self.infoBox.setFixedSize(300, 150)
+		self.grid.addWidget(self.infoBox, 1, 0, 1, 5)
+		
+		print self.load
+		if self.load!=0:
+			try:
+				self.infoBox.setText(self.load.getText())
+			except Exception as e:
+				print e
+				pass
+		
+	def save(self):
+		print "Saving"
+		infoSlide = Info()
+		print "..."
+		infoSlide.setText(str(self.infoBox.toPlainText()))
+		self.op.op.link.addItem(infoSlide, self.op.op.i)
+		print "Saved"
+		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
+		self.op.op.linkstored.save()
+		self.op.updateElementList()
+		
+class SpeakFrame(QWidget):
+	
+	def __init__(self, op, load):
+		QWidget.__init__(self)
+		self.op = op
+		self.load = load
+		self.pointvec = []
+		self.pointvar = []
+		self.anglevec = []
+		self.anglevar = []
+		self.addPAtIndex = 4
+		self.addAAtIndex = 4
+		self.initUI()
+		self.op.grid.addWidget(self, 1, 0, 1, 5)
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.characs = json_reader.readCharNames()
+		self.arcanas = json_reader.data_list("arcanas")
+		self.arcanas.extend([""])
+		
+		self.textl = QLabel(self, text="Text:")
+		self.grid.addWidget(self.textl, 1, 0)
+		
+		self.infoBox = QTextEdit(self)
+		self.infoBox.setFixedSize(300, 150)
+		self.grid.addWidget(self.infoBox, 1, 1, 3, 3)
+		
+		self.textl = QLabel(self, text="Points:")
+		self.grid.addWidget(self.textl, 2, 4, 1, 2)
+		
+		self.pointBox = QLineEdit(self)
+		self.pointBox.setFixedSize(20, 20)
+		self.grid.addWidget(self.pointBox, 3, 4)
+		self.pointvec.append(self.pointBox)
+		
+		pointOM = QComboBox(self)
+		pointOM.addItems(self.arcanas)
+		pointOM.setCurrentIndex(pointOM.count()-1)
+		self.grid.addWidget(pointOM, 3, 5)
+		self.pointvar.append(pointOM)
+		
+		self.textl = QLabel(self, text="Angle:")
+		self.grid.addWidget(self.textl, 2, 6, 1, 2)
+		
+		angleBox = QLineEdit(self)
+		angleBox.setFixedSize(20, 20)
+		self.grid.addWidget(angleBox, 3, 6)
+		self.anglevec.append(angleBox)
+		
+		angleOM = QComboBox(self)
+		angleOM.addItems(self.arcanas)
+		angleOM.setCurrentIndex(angleOM.count()-1)
+		self.grid.addWidget(angleOM, 3, 7)
+		self.anglevar.append(angleOM)
+		
+		self.speakerl = QLabel(self, text="Speaker:")
+		self.grid.addWidget(self.speakerl, 1, 4)
+		
+
+		self.speaker = QComboBox(self)
+		self.speaker.addItems(self.characs)
+		self.grid.addWidget(self.speaker, 1, 5)
+		
+		self.addp = QPushButton(self, text="Add points")
+		self.addp.clicked.connect(self.extendP)
+		self.grid.addWidget(self.addp, 30, 4, 1, 2)
+		
+		self.adda = QPushButton(self, text="Add angles")
+		self.adda.clicked.connect(self.extendA)
+		self.grid.addWidget(self.adda, 30, 6, 1, 2)
+		
+		if self.load != 0:
+			try:
+				self.infoBox.setText(self.load.getText())
+				self.speaker.setCurrentIndex(self.characs.index(self.load.getSpeaker()))
+				first = True
+				for arcana, points in self.load.getPoints().iteritems():
+					if first:
+						first = False
+					else:
+						self.extendP()
+					self.pointvec[-1].setText(str(points))
+					self.pointvar[-1].setCurrentIndex(self.arcanas.index(arcana))
+				first = True
+				for arcana, angle in self.load.getAngle().iteritems():
+					if first:
+						first = False
+					else:
+						self.extendA()
+					self.anglevec[-1].setText(str(angle))
+					self.anglevar[-1].setCurrentIndex(self.arcanas.index(arcana))
+			except Exception as e:
+				print e
+				pass
+			
+			
+		
+	def extendP(self):
+		self.pointvec.extend([QLineEdit(self)])
+		self.pointvec[-1].setFixedSize(20, 20)
+		self.pointvar.extend([QComboBox(self)])
+		self.grid.addWidget(self.pointvec[-1], self.addPAtIndex, 4)
+		self.pointvar[-1].addItems(self.arcanas)
+		self.pointvar[-1].setCurrentIndex(self.pointvar[-1].count()-1)
+		self.grid.addWidget(self.pointvar[-1], self.addPAtIndex, 5)
+		self.addPAtIndex+=1
+		
+	def extendA(self):
+		self.anglevec.extend([QLineEdit(self)])
+		self.anglevec[-1].setFixedSize(20, 20)
+		self.anglevar.extend([QComboBox(self)])
+		self.grid.addWidget(self.anglevec[-1], self.addAAtIndex, 6)
+		self.anglevar[-1].addItems(self.arcanas)
+		self.anglevar[-1].setCurrentIndex(self.anglevar[-1].count()-1)
+		self.grid.addWidget(self.anglevar[-1], self.addAAtIndex, 7)
+		self.addAAtIndex+=1
+		
+	def save(self):
+		print "Saving"
+		print "..."
+		speakSlide = Speak()
+		speakSlide.setText(self.infoBox.toPlainText())
+		speakSlide.setSpeaker(str(self.speaker.currentText()))
+		for i in xrange(len(self.pointvec)):
+			if(str(self.pointvar[i].currentText())!=""):
+				try:
+					amount = (int)(str(self.pointvec[i].text()))
+					speakSlide.putPoints(str(self.pointvar[i].currentText()), amount)
+				except:
+					popup("All Points must be integers.\nTo discard one line, empty the text field and set the arcana to blank.", "Critical")
+					print "Amount must be an integer"
+		for i in xrange(len(self.anglevec)):
+			if(str(self.anglevar[i].currentText())!=""):
+				try:
+					amount = (int)(str(self.anglevec[i].text()))
+					speakSlide.putAngle(str(self.anglevar[i].currentText()), amount)
+				except:
+					popup("All Points and Angles must be integers.\nTo discard one line, set empty the text field and set the arcana to blank.", "Critical")
+					print "Amount must be an integer"
+		self.op.op.link.addItem(speakSlide, self.op.op.i)
+		print "Saved"
+		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
+		self.op.op.linkstored.save()
+		self.op.updateElementList()
+		
+		
+class CameraFrame(QWidget):
+	
+	def __init__(self, op, load):
+		QWidget.__init__(self)
+		self.op = op
+		self.load = load
+		self.initUI()
+		self.op.grid.addWidget(self, 1, 0, 1, 5)
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.locations = json_reader.data_list("locations")
+		
+		self.textl = QLabel(self, text="Camera's position x:")
+		self.grid.addWidget(self.textl, 1, 0)
+		
+		self.cx = QLineEdit(self)
+		self.cx.setFixedSize(20, 20)
+		self.grid.addWidget(self.cx, 1, 1)
+		
+		self.textl = QLabel(self, text="Camera's position y:")
+		self.grid.addWidget(self.textl, 2, 0)
+		
+		self.cy = QLineEdit(self)
+		self.cy.setFixedSize(20, 20)
+		self.grid.addWidget(self.cy, 2, 1)
+		
+		self.textl = QLabel(self, text="Camera's position z:")
+		self.grid.addWidget(self.textl, 3, 0)
+		
+		self.cz = QLineEdit(self)
+		self.cz.setFixedSize(20, 20)
+		self.grid.addWidget(self.cz, 3, 1)
+		
+		self.textl = QLabel(self, text="Look at x:")
+		self.grid.addWidget(self.textl, 1, 2)
+		
+		self.lx = QLineEdit(self)
+		self.lx.setFixedSize(20, 20)
+		self.grid.addWidget(self.lx, 1, 3)
+		
+		self.textl = QLabel(self, text="Look at y:")
+		self.grid.addWidget(self.textl, 2, 2)
+		
+		self.ly = QLineEdit(self)
+		self.ly.setFixedSize(20, 20)
+		self.grid.addWidget(self.ly, 2, 3)
+		
+		self.textl = QLabel(self, text="Look at z:")
+		self.grid.addWidget(self.textl, 3, 2)
+		
+		self.lz = QLineEdit(self)
+		self.lz.setFixedSize(20, 20)
+		self.grid.addWidget(self.lz, 3, 3)
+		
+		self.locationl = QLabel(self, text="Location:")
+		self.grid.addWidget(self.locationl, 1, 4)
+		
+		self.locationO = QComboBox(self)
+		self.locationO.addItems(self.locations)
+		self.locationO.setCurrentIndex(0)
+		self.grid.addWidget(self.locationO, 1, 5)
+		
+		if self.load != 0:
+			try:
+				self.locationO.setCurrentIndex(self.locations.index(self.load.getPlace()))
+				cp = self.load.getCameraPosition()
+				la = self.load.getLookAt()
+				self.cx.setText(str(cp[0]))
+				self.cy.setText(str(cp[1]))
+				self.cz.setText(str(cp[2]))
+				self.lx.setText(str(la[0]))
+				self.ly.setText(str(la[1]))
+				self.lz.setText(str(la[2]))
+			except Exception as e:
+				print e
+				pass
+		
+			
+	def save(self):
+		print "Saving"
+		cameraSlide = Camera()
+		cameraSlide.setPlace(str(self.locationO.currentText()))
+		print "..."
+		try:
+			(int)(str(self.lx.text()))
+			(int)(str(self.ly.text()))
+			(int)(str(self.lz.text()))
+			(int)(str(self.cx.text()))
+			(int)(str(self.cy.text()))
+			(int)(str(self.cz.text()))
+		except:
+			popup("Camera position (x, y, z) and look direction (x, y, z) must be entered as whole numbers", "Critical")
+			print "Must be an integer"
+			return
+		
+		cameraSlide.setLookAt(((int)(str(self.lx.text())),(int)(str(self.ly.text())),(int)(str(self.lz.text()))))
+		cameraSlide.setCameraPosition(((int)(str(self.cx.text())),(int)(str(self.cy.text())),(int)(str(self.cz.text()))))
+		self.op.op.link.addItem(cameraSlide, self.op.op.i)
+		print "Saved"
+		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
+		self.op.op.linkstored.save()
+		self.op.updateElementList()
+		
+		
+class MoveFrame(QWidget):
+	
+	def __init__(self, op, load):
+		QWidget.__init__(self)
+		self.op = op
+		self.load = load
+		self.initUI()
+		self.op.grid.addWidget(self, 1, 0, 1, 5)
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.animations = json_reader.data_list("animations")
+		self.characs = json_reader.readCharNames()
+		
+		self.textl = QLabel(self, text="Go to x:")
+		self.grid.addWidget(self.textl, 1, 0)
+		
+		self.lx = QLineEdit(self)
+		self.lx.setFixedSize(20, 20)
+		self.grid.addWidget(self.lx, 1, 1)
+		
+		self.textl = QLabel(self, text="Go to y:")
+		self.grid.addWidget(self.textl, 2, 0)
+		
+		self.ly = QLineEdit(self)
+		self.ly.setFixedSize(20, 20)
+		self.grid.addWidget(self.ly, 2, 1)
+		
+		self.speakerl = QLabel(self, text="Person:")
+		self.grid.addWidget(self.speakerl, 1, 3)
+		
+		self.speaker = QComboBox(self)
+		self.speaker.addItems(self.characs)
+		self.speaker.setCurrentIndex(0)
+		self.grid.addWidget(self.speaker, 1, 4)
+		
+		self.anil = QLabel(self, text="Animation:")
+		self.grid.addWidget(self.anil, 2, 3)
+		
+		self.ani = QComboBox(self)
+		self.ani.addItems(self.animations)
+		self.ani.setCurrentIndex(self.animations.index("Idle"))
+		self.grid.addWidget(self.ani, 2, 4)
+		
+		if self.load != 0:
+			try:
+				self.ani.setCurrentIndex(self.animations.index(self.load.getAnimation()))
+				self.speaker.setCurrentIndex(self.characs.index(self.load.getSubject()))
+				self.lx.setText(str(self.load.getDestination()[0]))
+				self.ly.setText(str(self.load.getDestination()[1]))
+			except Exception as e:
+				print e
+				pass
+		
+		
+	def save(self):
+		print "Saving"
+		moveSlide = Movement()
+		moveSlide.setSubject(str(self.speaker.currentText()))
+		moveSlide.setAnimation(str(self.ani.currentText()))
+		print "..."
+		try:
+			(int)(str(self.lx.text()))
+			(int)(str(self.ly.text()))
+		except:
+			popup("Destination coordinates (x, y) must be entered as integers", "Critical")
+			print "Numbers must be integers"
+			return
+		
+		moveSlide.setDestination(((int)(str(self.lx.text())),(int)(str(self.ly.text()))))
+		self.op.op.link.addItem(moveSlide, self.op.op.i)
+		print "Saved"
+		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
+		self.op.op.linkstored.save()
+		self.op.updateElementList()

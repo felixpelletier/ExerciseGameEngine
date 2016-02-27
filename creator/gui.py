@@ -8,7 +8,7 @@ from ttk import Button, Style, Entry
 from creatures import Character, Persona
 import json_reader
 import slgui
-from popup import popup
+#from popup import popup
 
 class MainFrame():
 	
