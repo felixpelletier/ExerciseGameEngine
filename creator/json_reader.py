@@ -39,8 +39,7 @@ def writeOneP(persona):
 	with open(buildPath('data/' + persona.getName() + '.json'), 'w') as outfile:
 		json.dump(persona.__dict__, outfile)
 	outfile.close()
-	if persona.getName() not in readPerNames():
-		writePerNames(persona.getName())
+	writePerNames(persona.getName())
 	
 def readOne(name):
 	with open(buildPath('data/' + name+'.json')) as json_data:
@@ -65,6 +64,8 @@ def writeCharNames(name):
 	
 def writePerNames(name):
 	list = readPerNames()
+	if name in list:
+		return
 	list.append(name)
 	with open(buildPath('int/' + 'pers.json'), 'w') as outfile:
 		json.dump(list, outfile)

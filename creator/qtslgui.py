@@ -36,8 +36,7 @@ class SLFrame(QWidget):
 		self.mainframe.changeState(self.op)
 	
 	def simulate(self):
-		Simulation(self.link, self.arcana, self.level, self.angle)
-	
+		self.sim = Simulation(self.link, self.arcana, self.level, self.angle)
 	
 	def writeSave():
 		self.linkstored.setLink(self.link, self.level, self.angle)

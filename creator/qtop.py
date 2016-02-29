@@ -2,6 +2,7 @@ from qtheader import *
 from chargui import char_creator
 from pergui import per_creator
 from slcontextgui import SL_creator
+from supgui import sup_ui
 
 class OP(QWidget):
 	
@@ -47,10 +48,19 @@ class OP(QWidget):
 		createChar.clicked.connect(self.actionC)
 		bGrid.addWidget(createChar, 2, 0)
 		
+		support = QPushButton(intframe, text="Support/Contact")
+		support.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+		support.clicked.connect(self.actionE)
+		bGrid.addWidget(support, 3, 0)
+		
 		quit = QPushButton(intframe, text="Quit")
 		quit.setSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
 		quit.clicked.connect(self.quit)
-		bGrid.addWidget(quit, 3, 0)
+		bGrid.addWidget(quit, 4, 0)
+		
+	def actionE(self):
+		print "Changed frame to Support/Contact"
+		self.mainframe.changeState(sup_ui(self.mainframe, self))
 		
 	def actionP(self):
 		print "Changed frame to Persona creator"

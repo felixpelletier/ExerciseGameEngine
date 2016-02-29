@@ -4,7 +4,7 @@ import os
 block_cipher = None
 
 
-a = Analysis(['../gui.py'],
+a = Analysis(['../qtmain.py'],
              pathex=['/Users/t_waugs/Documents/Objeus repo/soul/creator'],
              binaries=None,
              datas=None,
@@ -40,7 +40,7 @@ pyz = PYZ(a.pure, a.zipped_data,
 exe = EXE(pyz,
           a.scripts,
           exclude_binaries=True,
-          name='gui',
+          name='qtmain',
           debug=False,
           strip=False,
           upx=True,
@@ -51,7 +51,7 @@ coll = COLLECT(exe,
                a.datas,
                strip=False,
                upx=True,
-               name='gui')
+               name='qtmain')
 app = BUNDLE(coll,
              name='Story Creator.app',
              icon=os.path.join(a.pathex[0], 'icon.icns'),

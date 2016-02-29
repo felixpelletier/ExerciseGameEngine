@@ -236,7 +236,7 @@ class per_creator(QWidget):
 				raise Exception("")
 			if not (self.chosenSpell == ""):
 				print "Ok"
-				self.lsdic[self.chosenSpell] = self.lslevel.text()
+				self.lsdic[str(self.chosenSpell)] = str(self.lslevel.text())
 				self.listLS.addItem(self.chosenSpell + " at level " + self.lslevel.text())
 				return
 		except:
@@ -316,8 +316,8 @@ class per_creator(QWidget):
 		print "Changed to edit frame"
 	
 	def save(self):
-		if os.path.exists(json_reader.buildPath('data/'+self.nameT.text()+".json")):
-			if not popup("Override existing Persona "+self.nameT.get(1.0, END).replace("\n", "")+"?", "Question"):
+		if os.path.exists(json_reader.buildPath("data/"+str(self.nameT.text())+".json")):
+			if not popup("Override existing Persona "+self.nameT.text()+"?", "Question"):
 				return
 		print "Saving"
 		spellDeck = []

@@ -17,6 +17,7 @@ class MainFrame(QWidget):
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)
 		self.currentWidget.show()
 		self.show()
+		self.raise_()
 		
 	def changeState(self, newWidgetState):
 		self.setPalette(newWidgetState.palette())
