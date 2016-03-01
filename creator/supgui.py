@@ -2,6 +2,8 @@ from qtheader import *
 from PyQt4.QtGui import QFileDialog
 from shutil import copytree, copy
 import os
+import email
+import smtplib
 
 class sup_ui(QWidget):
 	
@@ -25,17 +27,17 @@ class sup_ui(QWidget):
 		exportB.clicked.connect(self.export)
 		self.grid.addWidget(exportB, 0, 1)
 		
-		contact = QPushButton(self, text="Contact")
-		contact.clicked.connect(self.contact)
-		self.grid.addWidget(contact, 0, 2)
+		self.contact = QPushButton(self, text="Contact")
+		self.contact.clicked.connect(self.contactF)
+		self.grid.addWidget(self.contact, 0, 2)
 		
-		text = QLabel(self, text="Hello and thank you for using the Persona X Story Creator.\n\nTo import data from other versions of the Story Creator, click \"Import\".\n\nTo export your data to a seperate directory, (to prepare for a version change), click \"Export\".\n\nTo send your data to the dev team or to report a bug with the program, click \"Contact\"")
-		text.setAlignment(Qt.AlignHCenter)
-		self.grid.addWidget(text, 1, 0, 1, 3)
+		self.text = QLabel(self, text="Hello and thank you for using the Persona X Story Creator.\n\nTo import data from other versions of the Story Creator, click \"Import\".\n\nTo export your data to a seperate directory, (to prepare for a version change), click \"Export\".\n\nTo send your data to the dev team or to report a bug with the program, click \"Contact\"")
+		self.text.setAlignment(Qt.AlignHCenter)
+		self.grid.addWidget(self.text, 1, 0, 1, 3)
 		
-		back = QPushButton(self, text="Back")
-		back.clicked.connect(self.back)
-		self.grid.addWidget(back, 2, 1)
+		self.back = QPushButton(self, text="Back")
+		self.back.clicked.connect(self.backF)
+		self.grid.addWidget(self.back, 2, 1)
 		
 	def importF(self):
 		fileBrowser = QFileDialog()
@@ -44,6 +46,9 @@ class sup_ui(QWidget):
 		fileBrowser.setOption(QFileDialog.ShowDirsOnly, True)
 		if fileBrowser.exec_():
 			dir = fileBrowser.selectedFiles()
+		else:
+			print "Cancelled"
+			return
 		print "Copying data from "+str(dir[0])
 		files = os.listdir(str(dir[0]))
 		copyOn = True
@@ -78,6 +83,9 @@ class sup_ui(QWidget):
 		fileBrowser.setOption(QFileDialog.ShowDirsOnly, True)
 		if fileBrowser.exec_():
 			dir = fileBrowser.selectedFiles()
+		else:
+			print "Cancelled"
+			return
 		print "Copying data to "+str(dir[0])+"/exportdata"
 		try:
 			copytree(json_reader.buildPath("data"), str(dir[0])+"/exportdata")
@@ -88,8 +96,101 @@ class sup_ui(QWidget):
 		print "Successfully copied files"
 		popup("Files exported successfully!", "Information")
 		
-	def contact(self):
-		pass
+	def contactF(self):
+		self.contact.clicked.disconnect()
+		self.text.close()
+		emailFrame(self)
+		
+	def backF(self):
+		self.mainframe.changeState(self.op)
+		
+		
+class emailFrame(QWidget):
+
+	def __init__(self, op):
+		QWidget.__init__(self)
+		self.op = op
+		self.initUI()
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.op.grid.addWidget(self, 1, 0, 1, 3)
+		
+		subL = QLabel(self, text="Subject:")
+		subL.setAlignment(Qt.AlignHCenter)
+		self.grid.addWidget(subL, 0, 0)
+		
+		self.subject = QLineEdit(self)
+		self.subject.setFixedSize(150, 20)
+		self.grid.addWidget(self.subject, 0, 1)
+		
+		bodL = QLabel(self, text="")
+		bodL.setAlignment(Qt.AlignHCenter)
+		
+		self.body = QTextEdit(self)
+		self.body.setFixedSize(400, 150)
+		self.grid.addWidget(self.body, 1, 1, 1, 3)
+		
+		sem = QLabel(self, text="Your email:")
+		sem.setAlignment(Qt.AlignHCenter)
+		self.grid.addWidget(sem, 2, 0)
+		
+		self.semT = QLineEdit(self)
+		self.semT.setFixedSize(150, 20)
+		self.grid.addWidget(self.semT, 2, 1)
+		
+		send = QPushButton(self, text="Send")
+		send.clicked.connect(self.send)
+		self.grid.addWidget(send, 2, 2)
+		
+		self.addFiles = QCheckBox(self, text="Send submission")
+		self.grid.addWidget(self.addFiles, 0, 2)
+		
+		self.op.back.clicked.disconnect()
+		self.op.back.clicked.connect(self.back)
+		
+	def send(self):
+		if str(self.semT.text())=="" or str(self.semT.text()).isspace() or str(self.subject.text())=="" or str(self.subject.text()).isspace():
+			popup("Please enter a message and subject.", "Critical")
+			return
+		msg = email.message_from_string(str(self.body.toPlainText()))
+		msg['From'] = str(self.semT.text())
+		msg['To'] = "swwouf@hotmail.com"
+		msg['Subject'] = str(self.subject.text())
+		
+		s = smtplib.SMTP("smtp.live.com", 587)
+		s.ehlo()
+		s.starttls()
+		s.ehlo()
+		s.login("personaxdevteam@hotmail.com", 'PersonaX')
+		try:
+			s.sendmail(msg['From'], msg['To'], msg.as_string())
+			print "Message sent successfully"
+			popup("Email was sent! Thank you!", "Information")
+		except smtplib.SMTPSenderRefused:
+			popup("You must provide your email address so that we may contact you if needed.\n\nYour email address will not be shared with any third parties.", "Critical")		
+		s.quit()
 		
 	def back(self):
-		self.mainframe.changeState(self.op)
+		self.close()
+		self.op.text.show()
+		self.op.back.clicked.disconnect()
+		self.op.back.clicked.connect(self.op.backF)
+		self.op.contact.clicked.connect(self.op.contactF)
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
