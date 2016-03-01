@@ -2,8 +2,10 @@ from qtheader import *
 from PyQt4.QtGui import QFileDialog
 from shutil import copytree, copy
 import os
-import email
+from email.mime.multipart import MIMEMultipart, MIMEBase
+from email.mime.text import MIMEText
 import smtplib
+from glob import glob
 
 class sup_ui(QWidget):
 	
@@ -146,19 +148,31 @@ class emailFrame(QWidget):
 		self.grid.addWidget(send, 2, 2)
 		
 		self.addFiles = QCheckBox(self, text="Send submission")
+		self.addFiles.setToolTip("Check this box to send all Character, Persona and Social Link data along with your message")
 		self.grid.addWidget(self.addFiles, 0, 2)
 		
 		self.op.back.clicked.disconnect()
 		self.op.back.clicked.connect(self.back)
 		
 	def send(self):
-		if str(self.semT.text())=="" or str(self.semT.text()).isspace() or str(self.subject.text())=="" or str(self.subject.text()).isspace():
+		if str(self.body.toPlainText())=="" or str(self.body.toPlainText()).isspace() or str(self.subject.text())=="" or str(self.subject.text()).isspace():
 			popup("Please enter a message and subject.", "Critical")
 			return
-		msg = email.message_from_string(str(self.body.toPlainText()))
+		msg = MIMEMultipart()
+		body = MIMEText(str(self.body.toPlainText()))
+		msg.attach(body)
 		msg['From'] = str(self.semT.text())
 		msg['To'] = "swwouf@hotmail.com"
 		msg['Subject'] = str(self.subject.text())
+		if self.addFiles.isChecked():
+			print "Adding files"
+			fileNames = glob(json_reader.buildPath("data/*.json"))
+			print fileNames
+			for file in fileNames:
+				part = MIMEBase('application', "octet-stream")
+				part.set_payload( open(file,"rb").read() )
+				part.add_header('Content-Disposition', 'attachment; filename="%s"'% file[file.rfind("/"):])
+				msg.attach(part)
 		
 		s = smtplib.SMTP("smtp.live.com", 587)
 		s.ehlo()
@@ -169,9 +183,15 @@ class emailFrame(QWidget):
 			s.sendmail(msg['From'], msg['To'], msg.as_string())
 			print "Message sent successfully"
 			popup("Email was sent! Thank you!", "Information")
+			s.quit()
+			return
 		except smtplib.SMTPSenderRefused:
 			popup("You must provide your email address so that we may contact you if needed.\n\nYour email address will not be shared with any third parties.", "Critical")		
+			s.quit()
+			return
 		s.quit()
+		popup("Email failed to send, but not sure why...", "Critical")
+		
 		
 	def back(self):
 		self.close()
