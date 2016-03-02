@@ -1,4 +1,5 @@
 from qtheader import *
+from PyQt4.QtGui import QHBoxLayout
 from sls import SocialLink
 import sys
 
@@ -14,9 +15,13 @@ class PrettySL(QWidget):
 		self.initData()
 		self.initUI()
 		
+		
 	def initData(self):
-		self.actions = self.graph.getIDs()
-		self.maxDepth = len(self.actions) #Not used
+		self.actionIDs = self.graph.getIDs()
+		self.actionObjs = []
+		for act in self.table:
+			self.actionObjs.append(act[0])
+		self.maxDepth = len(self.actionIDs) #Not used
 		
 	def initUI(self):
 		self.grid = QGridLayout()
@@ -26,17 +31,15 @@ class PrettySL(QWidget):
 		self.grid.addWidget(self.enter, 0, 0)
 		
 		self.showTree = QPushButton(self, text="Show Tree")
-		self.grid.addWidget(self, 0, 1)
+		self.grid.addWidget(self.showTree, 0, 1)
 		
-		self.delete = QPUshButton(self, text="Delete")
+		#self.delete = QPushButton(self, text="Delete")
 		
 		self.back = QPushButton(self, text="Back")
 		self.back.clicked.connect(self.backF)
 		self.grid.addWidget(self.back, 0, 3)
 		
-		print "Opened"
-		
-		self.tree = TreeWidget(self.actions, self.table)
+		self.tree = TreeWidget(self.actionObjs, self.actionIDs, self.table)
 		self.grid.addWidget(self.tree, 1, 0, 1, 4)
 		
 	def backF(self):
@@ -45,9 +48,10 @@ class PrettySL(QWidget):
 		
 class TreeWidget(QWidget):
 	
-	def __init__(self, actions, table):
+	def __init__(self, actions, ids, table):
 		QWidget.__init__(self)
 		self.actions = actions
+		self.ids = ids
 		self.table = table
 		
 		self.currentDepth = 0
@@ -59,17 +63,14 @@ class TreeWidget(QWidget):
 		self.setLayout(self.grid)
 		
 		self.processed = []
-		self.diag = []
+		self.map = []
 		self.needsLine = []
 		self.depthTracker = {}
 		self.buttons = []
 		
-		self.nextRow(self.table[0][1:len(self.table[0])], 0)
+		self.nextRow(self.table[0], 1)
 		
-		print self.diag
-		print ""
-		print ""
-		print ""
+		print self.map
 		print ""
 		print ""
 		print ""
@@ -77,34 +78,35 @@ class TreeWidget(QWidget):
 		print ""
 		print ""
 		print ""
-		print ""
-		print ""
-		print ""
-		print self.depthTracker			
+		print self.depthTracker
+		
+		self.placedInLine = {}
+		self.lineWidgets = {}
+		
+		for element in self.map:
+			if element[1] not in self.lineWidgets:
+				self.lineWidgets[element[1]] = (QWidget(), QHBoxLayout())
+				self.lineWidgets[element[1]][0].setLayout(self.lineWidgets[element[1]][1])
+			tempB = QPushButton(self.lineWidgets[element[1]][0], text=self.ids[element[0]])
+			self.lineWidgets[element[1]][1].addWidget(tempB)
+		for lineNumber, widget in self.lineWidgets.iteritems():
+			self.grid.addWidget(widget[0], lineNumber, 0)
 	
 	def nextRow(self, currentAction, currentDepth):
-		print "Infinite Loop"
-		for relation in currentAction:
+		for relation in currentAction[1:len(currentAction)]:
 			if relation not in self.processed:
+				print self.processed
+				print (relation, currentDepth)
 				self.processed.append(relation)
 				self.map.append((relation, currentDepth))
 				try:
 					self.depthTracker[currentDepth]+=1
 				except KeyError:
 					self.depthTracker[currentDepth] = 1
-				self.nextRow(self, self.table[relation][1:len(self.table[relation])], currentDepth+1)
-			else:
-				self.needsLine.append(self.actions.index(currentAction), relation)
+				self.nextRow(self.table[relation], currentDepth+1)
+			self.needsLine.append((self.actions.index(currentAction[0]), relation))
 		
-	
-		"""LEGACY IDEAS
-		self.nextRowActions = []
-		for action in currentRowActions:
-			if action not in self.processed:
-				self.nextRowActions.extend([self.table[i][0] for i in self.table[self.table.index(action)][1:len(self.table[self.table.index(action)])]])
-			else:
-				self.needsLine.append((self.table))
-		"""
+
 app = QApplication(sys.argv)
 psl = PrettySL(None, None, SocialLink("Void").startLink(1, 0))
 psl.show()
