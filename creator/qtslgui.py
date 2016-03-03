@@ -2,6 +2,7 @@ from qtheader import *
 from sls import SocialLink
 from action import *
 from simulate import Simulation
+from slview import PrettySL
 
 class SLFrame(QWidget):
 		
@@ -25,6 +26,10 @@ class SLFrame(QWidget):
 		simulate = QPushButton(self, text="Simulate")
 		simulate.clicked.connect(self.simulate)
 		self.grid.addWidget(simulate, 2, 3)
+		
+		view = QPushButton(self, text="Graphic View")
+		view.clicked.connect(self.viewF)
+		self.grid.addWidget(view, 2, 4)
 
 		back = QPushButton(self, text="Back to Arcana selection")
 		back.clicked.connect(self.back)
@@ -37,6 +42,9 @@ class SLFrame(QWidget):
 	
 	def simulate(self):
 		self.sim = Simulation(self.link, self.arcana, self.level, self.angle)
+		
+	def viewF(self):
+		self. pretSL = PrettySL(self.mainframe, self, self.link)
 	
 	def writeSave():
 		self.linkstored.setLink(self.link, self.level, self.angle)

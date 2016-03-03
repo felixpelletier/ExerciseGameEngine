@@ -1,5 +1,6 @@
 from qtheader import *
-from PyQt4.QtGui import QHBoxLayout
+from PyQt4.QtGui import QHBoxLayout, QPen, QPainter, QBrush
+from PyQt4.QtCore import QPoint, QRectF
 from sls import SocialLink
 import sys
 
@@ -42,6 +43,9 @@ class PrettySL(QWidget):
 		self.tree = TreeWidget(self.actionObjs, self.actionIDs, self.table)
 		self.grid.addWidget(self.tree, 1, 0, 1, 4)
 		
+		self.setWindowModality(Qt.ApplicationModal)
+		self.show()
+		
 	def backF(self):
 		self.close()
 		
@@ -63,7 +67,7 @@ class TreeWidget(QWidget):
 		self.setLayout(self.grid)
 		
 		self.processed = []
-		self.map = []
+		self.map = [(0, 0)]
 		self.needsLine = []
 		self.depthTracker = {}
 		self.buttons = []
@@ -82,15 +86,20 @@ class TreeWidget(QWidget):
 		
 		self.placedInLine = {}
 		self.lineWidgets = {}
+		self.buttons = {}
 		
+		#"""FATAL FLAW FOR LINE DRAW
 		for element in self.map:
 			if element[1] not in self.lineWidgets:
 				self.lineWidgets[element[1]] = (QWidget(), QHBoxLayout())
 				self.lineWidgets[element[1]][0].setLayout(self.lineWidgets[element[1]][1])
 			tempB = QPushButton(self.lineWidgets[element[1]][0], text=self.ids[element[0]])
+			tempB.setFixedSize(150, 20)
 			self.lineWidgets[element[1]][1].addWidget(tempB)
+			self.buttons[element[0]] = tempB
 		for lineNumber, widget in self.lineWidgets.iteritems():
 			self.grid.addWidget(widget[0], lineNumber, 0)
+		
 	
 	def nextRow(self, currentAction, currentDepth):
 		for relation in currentAction[1:len(currentAction)]:
@@ -106,8 +115,46 @@ class TreeWidget(QWidget):
 				self.nextRow(self.table[relation], currentDepth+1)
 			self.needsLine.append((self.actions.index(currentAction[0]), relation))
 		
-
+	def paintEvent(self, event):
+		qp = QPainter()
+		qp.begin(self)
+		self.drawLines(qp)
+		qp.end()
+		
+	def drawLines(self, qp):
+		pen = QPen(Qt.black, 2, Qt.SolidLine)
+		qp.setPen(pen)
+		
+		#ifrom = self.mapToTree(self.needsLine[0][0])
+		#ito = self.mapToTree(self.needsLine[0][1])
+		#qp.drawLine(ifrom.x(), ifrom.y(), ito.x(), ito.y())
+		alternate = True
+		for line in self.needsLine:
+			ifrom = self.mapToTree(line[0])
+			ito = self.mapToTree(line[1])
+			if line[0]+1 == line[1]:
+				qp.drawLine(ifrom.x()+40, ifrom.y(), ito.x()+40, ito.y())
+			elif line[0] > line[1]:
+				pen.setStyle(Qt.DashLine)
+				qp.setPen(pen)
+				if alternate:
+					qp.drawArc(QRectF(ito.x(), ito.y(), 100, ifrom.y()-ito.y()), 90*16, 180*16)
+					alternate=False
+				else:
+					qp.drawArc(QRectF(ito.x(), ito.y(), 100, ifrom.y()-ito.y()), 270*16, 180*16)
+					alternate=True
+				pen.setStyle(Qt.SolidLine)
+				qp.setPen(pen)
+				
+		
+		
+	def mapToTree(self, index):
+		p = QPoint(self.buttons[index].x(), self.buttons[index].y())
+		return self.buttons[index].mapTo(self, p)
+		
+"""TESTS
 app = QApplication(sys.argv)
 psl = PrettySL(None, None, SocialLink("Void").startLink(1, 0))
 psl.show()
 sys.exit(app.exec_())
+"""

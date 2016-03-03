@@ -33,6 +33,7 @@ class Simulation(QWidget):
 		quit.clicked.connect(self.shutdown)
 		self.grid.addWidget(quit, 1000, 0)
 		
+		self.setWindowModality(Qt.ApplicationModal)
 		self.show()
 		
 	def shutdown(self):
