@@ -12,6 +12,8 @@ class PrettySL(QWidget):
 		self.op = op
 		self.graph = graph
 		self.table = graph.items
+		self.lastButtonPressed = False
+		self.subtree = []
 		#self.mainframe.setWindowTitle("Social Link Viewer")
 		self.initData()
 		self.initUI()
@@ -31,20 +33,23 @@ class PrettySL(QWidget):
 		self.enter = QPushButton(self, text="Edit")
 		self.grid.addWidget(self.enter, 0, 0)
 		
-		self.showTree = QPushButton(self, text="Show Tree")
-		self.grid.addWidget(self.showTree, 0, 1)
-		
 		#self.delete = QPushButton(self, text="Delete")
 		
 		self.back = QPushButton(self, text="Back")
 		self.back.clicked.connect(self.backF)
-		self.grid.addWidget(self.back, 0, 3)
+		self.grid.addWidget(self.back, 0, 2)
 		
-		self.tree = TreeWidget(self.actionObjs, self.actionIDs, self.table)
-		self.grid.addWidget(self.tree, 1, 0, 1, 4)
+		self.tree = TreeWidget(self, self.actionObjs, self.actionIDs, self.table)
+		self.grid.addWidget(self.tree, 1, 0, 1, 3)
 		
 		self.setWindowModality(Qt.ApplicationModal)
 		self.show()
+		
+	def trackIndex(self, index):
+		print "Called"
+		self.lastButtonPressed = True
+		self.subtree = self.graph.subTree(index)
+		print self.subtree
 		
 	def backF(self):
 		self.close()
@@ -52,11 +57,12 @@ class PrettySL(QWidget):
 		
 class TreeWidget(QWidget):
 	
-	def __init__(self, actions, ids, table):
+	def __init__(self, op, actions, ids, table):
 		QWidget.__init__(self)
 		self.actions = actions
 		self.ids = ids
 		self.table = table
+		self.op = op
 		
 		self.currentDepth = 0
 		
@@ -95,6 +101,7 @@ class TreeWidget(QWidget):
 				self.lineWidgets[element[1]][0].setLayout(self.lineWidgets[element[1]][1])
 			tempB = QPushButton(self.lineWidgets[element[1]][0], text=self.ids[element[0]])
 			tempB.setFixedSize(150, 20)
+			tempB.clicked.connect(lambda ignore, ind=element[0]:self.op.trackIndex(ind))
 			self.lineWidgets[element[1]][1].addWidget(tempB)
 			self.buttons[element[0]] = tempB
 		for lineNumber, widget in self.lineWidgets.iteritems():
@@ -124,7 +131,7 @@ class TreeWidget(QWidget):
 	def drawLines(self, qp):
 		pen = QPen(Qt.black, 2, Qt.SolidLine)
 		qp.setPen(pen)
-		
+		# Can be used to test drawing lines between specific actions. Keep for now.
 		#ifrom = self.mapToTree(self.needsLine[0][0])
 		#ito = self.mapToTree(self.needsLine[0][1])
 		#qp.drawLine(ifrom.x(), ifrom.y(), ito.x(), ito.y())
@@ -132,6 +139,13 @@ class TreeWidget(QWidget):
 		for line in self.needsLine:
 			ifrom = self.mapToTree(line[0])
 			ito = self.mapToTree(line[1])
+			if line[0] in self.op.subtree:
+				print "Set to red"
+				pen.setColor(Qt.red)
+				qp.setPen(pen)
+			if self.op.lastButtonPressed:
+				self.update()
+				self.op.lastButtonPressed=False
 			if line[0]+1 == line[1]:
 				qp.drawLine(ifrom.x()+40, ifrom.y(), ito.x()+40, ito.y())
 			elif line[0] > line[1]:
@@ -144,7 +158,8 @@ class TreeWidget(QWidget):
 					qp.drawArc(QRectF(ito.x(), ito.y(), 100, ifrom.y()-ito.y()), 270*16, 180*16)
 					alternate=True
 				pen.setStyle(Qt.SolidLine)
-				qp.setPen(pen)
+			pen.setColor(Qt.black)
+			qp.setPen(pen)
 				
 		
 		
@@ -152,9 +167,9 @@ class TreeWidget(QWidget):
 		p = QPoint(self.buttons[index].x(), self.buttons[index].y())
 		return self.buttons[index].mapTo(self, p)
 		
-"""TESTS
+#"""TESTS
 app = QApplication(sys.argv)
 psl = PrettySL(None, None, SocialLink("Void").startLink(1, 0))
 psl.show()
 sys.exit(app.exec_())
-"""
+#"""

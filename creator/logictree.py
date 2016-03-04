@@ -23,7 +23,7 @@ class MathGraph:
 	def size(self):
 		return len(self.items)
 		
-	def setFirst(self, item):#Not useful (index 0 always first element). Only useful if I do a full overhaul to a pure hashmap structure
+	def setFirst(self, item):#Not useful (index 0 always first element). Only useful if I do a full overhaul to a pure hashmap structure (which at this point won't happen)
 		self.first = item
 		
 	def getIDs(self):#safe but UGLY AF
@@ -76,7 +76,7 @@ class MathGraph:
 		if not jfound:
 			self.delItem(j)
 		
-	def delItem(self, i):#Not working
+	def delItem(self, i):
 		for relation in self.items[i][1:len(self.items[i])]:
 			self.delRelation(i, relation)
 		for itemRelation in self.items:
@@ -84,7 +84,54 @@ class MathGraph:
 				itemRelation.remove(i)		
 		self.items.pop(i)
 
-
+	def subTree(self, i, processed=set()):
+		countx = 0
+		county = 0
+				
+		UD = []
+		fullsubtree = self.ywaysfromi(i, processed)
+		for j in fullsubtree:
+			for item in fullsubtree:
+				if j in self.items[item]:
+					print "Link to " + str(j) + " at index " + str(self.items.index(item))
+					county+=1
+			for item in self.items:
+				if j in item:
+					print "Link to " + str(j) + " at index " + str(self.items.index(item))
+					countx+=1
+			if county == countx:
+				UD.append(j)
+			
+		#return self._findItem(i)
+		#"""LEGACY
+	def ywaysfromi(self, i, processed=set()):
+		sub = processed
+		if i not in sub:
+			sub = sub | set([i])
+			for relation in self.items[i][1:len(self.items[i])]:
+				sub = sub | self.subTree(relation, sub)
+		return sub
+		#"""
+		
+		#LEGACY
+	def _findRelation(self, i, j, sub):
+		jfound = False
+		print i
+		for itemRelation in self.items:
+			if j in itemRelation and self.items.index(itemRelation) != i:
+				print str(self.items.index(itemRelation)) + " is blocking removal of index " + str(j)
+				
+				jfound=True
+		if not jfound:
+			return self._findItem(j, sub)
+		return set()
+		
+	def _findItem(self, i, processed=set()):
+		sub = processed
+		for relation in self.items[i][1:len(self.items[i])]:
+			sub = sub | self._findRelation(i, relation, sub)
+		sub = sub | set([i])
+		return sub
 		
 class DynamicList(list):#Needs relocating (theoretically)
 

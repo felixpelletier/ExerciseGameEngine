@@ -21,15 +21,15 @@ class SL_creator(QWidget):
 		self.arcSel.activated.connect(self.showText)
 		self.arcSel.addItems(list)
 		self.arcSel.setCurrentIndex(0)
-		self.grid.addWidget(self.arcSel, 0, 1)
+		self.grid.addWidget(self.arcSel, 1, 1)
 		
 		select = QPushButton(self, text="Select")
 		select.clicked.connect(self.context)
-		self.grid.addWidget(select, 1, 1)
+		self.grid.addWidget(select, 2, 1)
 		
 		back = QPushButton(self, text="Back")
 		back.clicked.connect(self.back)
-		self.grid.addWidget(back, 2, 1)
+		self.grid.addWidget(back, 3, 1)
 		
 		self.card = QLabel(self)
 		defaultCard = QPixmap(json_reader.buildPath("int/cards/card.png"))
@@ -38,7 +38,7 @@ class SL_creator(QWidget):
 		self.grid.addWidget(self.card, 0, 0)
 		
 		self.text = QLabel(self, text="")
-		self.text.setMaximumWidth(400)
+		self.text.setFixedSize(400, 200)
 		self.text.setWordWrap(True)
 		self.text.setAlignment(Qt.AlignHCenter)
 		self.grid.addWidget(self.text, 1, 0, 3, 1)
