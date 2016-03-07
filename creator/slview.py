@@ -6,41 +6,34 @@ import sys
 
 class PrettySL(QWidget):
 
-	def __init__(self, mainframe, op, graph):
+	def __init__(self, mainframe, op):
 		QWidget.__init__(self)
 		self.mainframe = mainframe
 		self.op = op
-		self.graph = graph
-		self.table = graph.items
+		self.graph = self.op.link
+		self.table = self.op.link.items
 		self.lastButtonPressed = False
 		self.subtree = []
-		#self.mainframe.setWindowTitle("Social Link Viewer")
 		self.initData()
 		self.initUI()
 		
 		
 	def initData(self):
+		self.lab = None
 		self.actionIDs = self.graph.getIDs()
 		self.actionObjs = []
 		for act in self.table:
 			self.actionObjs.append(act[0])
-		self.maxDepth = len(self.actionIDs) #Not used
 		
 	def initUI(self):
 		self.grid = QGridLayout()
 		self.setLayout(self.grid)
-		
-		self.enter = QPushButton(self, text="Edit")
-		self.grid.addWidget(self.enter, 0, 0)
-		
-		#self.delete = QPushButton(self, text="Delete")
-		
-		self.back = QPushButton(self, text="Back")
-		self.back.clicked.connect(self.backF)
-		self.grid.addWidget(self.back, 0, 2)
-		
+
 		self.tree = TreeWidget(self, self.actionObjs, self.actionIDs, self.table)
-		self.grid.addWidget(self.tree, 1, 0, 1, 3)
+		self.grid.addWidget(self.tree, 0, 0, 10, 3)
+		
+		self.legend = Legend(self)
+		self.grid.addWidget(self.legend, 0, 3, 1, 2)
 		
 		self.setWindowModality(Qt.ApplicationModal)
 		self.show()
@@ -50,10 +43,83 @@ class PrettySL(QWidget):
 		self.lastButtonPressed = True
 		self.subtree = self.graph.subTree(index)
 		print self.subtree
+		self.initInfoUI(index)
 		
-	def backF(self):
+	def initInfoUI(self, index):
+		if not self.lab:
+			self.lab = QLabel(self, text="Selected element summary:")
+			self.grid.addWidget(self.lab, 1, 3, 1, 2)
+			self.idLabel = QLabel(self, text=self.actionIDs[index])
+			self.idLabel.setFixedSize(350, 40)
+			self.idLabel.setWordWrap(True)
+			self.grid.addWidget(self.idLabel, 2, 3, 1, 2)
+			self.edit = QPushButton(self, text="Edit")
+			self.edit.clicked.connect(lambda:self.enter(index))
+			self.grid.addWidget(self.edit, 3, 3, 1, 2)
+		else:
+			self.idLabel.setText(self.actionIDs[index])
+			self.edit.clicked.disconnect()
+			self.edit.clicked.connect(lambda:self.enter(index))
+		
+	def enter(self, index):
+		load = self.graph.getItem(index)
 		self.close()
+		self.op.view.setText("Graphic View")
+		self.op.view.clicked.disconnect()
+		self.op.view.clicked.connect(lambda:self.op.viewF(True))
+		self.op.listview.changeFrame(load, index)
+
 		
+		
+class Legend(QWidget):
+	
+	def __init__(self, op):
+		QWidget.__init__(self)
+		self.op = op
+		self.initUI()
+		
+	def initUI(self):
+		self.grid = QGridLayout()
+		self.setLayout(self.grid)
+		
+		self.lab = QLabel(self, text="Legend")
+		self.grid.addWidget(self.lab, 0, 0, 1, 2)
+		
+		self.dd = QLabel(self, text="Downstream dependancy:")
+		self.grid.addWidget(self.dd, 1, 0)
+		
+		self.ud = QLabel(self, text="Upstream dependancy:")
+		self.grid.addWidget(self.ud, 2, 0)
+		
+		self.unid = QLabel(self, text="Unique dependancy:")
+		self.grid.addWidget(self.unid, 3, 0)
+		
+		empty = QLabel(self)
+		empty.setFixedSize(100, 20)
+		self.grid.addWidget(empty, 1, 1)
+		self.grid.addWidget(empty, 2, 1)
+		self.grid.addWidget(empty, 3, 1)
+		
+	def paintEvent(self, event):
+		qp = QPainter()
+		qp.begin(self)
+		self.drawLines(qp)
+		qp.end()
+		
+	def drawLines(self, qp):
+		pen = QPen(Qt.black, 2, Qt.SolidLine)
+		qp.setPen(pen)
+		
+		qp.drawRect(self.lab.x()-5, self.lab.y()-5, 275, 100)
+		
+		qp.drawLine(self.dd.x()+155, self.dd.y()+5, self.dd.x()+250, self.dd.y()+5)
+		pen.setStyle(Qt.DashLine)
+		qp.setPen(pen)
+		qp.drawLine(self.ud.x()+155, self.ud.y()+5, self.ud.x()+250, self.ud.y()+5)
+		pen.setStyle(Qt.SolidLine)
+		pen.setColor(Qt.red)
+		qp.setPen(pen)
+		qp.drawLine(self.unid.x()+155, self.unid.y()+5, self.unid.x()+250, self.unid.y()+5)
 		
 class TreeWidget(QWidget):
 	
@@ -94,7 +160,6 @@ class TreeWidget(QWidget):
 		self.lineWidgets = {}
 		self.buttons = {}
 		
-		#"""FATAL FLAW FOR LINE DRAW
 		for element in self.map:
 			if element[1] not in self.lineWidgets:
 				self.lineWidgets[element[1]] = (QWidget(), QHBoxLayout())
@@ -139,10 +204,13 @@ class TreeWidget(QWidget):
 		for line in self.needsLine:
 			ifrom = self.mapToTree(line[0])
 			ito = self.mapToTree(line[1])
-			if line[0] in self.op.subtree:
-				print "Set to red"
+			if line[0] in self.op.subtree or line[1] in self.op.subtree:
 				pen.setColor(Qt.red)
 				qp.setPen(pen)
+				if line[0] in self.op.subtree:
+					qp.drawRect(ifrom.x()-6, ifrom.y()-7.5, 150, 20)
+				if line[1] == self.map[-1][0]:
+					qp.drawRect(ito.x()-6, ito.y()-7.5, 150, 20)
 			if self.op.lastButtonPressed:
 				self.update()
 				self.op.lastButtonPressed=False
@@ -167,9 +235,9 @@ class TreeWidget(QWidget):
 		p = QPoint(self.buttons[index].x(), self.buttons[index].y())
 		return self.buttons[index].mapTo(self, p)
 		
-#"""TESTS
+"""TESTS
 app = QApplication(sys.argv)
 psl = PrettySL(None, None, SocialLink("Void").startLink(1, 0))
 psl.show()
 sys.exit(app.exec_())
-#"""
+"""

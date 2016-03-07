@@ -89,29 +89,63 @@ class MathGraph:
 		county = 0
 				
 		UD = []
+		ignore = []
 		fullsubtree = self.ywaysfromi(i, processed)
+		print fullsubtree
 		for j in fullsubtree:
 			for item in fullsubtree:
-				if j in self.items[item]:
-					print "Link to " + str(j) + " at index " + str(self.items.index(item))
+				if item not in ignore and j in self.items[item]:
+					print "[Subtree] Link to " + str(j) + " at index " + str(item)
 					county+=1
 			for item in self.items:
 				if j in item:
-					print "Link to " + str(j) + " at index " + str(self.items.index(item))
+					print "[Full Tree] Link to " + str(j) + " at index " + str(self.items.index(item))
 					countx+=1
+			print "Is it unique?"
+			print str(county) + " relations in the subtree"
+			print str(countx) + " relations in the full tree"
 			if county == countx:
+				print "Yes"
 				UD.append(j)
+			else:
+				if j!=i:
+					ignore.append(j)
+				print "Removing " +str(j) + " from future checks in subtree"
+			county=0
+			countx=0
+		UD.append(i)
+		return UD
+		
+		"""
+		LOGIC:
+		Find the subtree of element at index i
+		Great, but we need to ensure that each element in the subtree is uniquely dependant on i, so:
+		for each element j in the subtree, compare:
+			The number of ways to reach j in the subtree
+		to
+			The global number of ways to reach j
+		If the number of global ways to reach j is equal to the number of ways in the subtree, that means every
+		single way of reaching j is encompassed by the subtree, thus element j is uniquely dependant on element i.
+		
+		county = Number of ways to reach j in the subtree
+		countx = Global number of ways to reach j
+		UD = Uniquely Dependant. List containing element indexes of uniquely dependant elements.
+		ignore = Special case:
+			When perusing the subtree, if a non-unique index is found we can be sure that any elements accessible
+			from that index are also not unique. Thus, we need to remove them from further consideration when we
+			check whether an element is accessible from the subtree.
 			
-		#return self._findItem(i)
-		#"""LEGACY
+		Returns:
+			UD: A list of the indexes of every element uniquely depedant on i, including i.
+		"""
+		
 	def ywaysfromi(self, i, processed=set()):
 		sub = processed
 		if i not in sub:
 			sub = sub | set([i])
 			for relation in self.items[i][1:len(self.items[i])]:
-				sub = sub | self.subTree(relation, sub)
+				sub = sub | self.ywaysfromi(relation, sub)
 		return sub
-		#"""
 		
 		#LEGACY
 	def _findRelation(self, i, j, sub):

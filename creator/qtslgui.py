@@ -16,6 +16,7 @@ class SLFrame(QWidget):
 		self.linkstored = SocialLink(arcana)
 		self.link = self.linkstored.startLink(level, angle)
 		self.i = 0
+		self.cc = None
 		self.initUI()
 		
 	def initUI(self):
@@ -25,17 +26,18 @@ class SLFrame(QWidget):
 		
 		simulate = QPushButton(self, text="Simulate")
 		simulate.clicked.connect(self.simulate)
-		self.grid.addWidget(simulate, 2, 3)
+		self.grid.addWidget(simulate, 2, 0)
 		
-		view = QPushButton(self, text="Graphic View")
-		view.clicked.connect(self.viewF)
-		self.grid.addWidget(view, 2, 4)
+		self.view = QPushButton(self, text="Graphic View")
+		self.view.clicked.connect(lambda:self.viewF(True))
+		self.grid.addWidget(self.view, 2, 1)
 
 		back = QPushButton(self, text="Back to Arcana selection")
 		back.clicked.connect(self.back)
 		self.grid.addWidget(back, 2, 2)
 		
-		SLBase(self.mainframe, self)
+		self.listview = SLBase(self.mainframe, self)
+		self.graphicview = None
 		
 	def back(self):
 		self.mainframe.changeState(self.op)
@@ -43,8 +45,26 @@ class SLFrame(QWidget):
 	def simulate(self):
 		self.sim = Simulation(self.link, self.arcana, self.level, self.angle)
 		
-	def viewF(self):
-		self. pretSL = PrettySL(self.mainframe, self, self.link)
+	def viewF(self, graph):
+		if graph:
+			self.graphicview = PrettySL(self.mainframe, self)
+			self.listview.close()
+			if self.cc:
+				self.cc.close()
+			self.view.setText("List View")
+			self.grid.addWidget(self.graphicview, 0, 0, 1, 3)
+			self.view.clicked.disconnect()
+			self.view.clicked.connect(lambda:self.viewF(False))
+		else:
+			if self.cc:
+				self.cc.show()
+			else:
+				self.listview = SLBase(self.mainframe, self)
+			self.graphicview.close()
+			self.view.setText("Graphic View")
+			self.grid.addWidget(self.listview, 0, 0, 1, 3)
+			self.view.clicked.disconnect()
+			self.view.clicked.connect(lambda:self.viewF(True))
 	
 	def writeSave():
 		self.linkstored.setLink(self.link, self.level, self.angle)
@@ -59,7 +79,7 @@ class SLBase(QWidget):
 		self.empty = True
 		self.load = 0
 		self.initUI()
-		self.op.grid.addWidget(self, 2, 0)
+		self.op.grid.addWidget(self, 0, 0, 1, 3)
 		
 	def initUI(self):
 		self.grid = QGridLayout()
@@ -79,20 +99,26 @@ class SLBase(QWidget):
 		self.actOM = QComboBox(self)
 		self.actOM.addItems(self.actions)
 		self.actOM.setCurrentIndex(0)
-		self.actOM.activated.connect(self.changeFrame)
+		self.actOM.activated.connect(self.changeFrameL)
 		self.actOM.setMaximumWidth(150)
 		self.grid.addWidget(self.actOM, 0, 0)
-			
-	def changeFrame(self):
+	#L for local. wtf overload?		
+	def changeFrameL(self):
 		print str(self.actOM.currentText())
 		if str(self.actOM.currentText()) is not "":
 			print "Set to load"
 			self.load = self.op.link.getItem(self.actions.index(str(self.actOM.currentText())))
 			print self.load
 		self.op.i = self.actions.index(str(self.actOM.currentText()))
-		self.close()
 		print "Current index: " + str(self.op.i)
+		self.close()
 		CreationContainer(self.mainframe, self.op, self.load)
+		
+	#Overloaded for slview
+	def changeFrame(self, load, index):
+		#self.close()
+		self.op.i = index
+		CreationContainer(self.mainframe, self.op, load)
 		
 		
 class CreationContainer(QWidget):
@@ -101,9 +127,10 @@ class CreationContainer(QWidget):
 		QWidget.__init__(self)
 		self.mainframe = mainframe
 		self.op = op
+		self.op.cc = self
 		self.load = load
 		self.initUI()
-		self.op.grid.addWidget(self, 0, 2, 2, 10)
+		self.op.grid.addWidget(self, 0, 0, 2, 10)
 		
 	def initUI(self):
 		self.grid = QGridLayout()
@@ -136,8 +163,8 @@ class CreationContainer(QWidget):
 		
 		self.connect(True)
 		self.next.setCurrentIndex(self.next.count()-1)
-		
-		self.backB = QPushButton(self, text="Back")
+#LEGACY	
+		self.backB = QPushButton(self, text="Back to List Menu")
 		self.backB.clicked.connect(self.back)
 		self.grid.addWidget(self.backB, 3, 4)
 		
@@ -184,11 +211,11 @@ class CreationContainer(QWidget):
 		self.existing_connections.clear()
 		for relation in self.op.link.getRelations(self.op.i):
 			self.existing_connections.addItem(self.op.link.getOneID(self.op.link.getItem(relation)))
-		
+	#LEGACY	
 	def back(self):
-		print "Back"
 		self.close()
-		SLBase(self.mainframe, self.op)
+		self.op.cc = None
+		self.op.viewF(False)
 		
 	def follow(self):
 		if not self.existing_connections.currentItem().text() or self.existing_connections.currentItem().text() == "":
