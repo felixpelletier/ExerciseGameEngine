@@ -10,3 +10,6 @@ Mac:
 Windows:
 	pyinstaller -y --clean spec/guiWin.spec
 	rm -rf build
+
+
+*Remember to review absolute positioning for the paint calls in slview.py
