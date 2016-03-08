@@ -12,7 +12,8 @@ class PrettySL(QWidget):
 		self.op = op
 		self.graph = self.op.link
 		self.table = self.op.link.items
-		self.lastButtonPressed = False
+		self.lastButtonPressed = None
+		self.needsRefresh = False
 		self.subtree = []
 		self.initData()
 		self.initUI()
@@ -40,7 +41,8 @@ class PrettySL(QWidget):
 		
 	def trackIndex(self, index):
 		print "Called"
-		self.lastButtonPressed = True
+		self.needsRefresh = True
+		self.lastButtonPressed = index
 		self.subtree = self.graph.subTree(index)
 		print self.subtree
 		self.initInfoUI(index)
@@ -94,11 +96,15 @@ class Legend(QWidget):
 		self.unid = QLabel(self, text="Unique dependancy:")
 		self.grid.addWidget(self.unid, 3, 0)
 		
+		self.sel = QLabel(self, text="Selected element:")
+		self.grid.addWidget(self.sel, 4, 0)
+		
 		empty = QLabel(self)
 		empty.setFixedSize(100, 20)
 		self.grid.addWidget(empty, 1, 1)
 		self.grid.addWidget(empty, 2, 1)
 		self.grid.addWidget(empty, 3, 1)
+		self.grid.addWidget(empty, 4, 1)
 		
 	def paintEvent(self, event):
 		qp = QPainter()
@@ -110,7 +116,7 @@ class Legend(QWidget):
 		pen = QPen(Qt.black, 2, Qt.SolidLine)
 		qp.setPen(pen)
 		
-		qp.drawRect(self.lab.x()-5, self.lab.y()-5, 275, 100)
+		qp.drawRect(self.lab.x()-5, self.lab.y()-5, 275, 125)
 		
 		qp.drawLine(self.dd.x()+155, self.dd.y()+5, self.dd.x()+250, self.dd.y()+5)
 		pen.setStyle(Qt.DashLine)
@@ -120,6 +126,9 @@ class Legend(QWidget):
 		pen.setColor(Qt.red)
 		qp.setPen(pen)
 		qp.drawLine(self.unid.x()+155, self.unid.y()+5, self.unid.x()+250, self.unid.y()+5)
+		pen.setColor(Qt.yellow)
+		qp.setPen(pen)
+		qp.drawRect(self.sel.x()+155, self.sel.y(), 95, 20)
 		
 class TreeWidget(QWidget):
 	
@@ -201,39 +210,51 @@ class TreeWidget(QWidget):
 		#ito = self.mapToTree(self.needsLine[0][1])
 		#qp.drawLine(ifrom.x(), ifrom.y(), ito.x(), ito.y())
 		alternate = True
+		print self.op.lastButtonPressed
+		if self.op.lastButtonPressed is not None:
+			pen.setColor(Qt.yellow)
+			qp.setPen(pen)
+			qp.drawRect(self.mapToTree(self.op.lastButtonPressed).x(), self.mapToTree(self.op.lastButtonPressed).y(), self.buttons[self.op.lastButtonPressed].rect().width(), self.buttons[self.op.lastButtonPressed].rect().height())
+			pen.setColor(Qt.black)
+			qp.setPen(pen)
 		for line in self.needsLine:
+			width0 = self.buttons[line[0]].rect().width()
+			height0 = self.buttons[line[0]].rect().height()
+			width1 = self.buttons[line[1]].rect().width()
+			height1 = self.buttons[line[1]].rect().height()
 			ifrom = self.mapToTree(line[0])
 			ito = self.mapToTree(line[1])
 			if line[0] in self.op.subtree or line[1] in self.op.subtree:
 				pen.setColor(Qt.red)
 				qp.setPen(pen)
-				if line[0] in self.op.subtree:
-					qp.drawRect(ifrom.x()-6, ifrom.y()-7.5, 150, 20)
+				if line[0] in self.op.subtree and line[0] != self.op.lastButtonPressed:
+					qp.drawRect(ifrom.x(), ifrom.y(), width0, height0)
 				if line[1] == self.map[-1][0]:
-					qp.drawRect(ito.x()-6, ito.y()-7.5, 150, 20)
-			if self.op.lastButtonPressed:
+					qp.drawRect(ito.x(), ito.y(), width1, height1)
+			if self.op.needsRefresh:
 				self.update()
-				self.op.lastButtonPressed=False
+				self.op.needsRefresh = False
 			if line[0]+1 == line[1]:
-				qp.drawLine(ifrom.x()+40, ifrom.y(), ito.x()+40, ito.y())
+				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+1, ito.x()+(width1/2), ito.y())
 			elif line[0] > line[1]:
 				pen.setStyle(Qt.DashLine)
 				qp.setPen(pen)
 				if alternate:
-					qp.drawArc(QRectF(ito.x(), ito.y(), 100, ifrom.y()-ito.y()), 90*16, 180*16)
+					qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 90*16, 180*16)
 					alternate=False
 				else:
-					qp.drawArc(QRectF(ito.x(), ito.y(), 100, ifrom.y()-ito.y()), 270*16, 180*16)
+					qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 270*16, 180*16)
 					alternate=True
 				pen.setStyle(Qt.SolidLine)
 			pen.setColor(Qt.black)
 			qp.setPen(pen)
-				
+			
 		
 		
 	def mapToTree(self, index):
-		p = QPoint(self.buttons[index].x(), self.buttons[index].y())
+		p = QPoint(self.buttons[index].rect().left(), self.buttons[index].rect().top())
 		return self.buttons[index].mapTo(self, p)
+		
 		
 """TESTS
 app = QApplication(sys.argv)
