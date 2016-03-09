@@ -54,3 +54,4 @@ proto/src
 .tinyobjloader/*
 bin/*
 .build/*
+*.DS_Store
