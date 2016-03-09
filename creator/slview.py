@@ -15,6 +15,7 @@ class PrettySL(QWidget):
 		self.lastButtonPressed = None
 		self.needsRefresh = False
 		self.subtree = []
+		self.delete = None
 		self.initData()
 		self.initUI()
 		
@@ -46,22 +47,45 @@ class PrettySL(QWidget):
 		self.subtree = self.graph.subTree(index)
 		print self.subtree
 		self.initInfoUI(index)
+			
+	def deleteSubtree(self):
+		if not popup("Are you certain you want to delete this item and it's subtree?\n(Everything in red and yellow will be deleted)", "Warning"):
+			return
+		self.graph.delItem(self.lastButtonPressed)
+		self.lab.close()
+		self.initData()
+		self.lastButtonPressed = None
+		self.delete.close()
+		self.delete = None
+		self.subtree = []
+		self.needsRefresh = True
+		self.idLabel.close()
+		self.edit.clicked.disconnect()
+		self.edit.close()
+		self.op.linkstored.save()
+		self.tree.close()
+		self.tree = TreeWidget(self, self.actionObjs, self.actionIDs, self.table)
+		self.grid.addWidget(self.tree, 0, 0, 10, 3)
 		
 	def initInfoUI(self, index):
 		if not self.lab:
 			self.lab = QLabel(self, text="Selected element summary:")
-			self.grid.addWidget(self.lab, 1, 3, 1, 2)
+			self.grid.addWidget(self.lab, 2, 3, 1, 2)
 			self.idLabel = QLabel(self, text=self.actionIDs[index])
 			self.idLabel.setFixedSize(350, 40)
 			self.idLabel.setWordWrap(True)
-			self.grid.addWidget(self.idLabel, 2, 3, 1, 2)
+			self.grid.addWidget(self.idLabel, 3, 3, 1, 2)
 			self.edit = QPushButton(self, text="Edit")
 			self.edit.clicked.connect(lambda:self.enter(index))
-			self.grid.addWidget(self.edit, 3, 3, 1, 2)
+			self.grid.addWidget(self.edit, 4, 3, 1, 2)
 		else:
 			self.idLabel.setText(self.actionIDs[index])
 			self.edit.clicked.disconnect()
 			self.edit.clicked.connect(lambda:self.enter(index))
+		if not self.delete:
+			self.delete = QPushButton(self, text="Delete element and subtree")
+			self.delete.clicked.connect(self.deleteSubtree)
+			self.grid.addWidget(self.delete, 1, 3, 1, 2)
 		
 	def enter(self, index):
 		load = self.graph.getItem(index)
@@ -229,7 +253,7 @@ class TreeWidget(QWidget):
 				qp.setPen(pen)
 				if line[0] in self.op.subtree and line[0] != self.op.lastButtonPressed:
 					qp.drawRect(ifrom.x(), ifrom.y(), width0, height0)
-				if line[1] == self.map[-1][0]:
+				if line[1] == self.map[-1][0] and line[1] != self.op.lastButtonPressed:
 					qp.drawRect(ito.x(), ito.y(), width1, height1)
 			if self.op.needsRefresh:
 				self.update()

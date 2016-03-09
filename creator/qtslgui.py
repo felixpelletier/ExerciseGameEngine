@@ -116,7 +116,6 @@ class SLBase(QWidget):
 		
 	#Overloaded for slview
 	def changeFrame(self, load, index):
-		#self.close()
 		self.op.i = index
 		CreationContainer(self.mainframe, self.op, load)
 		
@@ -141,7 +140,7 @@ class CreationContainer(QWidget):
 		types = ["Info", "Speak", "Camera Change", "Movement"]
 		
 		self.save = QPushButton(self, text="Save")
-		self.grid.addWidget(self.save, 2, 0)
+		self.grid.addWidget(self.save, 3, 0)
 		
 		self.existing_connections = QListWidget(self)
 		self.populateExistingConnections()
@@ -163,7 +162,7 @@ class CreationContainer(QWidget):
 		
 		self.connect(True)
 		self.next.setCurrentIndex(self.next.count()-1)
-#LEGACY	
+		
 		self.backB = QPushButton(self, text="Back to List Menu")
 		self.backB.clicked.connect(self.back)
 		self.grid.addWidget(self.backB, 3, 4)
@@ -175,10 +174,10 @@ class CreationContainer(QWidget):
 		self.connectB = QPushButton(self, text="Connect")
 		self.connectB.clicked.connect(self.lightConnect)
 		self.grid.addWidget(self.connectB, 3, 3)
-		
-		self.delete = QPushButton(self, text="Delete")
-		self.delete.clicked.connect(self.removeElement)
-		self.grid.addWidget(self.delete, 3, 0)
+#LEGACY		
+#		self.delete = QPushButton(self, text="Delete")
+#		self.delete.clicked.connect(self.removeElement)
+#		self.grid.addWidget(self.delete, 3, 0)
 		
 		self.follow_path = QPushButton(self, text="Enter linked element")
 		self.follow_path.clicked.connect(self.follow)
@@ -192,14 +191,13 @@ class CreationContainer(QWidget):
 		self.grid.addWidget(self.conLab, 0, 5)
 		
 	def removeRelation(self):
-		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS RELATION WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)"+
-					"\n\ne.g.\nAction 1 => Action 2 => Action 3\nAction 1 =/> Action 2 => Action 3\nAction 1 => Nothing\n\nHowever:\nAction 1 => Action 2\nAction 5 => Action 2\n\n"+
-					"Action 1 =/> Action 2\nAction 5 => Action 2\n\nAction 1 => Nothing\nAction 5 => Action 2", "Warning"):
+		if not popup("Are you sure you want to remove this relation? Any elements with a unique dependancy on this relation will also be deleted.\nIt is highly recommended you take a look at the graphical view of the tree in order to see the potential effects of the deletion.", "Warning"):
 			return
-		self.op.link.delRelation(self.op.i, self.actions.index(str(self.existing_connections.currentText())))
+		self.op.link.delRelation(self.op.i, self.actions.index(str(self.existing_connections.currentItem().text())))
 		self.populateExistingConnections()
 		self.updateElementList()
-		
+		self.op.linkstored.save()
+#LEGACY		
 	def removeElement(self):
 		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS ACTION AND ITS RELATIONS WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)", "Warning"):
 			return
