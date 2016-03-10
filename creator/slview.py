@@ -72,7 +72,7 @@ class PrettySL(QWidget):
 			self.lab = QLabel(self, text="Selected element summary:")
 			self.grid.addWidget(self.lab, 2, 3, 1, 2)
 			self.idLabel = QLabel(self, text=self.actionIDs[index])
-			self.idLabel.setFixedSize(350, 40)
+			self.idLabel.setFixedSize(300, 40)
 			self.idLabel.setWordWrap(True)
 			self.grid.addWidget(self.idLabel, 3, 3, 1, 2)
 			self.edit = QPushButton(self, text="Edit")
@@ -102,6 +102,7 @@ class Legend(QWidget):
 	def __init__(self, op):
 		QWidget.__init__(self)
 		self.op = op
+		self.fixed = False
 		self.initUI()
 		
 	def initUI(self):
@@ -124,7 +125,7 @@ class Legend(QWidget):
 		self.grid.addWidget(self.sel, 4, 0)
 		
 		empty = QLabel(self)
-		empty.setFixedSize(100, 20)
+		empty.setFixedSize(150, 20)
 		self.grid.addWidget(empty, 1, 1)
 		self.grid.addWidget(empty, 2, 1)
 		self.grid.addWidget(empty, 3, 1)
@@ -140,7 +141,7 @@ class Legend(QWidget):
 		pen = QPen(Qt.black, 2, Qt.SolidLine)
 		qp.setPen(pen)
 		
-		qp.drawRect(self.lab.x()-5, self.lab.y()-5, 275, 125)
+		qp.drawRect(self.rect().left(), self.rect().top(), self.rect().width(), self.rect().height())
 		
 		qp.drawLine(self.dd.x()+155, self.dd.y()+5, self.dd.x()+250, self.dd.y()+5)
 		pen.setStyle(Qt.DashLine)
@@ -182,9 +183,7 @@ class TreeWidget(QWidget):
 		print self.map
 		print ""
 		print ""
-		print ""
 		print self.needsLine
-		print ""
 		print ""
 		print ""
 		print self.depthTracker
@@ -234,7 +233,7 @@ class TreeWidget(QWidget):
 		#ito = self.mapToTree(self.needsLine[0][1])
 		#qp.drawLine(ifrom.x(), ifrom.y(), ito.x(), ito.y())
 		alternate = True
-		print self.op.lastButtonPressed
+		#print self.op.lastButtonPressed
 		if self.op.lastButtonPressed is not None:
 			pen.setColor(Qt.yellow)
 			qp.setPen(pen)
@@ -259,7 +258,7 @@ class TreeWidget(QWidget):
 				self.update()
 				self.op.needsRefresh = False
 			if line[0]+1 == line[1]:
-				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+1, ito.x()+(width1/2), ito.y())
+				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+(height0/2), ito.x()+(width1/2), ito.y()+(height1/2))
 			elif line[0] > line[1]:
 				pen.setStyle(Qt.DashLine)
 				qp.setPen(pen)
