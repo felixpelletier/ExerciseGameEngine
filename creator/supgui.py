@@ -1,5 +1,5 @@
 from qtheader import *
-from PyQt4.QtGui import QFileDialog
+from PySide.QtGui import QFileDialog
 from shutil import copytree, copy
 import os
 from email.mime.multipart import MIMEMultipart, MIMEBase

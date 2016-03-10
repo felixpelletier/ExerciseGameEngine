@@ -1,6 +1,6 @@
 from qtheader import *
-from PyQt4.QtGui import QHBoxLayout, QPen, QPainter, QBrush
-from PyQt4.QtCore import QPoint, QRectF
+from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush
+from PySide.QtCore import QPoint, QRectF
 from sls import SocialLink
 import sys
 
