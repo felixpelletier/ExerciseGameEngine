@@ -8,4 +8,4 @@ function get(datapath)
 	end
 	return decoded
 end
-print (get({file='data.json', path='test'}))
+--print (get({file='data.json', path='test'}))
