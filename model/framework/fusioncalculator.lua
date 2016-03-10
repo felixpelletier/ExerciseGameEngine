@@ -10,10 +10,12 @@ function fuse(together, allpersonas)
 	for name, persona in pairs(together) do
 		if persona.arcana == common then common=true else common=persona.arcana end--Won't work for 3way+
 		fusebetween = fusebetween .. persona.arcana
-		if (persona.level > base_level and base_level == 0) or (persona.level < base_level) then
-			base_level = persona.level
-		end
+		base_level = base_level + persona.level
+--		if (persona.level > base_level and base_level == 0) or (persona.level < base_level) then
+--			base_level = persona.level
+--		end
 	end
+	base_level = base_level/(#together)+1--This is how it was done in the python fusion script that I had written.
 	if not (type(common) == 'boolean') then common=false end
 	print(fusebetween, combos[fusebetween])
 	if combos[fusebetween] then
