@@ -25,7 +25,9 @@ class per_creator(QWidget):
 		self.endT = None
 		self.agiT = None
 		self.luckT = None
-
+		
+		self.createFrame = None
+		
 		self.initUI(True)
 	
 	def initUI(self, infoDump):
@@ -118,46 +120,55 @@ class per_creator(QWidget):
 		self.cfgrid.addWidget(slashL, 1, 5)
 		self.slashO = QComboBox(self.createFrame)
 		self.slashO.addItems(resList)
+		self.slashO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.slashO, 1, 6)
 		strikeL = QLabel(self.createFrame, text="Strike")
 		self.cfgrid.addWidget(strikeL, 2, 5)
 		self.strikeO = QComboBox(self.createFrame)
 		self.strikeO.addItems(resList)
+		self.strikeO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.strikeO, 2, 6)
 		pierceL = QLabel(self.createFrame, text="Pierce")
 		self.cfgrid.addWidget(pierceL, 3, 5)
 		self.pierceO = QComboBox(self.createFrame)
 		self.pierceO.addItems(resList)
+		self.pierceO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.pierceO, 3, 6)
 		fireL = QLabel(self.createFrame, text="Fire")
 		self.cfgrid.addWidget(fireL, 4, 5)
 		self.fireO = QComboBox(self.createFrame)
 		self.fireO.addItems(resList)
+		self.fireO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.fireO, 4, 6)
 		iceL = QLabel(self.createFrame, text="Ice")
 		self.cfgrid.addWidget(iceL, 5, 5)
 		self.iceO = QComboBox(self.createFrame)
 		self.iceO.addItems(resList)
+		self.iceO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.iceO, 5, 6)
 		elecL = QLabel(self.createFrame, text="Elec")
 		self.cfgrid.addWidget(elecL, 6, 5)
 		self.elecO = QComboBox(self.createFrame)
 		self.elecO.addItems(resList)
+		self.elecO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.elecO, 6, 6)
 		windL = QLabel(self.createFrame, text="Wind")
 		self.cfgrid.addWidget(windL, 7, 5)
 		self.windO= QComboBox(self.createFrame)
 		self.windO.addItems(resList)
+		self.windO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.windO, 7, 6)
 		lightL = QLabel(self.createFrame, text="Light")
 		self.cfgrid.addWidget(lightL, 8, 5)
 		self.lightO = QComboBox(self.createFrame)
 		self.lightO.addItems(resList)
+		self.lightO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.lightO, 8, 6)
 		darkL = QLabel(self.createFrame, text="Dark")
 		self.cfgrid.addWidget(darkL, 9, 5)
 		self.darkO = QComboBox(self.createFrame)
 		self.darkO.addItems(resList)
+		self.darkO.setCurrentIndex(1)
 		self.cfgrid.addWidget(self.darkO, 9, 6)
 		
 		spellList = json_reader.data_list("spells")
@@ -238,6 +249,8 @@ class per_creator(QWidget):
 				print "Ok"
 				self.lsdic[str(self.chosenSpell)] = str(self.lslevel.text())
 				self.listLS.addItem(self.chosenSpell + " at level " + self.lslevel.text())
+				self.lslevel.setText("")
+				self.lsSpellO.setCurrentIndex(0)
 				return
 		except:
 			popup("You must enter a level that is greater than the Persona's level.", "Critical")
@@ -359,9 +372,12 @@ class per_creator(QWidget):
 		
 	
 	def new(self):
+		if self.createFrame and not popup("Override any unsaved changes?", "Warning"):
+			return
 		self.buttonFrame.close()
 		self.initUI(False)
 		print "Created"
+		
 	def back(self):
 		print "Returned to main screen"
 		self.mainframe.changeState(self.op)

@@ -66,15 +66,18 @@ class sup_ui(QWidget):
 				if copyOn:
 					print "Copying valid file " + file
 					copy(os.path.join(str(dir[0]), file), json_reader.buildPath("data"))
-					try:#Ugly AF
-						json_reader.readOne(file[:len(file)-5])
-						json_reader.writeCharNames(file[:len(file)-5])
-					except:
-						try:
-							json_reader.readOneP(file[:len(file)-5])
-							json_reader.writePerNames(file[:len(file)-5])
+					if "_link" not in file:
+						try:#Ugly AF
+							json_reader.readOne(file[:len(file)-5])
+							json_reader.writeCharNames(file[:len(file)-5])
 						except:
-							pass
+							print "Not a Character"
+							try:
+								json_reader.readP(file[:len(file)-5])
+								json_reader.writePerNames(file[:len(file)-5])
+							except Exception as e:
+								print "Not a Persona"
+								print e
 		print "Successfully copied files"
 		popup("Files imported successfully!", "Information")
 		
