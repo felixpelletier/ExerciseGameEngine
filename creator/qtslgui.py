@@ -93,7 +93,7 @@ class SLBase(QWidget):
 		
 		if self.empty:
 			start = QPushButton(self, text="Start New")
-			start.clicked.connect(self.changeFrame)
+			start.clicked.connect(self.changeFrameL)
 			self.grid.addWidget(start, 0, 1)
 
 		self.actOM = QComboBox(self)
@@ -209,7 +209,7 @@ class CreationContainer(QWidget):
 		self.existing_connections.clear()
 		for relation in self.op.link.getRelations(self.op.i):
 			self.existing_connections.addItem(self.op.link.getOneID(self.op.link.getItem(relation)))
-	#LEGACY	
+#LEGACY	
 	def back(self):
 		self.close()
 		self.op.cc = None

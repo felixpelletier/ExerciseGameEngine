@@ -1,5 +1,5 @@
 from qtheader import *
-from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush
+from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush, QDesktopWidget, QScrollArea
 from PySide.QtCore import QPoint, QRectF
 from sls import SocialLink
 import sys
@@ -32,7 +32,14 @@ class PrettySL(QWidget):
 		self.setLayout(self.grid)
 
 		self.tree = TreeWidget(self, self.actionObjs, self.actionIDs, self.table)
-		self.grid.addWidget(self.tree, 0, 0, 10, 3)
+		
+		
+		self.scrollArea = QScrollArea()
+		self.scrollArea.setBackgroundRole(QPalette.Dark)
+		self.scrollArea.setWidget(self.tree)
+		self.scrollArea.ensureWidgetVisible(self.tree, 500, 500)
+		
+		self.grid.addWidget(self.scrollArea, 0, 0, 10, 3)
 		
 		self.legend = Legend(self)
 		self.grid.addWidget(self.legend, 0, 3, 1, 2)
@@ -163,10 +170,9 @@ class TreeWidget(QWidget):
 		self.ids = ids
 		self.table = table
 		self.op = op
-		
 		self.currentDepth = 0
-		
 		self.initUI()
+		
 		
 	def initUI(self):
 		self.grid = QGridLayout()
@@ -198,7 +204,7 @@ class TreeWidget(QWidget):
 				self.lineWidgets[element[1]][0].setLayout(self.lineWidgets[element[1]][1])
 			tempB = QPushButton(self.lineWidgets[element[1]][0], text=self.ids[element[0]])
 			tempB.setFixedSize(150, 20)
-			tempB.clicked.connect(lambda ignore, ind=element[0]:self.op.trackIndex(ind))
+			tempB.clicked.connect(lambda ind=element[0]:self.op.trackIndex(ind))
 			self.lineWidgets[element[1]][1].addWidget(tempB)
 			self.buttons[element[0]] = tempB
 		for lineNumber, widget in self.lineWidgets.iteritems():
