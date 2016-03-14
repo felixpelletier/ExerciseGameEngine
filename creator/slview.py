@@ -37,6 +37,14 @@ class PrettySL(QWidget):
 		self.scrollArea = QScrollArea()
 		self.scrollArea.setBackgroundRole(QPalette.Dark)
 		self.scrollArea.setWidget(self.tree)
+		if self.tree.rect().width()< 600:
+			self.scrollArea.setFixedWidth(self.tree.rect().width()+25)
+		else:
+			self.scrollArea.setFixedWidth(600)
+		if self.tree.rect().height()<600:
+			self.scrollArea.setFixedHeight(self.tree.rect().height())
+		else:
+			self.scrollArea.setFixedHeight(600)
 		self.scrollArea.ensureWidgetVisible(self.tree, 500, 500)
 		
 		self.grid.addWidget(self.scrollArea, 0, 0, 10, 3)
@@ -178,13 +186,17 @@ class TreeWidget(QWidget):
 		self.grid = QGridLayout()
 		self.setLayout(self.grid)
 		
-		self.processed = []
+		self.processed = [0]
 		self.map = [(0, 0)]
 		self.needsLine = []
 		self.depthTracker = {}
 		self.buttons = []
 		
 		self.nextRow(self.table[0], 1)
+		
+		self.mapped = {}
+		for element in self.map:
+			self.mapped[element[0]] = element[1]
 		
 		print self.map
 		print ""
@@ -258,14 +270,14 @@ class TreeWidget(QWidget):
 				qp.setPen(pen)
 				if line[0] in self.op.subtree and line[0] != self.op.lastButtonPressed:
 					qp.drawRect(ifrom.x(), ifrom.y(), width0, height0)
-				if line[1] == self.map[-1][0] and line[1] != self.op.lastButtonPressed:
+				if line[1] in self.op.subtree and line[1] != self.op.lastButtonPressed:
 					qp.drawRect(ito.x(), ito.y(), width1, height1)
 			if self.op.needsRefresh:
 				self.update()
 				self.op.needsRefresh = False
-			if line[0]+1 == line[1]:
+			if self.mapped[line[0]] < self.mapped[line[1]]:
 				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+(height0/2), ito.x()+(width1/2), ito.y()+(height1/2))
-			elif line[0] > line[1]:
+			else:
 				pen.setStyle(Qt.DashLine)
 				qp.setPen(pen)
 				if alternate:

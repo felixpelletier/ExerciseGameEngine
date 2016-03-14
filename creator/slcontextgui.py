@@ -86,10 +86,11 @@ class SL_creator(QWidget):
 			(int)(str(self.newAng.text()))
 			if self.angs[0] == "No angles":
 				self.angleOM.clear()
-			self.angleOM.addItem("Angle "+self.newAng.text())
+			self.angleOM.addItem("Angle "+str(self.newAng.text()))
 			self.angleOM.setCurrentIndex(self.angleOM.count()-1)
 			self.newAng.clear()
-		except:
+		except Exception as e:
+			print e
 			popup("The Angle must be an integer", "Critical")
 			print "Angle must be an integer"
 		

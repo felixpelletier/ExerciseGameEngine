@@ -90,6 +90,8 @@ class MathGraph:
 				
 		UD = []
 		ignore = []
+		if i != 0:
+			ignore.append(0)#We don't want to consider anything solely accessible by root to be "part of the subtree". Root is a unique case.
 		fullsubtree = self.ywaysfromi(i, processed)
 		print fullsubtree
 		for j in fullsubtree:
@@ -114,6 +116,8 @@ class MathGraph:
 			county=0
 			countx=0
 		UD.append(i)
+		if 0 in UD and i!=0:
+			UD.pop(0)
 		return UD
 		
 		"""
@@ -134,6 +138,8 @@ class MathGraph:
 			When perusing the subtree, if a non-unique index is found we can be sure that any elements accessible
 			from that index are also not unique. Thus, we need to remove them from further consideration when we
 			check whether an element is accessible from the subtree.
+			Since the root of the tree is the starting point, if we are not considering the 'subtree of root' (which
+			would be the entire tree) then we must ignore any unique dependancies passing through root.
 			
 		Returns:
 			UD: A list of the indexes of every element uniquely depedant on i, including i.
@@ -147,25 +153,6 @@ class MathGraph:
 				sub = sub | self.ywaysfromi(relation, sub)
 		return sub
 		
-		#LEGACY
-	def _findRelation(self, i, j, sub):
-		jfound = False
-		print i
-		for itemRelation in self.items:
-			if j in itemRelation and self.items.index(itemRelation) != i:
-				print str(self.items.index(itemRelation)) + " is blocking removal of index " + str(j)
-				
-				jfound=True
-		if not jfound:
-			return self._findItem(j, sub)
-		return set()
-		
-	def _findItem(self, i, processed=set()):
-		sub = processed
-		for relation in self.items[i][1:len(self.items[i])]:
-			sub = sub | self._findRelation(i, relation, sub)
-		sub = sub | set([i])
-		return sub
 		
 class DynamicList(list):#Needs relocating (theoretically)
 

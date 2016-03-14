@@ -43,10 +43,16 @@ class SLFrame(QWidget):
 		self.mainframe.changeState(self.op)
 	
 	def simulate(self):
+		if len(self.link.getIDs())==0:
+			popup("Nothing to simulate!", "Information")
+			return
 		self.sim = Simulation(self.link, self.arcana, self.level, self.angle)
 		
 	def viewF(self, graph):
 		if graph:
+			if len(self.link.getIDs())==0:
+				popup("Nothing to show!", "Information")
+				return
 			self.graphicview = PrettySL(self.mainframe, self)
 			self.listview.close()
 			if self.cc:
@@ -269,6 +275,7 @@ class CreationContainer(QWidget):
 		self.actions = self.op.link.getIDs()
 		self.actions.append("New element")
 		self.next.addItems(self.actions)
+		self.next.setCurrentIndex(len(self.actions)-1)
 		
 	def changeFrame(self, something):
 		print "Changed to " + str(self.actOM.currentText())
