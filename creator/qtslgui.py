@@ -59,6 +59,7 @@ class SLFrame(QWidget):
 				self.cc.close()
 			self.view.setText("List View")
 			self.grid.addWidget(self.graphicview, 0, 0, 1, 3)
+			self.graphicview.show()
 			self.view.clicked.disconnect()
 			self.view.clicked.connect(lambda:self.viewF(False))
 		else:
@@ -66,11 +67,15 @@ class SLFrame(QWidget):
 				self.cc.show()
 			else:
 				self.listview = SLBase(self.mainframe, self)
-			self.graphicview.close()
+			if self.graphicview:
+				self.graphicview.close()
 			self.view.setText("Graphic View")
 			self.grid.addWidget(self.listview, 0, 0, 1, 3)
+			self.listview.show()
 			self.view.clicked.disconnect()
 			self.view.clicked.connect(lambda:self.viewF(True))
+		self.mainframe.center()
+			
 	
 	def writeSave():
 		self.linkstored.setLink(self.link, self.level, self.angle)
@@ -110,12 +115,12 @@ class SLBase(QWidget):
 		self.grid.addWidget(self.actOM, 0, 0)
 	#L for local. wtf overload?		
 	def changeFrameL(self):
-		print str(self.actOM.currentText())
-		if str(self.actOM.currentText()) is not "":
+		print self.actOM.currentText()
+		if self.actOM.currentText() is not "":
 			print "Set to load"
-			self.load = self.op.link.getItem(self.actions.index(str(self.actOM.currentText())))
+			self.load = self.op.link.getItem(self.actions.index(self.actOM.currentText()))
 			print self.load
-		self.op.i = self.actions.index(str(self.actOM.currentText()))
+		self.op.i = self.actions.index(self.actOM.currentText())
 		print "Current index: " + str(self.op.i)
 		self.close()
 		CreationContainer(self.mainframe, self.op, self.load)
@@ -166,7 +171,7 @@ class CreationContainer(QWidget):
 		self.actOM.activated.connect(self.changeFrame)
 		self.grid.addWidget(self.actOM, 0, 0, 1, 2)
 		
-		self.connect(True)
+		self.connect()
 		self.next.setCurrentIndex(self.next.count()-1)
 		
 		self.backB = QPushButton(self, text="Back to List Menu")
@@ -180,11 +185,7 @@ class CreationContainer(QWidget):
 		self.connectB = QPushButton(self, text="Connect")
 		self.connectB.clicked.connect(self.lightConnect)
 		self.grid.addWidget(self.connectB, 3, 3)
-#LEGACY		
-#		self.delete = QPushButton(self, text="Delete")
-#		self.delete.clicked.connect(self.removeElement)
-#		self.grid.addWidget(self.delete, 3, 0)
-		
+	
 		self.follow_path = QPushButton(self, text="Enter linked element")
 		self.follow_path.clicked.connect(self.follow)
 		self.grid.addWidget(self.follow_path, 0, 6, 2, 1)
@@ -197,77 +198,66 @@ class CreationContainer(QWidget):
 		self.grid.addWidget(self.conLab, 0, 5)
 		
 	def removeRelation(self):
-		if not popup("Are you sure you want to remove this relation? Any elements with a unique dependancy on this relation will also be deleted.\nIt is highly recommended you take a look at the graphical view of the tree in order to see the potential effects of the deletion.", "Warning"):
+		if not self.existing_connections.currentItem() or not popup("Are you sure you want to remove this relation? Any elements with a unique dependancy on this relation will also be deleted.\nIt is highly recommended you take a look at the graphical view of the tree in order to see the potential effects of the deletion.", "Warning"):
 			return
-		self.op.link.delRelation(self.op.i, self.actions.index(str(self.existing_connections.currentItem().text())))
+		self.op.link.delRelation(self.op.i, self.actions.index(self.existing_connections.currentItem().text()))
 		self.populateExistingConnections()
 		self.updateElementList()
 		self.op.linkstored.save()
-#LEGACY		
-	def removeElement(self):
-		if not popup("Are you sure you want to remove this relation?\n\nWARNING: ANY ACTIONS SOLELY DEPENDANT ON THIS ACTION AND ITS RELATIONS WILL BE DELETED RECURSIVELY (TREE WILL BE PRUNED)", "Warning"):
-			return
-		print "Deleting " + str(self.op.i)
-		self.op.link.delItem(self.op.i)
-		self.back()
 	
 	def populateExistingConnections(self):
 		self.existing_connections.clear()
 		for relation in self.op.link.getRelations(self.op.i):
 			self.existing_connections.addItem(self.op.link.getOneID(self.op.link.getItem(relation)))
-#LEGACY	
+
 	def back(self):
+		if not popup("Return to list main menu?\n(Lose any unsaved changes)", "Warning"):
+			return
 		self.close()
 		self.op.cc = None
 		self.op.viewF(False)
 		
 	def follow(self):
-		if not self.existing_connections.currentItem().text() or self.existing_connections.currentItem().text() == "":
+		if not self.existing_connections.currentItem() or self.existing_connections.currentItem().text() == "":
 			return
+		self.window.save()
 		print [self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text())
 		self.next.setCurrentIndex([self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text()))
-		self.connect(True)
+		self.op.i = self.actions.index(self.next.currentText())
+		self.connect()
 		self.next.setCurrentIndex(self.next.count()-1)
 		
 	def lightConnect(self):
-		if str(self.next.currentText()) == "New element":
+		self.window.save()
+		if self.next.currentText() == "New element":
 			self.op.link.addRelation(self.op.i, self.op.link.size())
 			print "Linked to index " + str(self.op.link.size())
 			self.op.i = self.op.link.size()
 			self.load=0
 			self.changeFrame(0)
-			self.populateExistingConnections()
 			self.updateElementList()
 		else:
-			self.op.link.addRelation(self.op.i, self.actions.index(str(self.next.currentText())))
-			print "Linked to index " + str(self.actions.index(str(self.next.currentText())))
-			self.window.save()
-			self.populateExistingConnections()
+			self.op.link.addRelation(self.op.i, self.actions.index(self.next.currentText()))
+			print "Linked to index " + str(self.actions.index(self.next.currentText()))
+		self.populateExistingConnections()
 		
-	def connect(self, spawn):
-		if str(self.next.currentText()) == "New element":
-			if not spawn:
-				self.op.link.addRelation(self.op.i, self.op.link.size())
-				print "Linked to index " + str(self.op.link.size())
-			self.op.i = self.op.link.size()
+	def connect(self):
+		print self.next.currentText()
+		if self.next.currentText() == "New element":
 			self.load=0
 			self.changeFrame(0)
 		else:
-			if not spawn:
-				self.op.link.addRelation(self.op.i, self.actions.index(str(self.next.currentText())))
-				print "Linked to index " + str(self.actions.index(str(self.next.currentText())))
-			self.op.i = self.actions.index(str(self.next.currentText()))
-			if isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Info):
+			if isinstance(self.op.link.getItem(self.actions.index(self.next.currentText())), Info):
 				self.actOM.setCurrentIndex(0)
-			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Speak):
+			elif isinstance(self.op.link.getItem(self.actions.index(self.next.currentText())), Speak):
 				self.actOM.setCurrentIndex(1)
-			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Camera):
+			elif isinstance(self.op.link.getItem(self.actions.index(self.next.currentText())), Camera):
 				self.actOM.setCurrentIndex(2)
-			elif isinstance(self.op.link.getItem(self.actions.index(str(self.next.currentText()))), Movement):
+			elif isinstance(self.op.link.getItem(self.actions.index(self.next.currentText())), Movement):
 				self.actOM.setCurrentIndex(3)
 			else:
 				raise Exception("Not a type!")
-			self.load = self.op.link.getItem(self.actions.index(str(self.next.currentText())))
+			self.load = self.op.link.getItem(self.actions.index(self.next.currentText()))
 			self.changeFrame(0)
 			
 	def updateElementList(self):
@@ -278,19 +268,23 @@ class CreationContainer(QWidget):
 		self.next.setCurrentIndex(len(self.actions)-1)
 		
 	def changeFrame(self, something):
-		print "Changed to " + str(self.actOM.currentText())
+		print "Changed to " + self.actOM.currentText()
 		try:
 			self.window.close()
 		except AttributeError:
 			pass#No window open
-		if str(self.actOM.currentText()) == "Speak":
+		if self.actOM.currentText() == "Speak":
 			self.window = SpeakFrame(self, self.load)
-		elif str(self.actOM.currentText()) == "Camera Change":
+		elif self.actOM.currentText() == "Camera Change":
 			self.window = CameraFrame(self, self.load)
-		elif str(self.actOM.currentText()) == "Movement":
+		elif self.actOM.currentText() == "Movement":
 			self.window = MoveFrame(self, self.load)
-		else:# self.type.get() == "Info":
+		else:# self.actOM.currentText() == "Info":
 			self.window = InfoFrame(self, self.load)
+		try:
+			self.save.clicked.disconnect()
+		except:
+			pass
 		self.save.clicked.connect(self.window.save)
 		self.populateExistingConnections()
 		self.updateElementList()
@@ -324,12 +318,14 @@ class InfoFrame(QWidget):
 		print "Saving"
 		infoSlide = Info()
 		print "..."
-		infoSlide.setText(str(self.infoBox.toPlainText()))
+		infoSlide.setText(self.infoBox.toPlainText())
+		print self.op.op.i
 		self.op.op.link.addItem(infoSlide, self.op.op.i)
 		print "Saved"
 		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
 		self.op.op.linkstored.save()
 		self.op.updateElementList()
+		popup("Saved!", "Information")
 		
 class SpeakFrame(QWidget):
 	
@@ -456,20 +452,20 @@ class SpeakFrame(QWidget):
 		print "..."
 		speakSlide = Speak()
 		speakSlide.setText(self.infoBox.toPlainText())
-		speakSlide.setSpeaker(str(self.speaker.currentText()))
+		speakSlide.setSpeaker(self.speaker.currentText())
 		for i in xrange(len(self.pointvec)):
-			if(str(self.pointvar[i].currentText())!=""):
+			if(self.pointvar[i].currentText()!=""):
 				try:
-					amount = (int)(str(self.pointvec[i].text()))
-					speakSlide.putPoints(str(self.pointvar[i].currentText()), amount)
+					amount = (int)(self.pointvec[i].text())
+					speakSlide.putPoints(self.pointvar[i].currentText(), amount)
 				except:
 					popup("All Points must be integers.\nTo discard one line, empty the text field and set the arcana to blank.", "Critical")
 					print "Amount must be an integer"
 		for i in xrange(len(self.anglevec)):
-			if(str(self.anglevar[i].currentText())!=""):
+			if(self.anglevar[i].currentText()!=""):
 				try:
-					amount = (int)(str(self.anglevec[i].text()))
-					speakSlide.putAngle(str(self.anglevar[i].currentText()), amount)
+					amount = (int)(self.anglevec[i].text())
+					speakSlide.putAngle(self.anglevar[i].currentText(), amount)
 				except:
 					popup("All Points and Angles must be integers.\nTo discard one line, set empty the text field and set the arcana to blank.", "Critical")
 					print "Amount must be an integer"
@@ -478,6 +474,7 @@ class SpeakFrame(QWidget):
 		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
 		self.op.op.linkstored.save()
 		self.op.updateElementList()
+		popup("Saved!", "Information")
 		
 		
 class CameraFrame(QWidget):
@@ -564,27 +561,28 @@ class CameraFrame(QWidget):
 	def save(self):
 		print "Saving"
 		cameraSlide = Camera()
-		cameraSlide.setPlace(str(self.locationO.currentText()))
+		cameraSlide.setPlace(self.locationO.currentText())
 		print "..."
 		try:
-			(int)(str(self.lx.text()))
-			(int)(str(self.ly.text()))
-			(int)(str(self.lz.text()))
-			(int)(str(self.cx.text()))
-			(int)(str(self.cy.text()))
-			(int)(str(self.cz.text()))
+			(int)(self.lx.text())
+			(int)(self.ly.text())
+			(int)(self.lz.text())
+			(int)(self.cx.text())
+			(int)(self.cy.text())
+			(int)(self.cz.text())
 		except:
 			popup("Camera position (x, y, z) and look direction (x, y, z) must be entered as whole numbers", "Critical")
 			print "Must be an integer"
 			return
 		
-		cameraSlide.setLookAt(((int)(str(self.lx.text())),(int)(str(self.ly.text())),(int)(str(self.lz.text()))))
-		cameraSlide.setCameraPosition(((int)(str(self.cx.text())),(int)(str(self.cy.text())),(int)(str(self.cz.text()))))
+		cameraSlide.setLookAt(((int)(self.lx.text()),(int)(self.ly.text()),(int)(self.lz.text())))
+		cameraSlide.setCameraPosition(((int)(self.cx.text()),(int)(self.cy.text()),(int)(self.cz.text())))
 		self.op.op.link.addItem(cameraSlide, self.op.op.i)
 		print "Saved"
 		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
 		self.op.op.linkstored.save()
 		self.op.updateElementList()
+		popup("Saved!", "Information")
 		
 		
 class MoveFrame(QWidget):
@@ -637,8 +635,8 @@ class MoveFrame(QWidget):
 			try:
 				self.ani.setCurrentIndex(self.animations.index(self.load.getAnimation()))
 				self.speaker.setCurrentIndex(self.characs.index(self.load.getSubject()))
-				self.lx.setText(str(self.load.getDestination()[0]))
-				self.ly.setText(str(self.load.getDestination()[1]))
+				self.lx.setText(self.load.getDestination()[0])
+				self.ly.setText(self.load.getDestination()[1])
 			except Exception as e:
 				print e
 				pass
@@ -647,20 +645,22 @@ class MoveFrame(QWidget):
 	def save(self):
 		print "Saving"
 		moveSlide = Movement()
-		moveSlide.setSubject(str(self.speaker.currentText()))
-		moveSlide.setAnimation(str(self.ani.currentText()))
+		moveSlide.setSubject(self.speaker.currentText())
+		moveSlide.setAnimation(self.ani.currentText())
 		print "..."
 		try:
-			(int)(str(self.lx.text()))
-			(int)(str(self.ly.text()))
+			(int)(self.lx.text())
+			(int)(self.ly.text())
 		except:
 			popup("Destination coordinates (x, y) must be entered as integers", "Critical")
 			print "Numbers must be integers"
 			return
 		
-		moveSlide.setDestination(((int)(str(self.lx.text())),(int)(str(self.ly.text()))))
+		moveSlide.setDestination(((int)(self.lx.text()),(int)(self.ly.text())))
 		self.op.op.link.addItem(moveSlide, self.op.op.i)
 		print "Saved"
 		self.op.op.linkstored.setLink(self.op.op.link, self.op.op.level, self.op.op.angle)
 		self.op.op.linkstored.save()
 		self.op.updateElementList()
+		popup("Saved!", "Information")
+		

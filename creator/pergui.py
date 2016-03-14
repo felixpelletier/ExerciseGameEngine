@@ -247,7 +247,7 @@ class per_creator(QWidget):
 				raise Exception("")
 			if not (self.chosenSpell == ""):
 				print "Ok"
-				self.lsdic[str(self.chosenSpell)] = str(self.lslevel.text())
+				self.lsdic[self.chosenSpell] = self.lslevel.text()
 				self.listLS.addItem(self.chosenSpell + " at level " + self.lslevel.text())
 				self.lslevel.setText("")
 				self.lsSpellO.setCurrentIndex(0)
@@ -326,34 +326,36 @@ class per_creator(QWidget):
 				self.loadPer(temp)
 			else:
 				return
+		self.createFrame.show()
+		self.mainframe.center()
 		print "Changed to edit frame"
 	
 	def save(self):
-		if os.path.exists(json_reader.buildPath("data/"+str(self.nameT.text())+".json")):
+		if os.path.exists(json_reader.buildPath("data/"+self.nameT.text()+".json")):
 			if not popup("Override existing Persona "+self.nameT.text()+"?", "Question"):
 				return
 		print "Saving"
 		spellDeck = []
 		for combobox in self.iSpellOs:
-			spellDeck.append(str(combobox.currentText()))
-		stats = [str(self.strT.text()), str(self.magT.text()), str(self.endT.text()), str(self.agiT.text()), str(self.luckT.text())]
-		res = [str(self.slashO.currentText()), str(self.strikeO.currentText()), str(self.pierceO.currentText()), str(self.fireO.currentText()), str(self.iceO.currentText()), str(self.elecO.currentText()), str(self.windO.currentText()), str(self.lightO.currentText()), str(self.darkO.currentText())]
+			spellDeck.append(combobox.currentText())
+		stats = [self.strT.text(), self.magT.text(), self.endT.text(), self.agiT.text(), self.luckT.text()]
+		res = [self.slashO.currentText(), self.strikeO.currentText(), self.pierceO.currentText(), self.fireO.currentText(), self.iceO.currentText(), self.elecO.currentText(), self.windO.currentText(), self.lightO.currentText(), self.darkO.currentText()]
 		try:
-			(int)(str(self.levelT.text()))
-			(int)(str(self.strT.text()))
-			(int)(str(self.magT.text()))
-			(int)(str(self.endT.text()))
-			(int)(str(self.agiT.text()))
-			(int)(str(self.luckT.text()))
+			(int)(self.levelT.text())
+			(int)(self.strT.text())
+			(int)(self.magT.text())
+			(int)(self.endT.text())
+			(int)(self.agiT.text())
+			(int)(self.luckT.text())
 		except:
 			popup("There is a number entry that isn't valid.\nEntries requiring numbers are:\nLEVEL\nSTR\nMAG\nEND\nAGI\nLUCK", "Critical")
 			print "Not Saved"
 			return
-		if not (str(self.nameT.text()) and not str(self.nameT.text()).isspace()):
+		if not (self.nameT.text() and not self.nameT.text().isspace()):
 			popup("No name entered for your Persona. Name is a required field.", "Critical")
 			print "No Name, not saved"
 			return
-		toWrite = Persona(str(self.nameT.text()), str(self.arcO.currentText()), str(self.levelT.text()), str(self.textT.toPlainText()), spellDeck, self.lsdic, stats, res, [str(self.listEL1.currentText()), str(self.listEL2.currentText())])
+		toWrite = Persona(self.nameT.text(), self.arcO.currentText(), self.levelT.text(), self.textT.toPlainText(), spellDeck, self.lsdic, stats, res, [self.listEL1.currentText(), self.listEL2.currentText()])
 		json_reader.writeOneP(toWrite)
 		temp = self.nameT.text()
 		if (temp not in [self.listP.item(i).text() for i in range(self.listP.count())]):
@@ -376,6 +378,8 @@ class per_creator(QWidget):
 			return
 		self.buttonFrame.close()
 		self.initUI(False)
+		self.createFrame.show()
+		self.mainframe.center()
 		print "Created"
 		
 	def back(self):

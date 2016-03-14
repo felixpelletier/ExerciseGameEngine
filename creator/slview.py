@@ -1,5 +1,5 @@
 from qtheader import *
-from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush, QDesktopWidget, QScrollArea
+from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush, QScrollArea
 from PySide.QtCore import QPoint, QRectF
 from sls import SocialLink
 import sys

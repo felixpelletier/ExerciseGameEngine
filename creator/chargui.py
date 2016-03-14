@@ -85,7 +85,13 @@ class char_creator(QWidget):
 			popup("Sorry, your character cannot be called \""+self.nameT.text()+"\". That is a reserved keyword (and it's also a dumb name)", "Critical")
 			return
 		print "Saving"
-		toWrite = Character(str(self.nameT.text()), str(self.infoT.toPlainText()), self.importantB.isChecked())
+		try:
+			toWrite = Character(self.nameT.text(), self.infoT.toPlainText(), self.importantB.isChecked())
+		except UnicodeEncodeError as e:
+			print e
+			print type(e)
+			popup("Sorry, unicode characters are not supported.", "Critical")
+			return
 		json_reader.writeOne(toWrite)
 		if toWrite.getName() not in [self.allChars.itemText(i) for i in range(self.allChars.count())]:
 			self.allChars.insertItem(self.allChars.count()-1, self.nameT.text())

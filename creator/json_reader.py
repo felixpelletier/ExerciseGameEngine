@@ -64,28 +64,18 @@ def writeCharNames(name):
 	
 def writePerNames(name):
 	list = readPerNames()
-	if name in list:
+	if name.encode('utf-8') in list:
 		return
-	list.append(name)
+	list.append(name.encode('utf-8'))
 	with open(buildPath('int/' + 'pers.json'), 'w') as outfile:
 		json.dump(list, outfile)
 	outfile.close()
 	
 def readPerNames():
-	try:
-		with open(buildPath('int/' + 'pers.json')) as json_data:
-			names = json.load(json_data)
-		json_data.close()
-		noU = []
-		for item in names:
-			if isinstance(item, unicode):
-				item = item.encode('utf-8')
-			noU.append(item)
-		return noU
-	except:
-		print "No existing names"
-	empty = []
-	return empty
+	with open(buildPath('int/' + 'pers.json')) as json_data:
+		names = json.load(json_data)
+	json_data.close()
+	return names
 	
 def deleteChar(name):
 	list = readCharNames()
@@ -104,20 +94,10 @@ def deletePer(name):
 	os.remove(buildPath('data/'+name + '.json'))
 	
 def readCharNames():
-	try:
-		with open(buildPath('int/' + 'chars.json')) as json_data:
-			names = json.load(json_data)
-		json_data.close()
-		noU = []
-		for item in names:
-			if isinstance(item, unicode):
-				item = item.encode('utf-8')
-			noU.append(item)
-		return noU
-	except:
-		print "No existing names"
-	empty = []
-	return empty
+	with open(buildPath('int/' + 'chars.json')) as json_data:
+		names = json.load(json_data)
+	json_data.close()
+	return names
 		
 
 def data_list(fetch):

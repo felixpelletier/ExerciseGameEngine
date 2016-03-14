@@ -1,3 +1,4 @@
+#--coding:utf-8--
 from qtheader import *
 import sys
 from qtmainframe import MainFrame

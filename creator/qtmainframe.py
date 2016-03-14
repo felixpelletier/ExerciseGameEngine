@@ -25,3 +25,10 @@ class MainFrame(QWidget):
 		self.layout.addWidget(newWidgetState, 0, 0)
 		self.currentWidget = newWidgetState
 		newWidgetState.show()
+		self.center()
+	
+	def center(self):
+		#Center window
+		qr = self.frameGeometry()
+		qr.moveCenter(QDesktopWidget().availableGeometry().center())
+		self.move(qr.topLeft())
