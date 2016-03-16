@@ -271,7 +271,7 @@ class per_creator(QWidget):
 			i=i+1
 		print key
 		print self.lsdic.pop(key)
-		self.listLS.takeItem(self.listLS.currentItem().text())
+		self.listLS.takeItem(self.listLS.currentRow())
 		
 		
 	def loadPer(self, name):

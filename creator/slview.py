@@ -139,12 +139,16 @@ class Legend(QWidget):
 		self.sel = QLabel(self, text="Selected element:")
 		self.grid.addWidget(self.sel, 4, 0)
 		
+		self.leaf = QLabel(self, text="End(s) of cutscene:")
+		self.grid.addWidget(self.leaf, 5, 0)
+		
 		empty = QLabel(self)
 		empty.setFixedSize(150, 20)
 		self.grid.addWidget(empty, 1, 1)
 		self.grid.addWidget(empty, 2, 1)
 		self.grid.addWidget(empty, 3, 1)
 		self.grid.addWidget(empty, 4, 1)
+		self.grid.addWidget(empty, 5, 1)
 		
 	def paintEvent(self, event):
 		qp = QPainter()
@@ -169,6 +173,9 @@ class Legend(QWidget):
 		pen.setColor(Qt.yellow)
 		qp.setPen(pen)
 		qp.drawRect(self.sel.x()+155, self.sel.y(), 95, 20)
+		pen.setColor(Qt.green)
+		qp.setPen(pen)
+		qp.drawRect(self.leaf.x()+155, self.leaf.y(), 95, 20)
 		
 class TreeWidget(QWidget):
 	
@@ -265,27 +272,43 @@ class TreeWidget(QWidget):
 			height1 = self.buttons[line[1]].rect().height()
 			ifrom = self.mapToTree(line[0])
 			ito = self.mapToTree(line[1])
+			if len(self.table[line[0]])==1 or len(self.table[line[1]])==1:
+				pen.setColor(Qt.green)
+				qp.setPen(pen)
+				if len(self.table[line[0]])==1:
+					if line[0] in self.op.subtree or line[0]==self.op.lastButtonPressed:
+						qp.drawRect(ifrom.x()-2, ifrom.y()-2, width0+4, height0+4)
+					else:
+						qp.drawRect(ifrom.x(), ifrom.y(), width0, height0)
+				if len(self.table[line[1]])==1:
+					if line[1] in self.op.subtree:
+						qp.drawRect(ito.x()-2, ito.y()-2, width1+4, height1+4)
+					else:
+						qp.drawRect(ito.x(), ito.y(), width1, height1)
+				pen.setColor(Qt.black)
+				qp.setPen(pen)
 			if line[0] in self.op.subtree or line[1] in self.op.subtree:
 				pen.setColor(Qt.red)
 				qp.setPen(pen)
-				if line[0] in self.op.subtree and line[0] != self.op.lastButtonPressed:
+				if line[0] in self.op.subtree and line[0] != self.op.lastButtonPressed:# and len(self.table[line[0]])>1:
 					qp.drawRect(ifrom.x(), ifrom.y(), width0, height0)
-				if line[1] in self.op.subtree and line[1] != self.op.lastButtonPressed:
+				if line[1] in self.op.subtree and line[1] != self.op.lastButtonPressed:# and len(self.table[line[1]])>1:
 					qp.drawRect(ito.x(), ito.y(), width1, height1)
 			if self.op.needsRefresh:
 				self.update()
 				self.op.needsRefresh = False
-			if self.mapped[line[0]] < self.mapped[line[1]]:
+			if self.mapped[line[0]] <= self.mapped[line[1]]:
 				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+(height0/2), ito.x()+(width1/2), ito.y()+(height1/2))
 			else:
 				pen.setStyle(Qt.DashLine)
 				qp.setPen(pen)
-				if alternate:
-					qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 90*16, 180*16)
-					alternate=False
-				else:
-					qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 270*16, 180*16)
-					alternate=True
+				qp.drawLine(ifrom.x()+(width0/2), ifrom.y()+(height0/2), ito.x()+(width1/2), ito.y()+(height1/2))
+				#if alternate:
+				#	qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 90*16, 180*16)
+				#	alternate=False
+				#else:
+				#	qp.drawArc(QRectF(ito.x(), ito.y()+1, width0, ifrom.y()-ito.y()), 270*16, 180*16)
+				#	alternate=True
 				pen.setStyle(Qt.SolidLine)
 			pen.setColor(Qt.black)
 			qp.setPen(pen)

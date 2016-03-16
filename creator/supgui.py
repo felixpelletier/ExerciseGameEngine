@@ -162,7 +162,7 @@ class emailFrame(QWidget):
 			popup("Please enter a message and subject.", "Critical")
 			return
 		msg = MIMEMultipart()
-		body = MIMEText(str(self.body.toPlainText()))
+		body = MIMEText(str(self.body.toPlainText() + "\n\nSent by " + self.semT.text()))
 		msg.attach(body)
 		msg['From'] = str(self.semT.text())
 		msg['To'] = "swwouf@hotmail.com"
@@ -178,6 +178,7 @@ class emailFrame(QWidget):
 				msg.attach(part)
 		
 		s = smtplib.SMTP("smtp.live.com", 587)
+		s.set_debuglevel(1)
 		s.ehlo()
 		s.starttls()
 		s.ehlo()
@@ -192,9 +193,10 @@ class emailFrame(QWidget):
 			popup("You must provide your email address so that we may contact you if needed.\n\nYour email address will not be shared with any third parties.", "Critical")		
 			s.quit()
 			return
-		s.quit()
-		popup("Email failed to send, but not sure why...", "Critical")
-		
+		except Exception as e:
+			print e
+			popup("Email failed to send, but not sure why...", "Critical")
+
 		
 	def back(self):
 		self.close()

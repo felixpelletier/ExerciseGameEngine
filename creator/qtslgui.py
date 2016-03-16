@@ -220,7 +220,6 @@ class CreationContainer(QWidget):
 	def follow(self):
 		if not self.existing_connections.currentItem() or self.existing_connections.currentItem().text() == "":
 			return
-		self.window.save()
 		print [self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text())
 		self.next.setCurrentIndex([self.next.itemText(i) for i in range(self.next.count())].index(self.existing_connections.currentItem().text()))
 		self.op.i = self.actions.index(self.next.currentText())
@@ -228,7 +227,9 @@ class CreationContainer(QWidget):
 		self.next.setCurrentIndex(self.next.count()-1)
 		
 	def lightConnect(self):
-		self.window.save()
+		if not self.checkCached():
+			popup("Please save this action before linking it to a new one", "Information")
+			return
 		if self.next.currentText() == "New element":
 			self.op.link.addRelation(self.op.i, self.op.link.size())
 			print "Linked to index " + str(self.op.link.size())
@@ -259,6 +260,13 @@ class CreationContainer(QWidget):
 				raise Exception("Not a type!")
 			self.load = self.op.link.getItem(self.actions.index(self.next.currentText()))
 			self.changeFrame(0)
+			
+	def checkCached(self):
+		print len(self.op.link.items)-1
+		print self.op.i
+		if self.op.link.getItem(self.op.i) == []:
+			return False
+		return True
 			
 	def updateElementList(self):
 		self.next.clear()
