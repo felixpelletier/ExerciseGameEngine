@@ -93,8 +93,21 @@ class PrettySL(QWidget):
 			self.edit = QPushButton(self, text="Edit")
 			self.edit.clicked.connect(lambda:self.enter(index))
 			self.grid.addWidget(self.edit, 4, 3, 1, 2)
+			self.lkst = QLabel(self, text="Selected element links to:")
+			self.grid.addWidget(self.lkst, 5, 3, 1, 2)
+			self.rels = QLabel(self)
+			self.rels.setMaximumWidth(300)
+			text = ""
+			for relation in self.table[index][1:len(self.table[index])]:
+				text+= "(" + str(relation) + ") " + self.graph.getOneID(self.table[relation][0]) + "\n\n"
+			self.rels.setText(text)
+			self.grid.addWidget(self.rels, 6, 3, 1, 2)
 		else:
+			text = ""
 			self.idLabel.setText(self.actionIDs[index])
+			for relation in self.table[index][1:len(self.table[index])]:
+				text+= "(" + str(relation) + ") " + self.graph.getOneID(self.table[relation][0]) + "\n\n"
+			self.rels.setText(text)	
 			self.edit.clicked.disconnect()
 			self.edit.clicked.connect(lambda:self.enter(index))
 		if not self.delete:

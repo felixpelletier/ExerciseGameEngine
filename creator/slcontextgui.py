@@ -73,25 +73,25 @@ class SL_creator(QWidget):
 		self.grid.addWidget(self.go, 5, 2, 1, 2)
 		
 	def fetchangles(self):
+		try:
+				self.delang.close()
+		except:
+			print "Failed to close delang"
 		self.angs = []
 		try:
 			tempLink = json_reader.readLink(str(self.arcSel.currentText()))
 			for decon in tempLink["cutscenes"]:
 				if str(decon)[:str(decon).index("_")] == self.levelOM.currentText()[str(self.levelOM.currentText()).index(" ")+1:]:
 					self.angs.append("Angle " + str(decon)[str(decon).index("_")+1:] )
-			if self.angs:
+		except:
+			pass
+		if self.angs:
 				print "There are angles for this level"
 				self.delang = QPushButton(self, text="Delete Angle")
 				self.delang.clicked.connect(self.deleteangle)
 				self.grid.addWidget(self.delang, 4, 2, 1, 2)
-		except:
-			pass
-		if not self.angs:
+		else:
 			self.angs.append("No angles")
-			try:
-				self.delang.close()
-			except:
-				print "Failed to close delang"
 		self.angleOM.clear()
 		self.angleOM.addItems(self.angs)
 		self.angleOM.setCurrentIndex(0)
