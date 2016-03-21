@@ -2,6 +2,7 @@ from qtheader import *
 from PySide.QtGui import QHBoxLayout, QPen, QPainter, QBrush, QScrollArea
 from PySide.QtCore import QPoint, QRectF
 from sls import SocialLink
+from action import Speak
 import sys
 
 class PrettySL(QWidget):
@@ -86,7 +87,11 @@ class PrettySL(QWidget):
 		if not self.lab:
 			self.lab = QLabel(self, text="Selected element summary:")
 			self.grid.addWidget(self.lab, 2, 3, 1, 2)
-			self.idLabel = QLabel(self, text=self.actionIDs[index])
+			idt=""
+			if isinstance(self.table[index][0], Speak):
+				idt+=self.table[index][0].speaker + " says:\n\n"
+			idt+=self.actionIDs[index]
+			self.idLabel = QLabel(self, text=idt)
 			self.idLabel.setFixedSize(300, 40)
 			self.idLabel.setWordWrap(True)
 			self.grid.addWidget(self.idLabel, 3, 3, 1, 2)
@@ -104,7 +109,11 @@ class PrettySL(QWidget):
 			self.grid.addWidget(self.rels, 6, 3, 1, 2)
 		else:
 			text = ""
-			self.idLabel.setText(self.actionIDs[index])
+			idt=""
+			if isinstance(self.table[index][0], Speak):
+				idt+=self.table[index][0].speaker + " says:\n\n"
+			idt+=self.actionIDs[index]
+			self.idLabel.setText(idt)
 			for relation in self.table[index][1:len(self.table[index])]:
 				text+= "(" + str(relation) + ") " + self.graph.getOneID(self.table[relation][0]) + "\n\n"
 			self.rels.setText(text)	

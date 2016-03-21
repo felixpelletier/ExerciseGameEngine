@@ -7,6 +7,9 @@ class SocialLink():
 	def __init__(self, arcana):
 		self.arcana = arcana
 		self.cutscenes = {}#[level][angle]
+		self.pseudoname = ""
+		self.finalpersona = {} #Angle: Persona Name
+		self.requiredPoints = {} #Level:{Angle: Points, Stats:{Stat: (1-5)} }
 		self.loadLinks()
 		
 	def setLink(self, graph, level, angle):
@@ -14,10 +17,18 @@ class SocialLink():
 		
 	def loadLinks(self):
 		try:
-			tempdic = json_reader.readLink(self.arcana)["cutscenes"]
+			fullLink = json_reader.readLink(self.arcana)
+			tempdic = fullLink["cutscenes"]
 			print tempdic
 			for id, graph in tempdic.iteritems():
 				self.cutscenes[id] = MathGraph(graph["id"]).loadGraph(graph["items"])
+			#if statements necessary for backwards-compatibility
+			if 'pseudoname' in fullLink:
+				self.pseudoname = fullLink['pseudoname']
+			if 'finalpersona' in fullLink:
+				self.finalpersona = fullLink['finalpersona']
+			if 'requiredpoints' in fullLink:
+				self.requiredpoints = fullLink['requiredpoints']
 		except:
 			print "No existing link"
 		print self.cutscenes
@@ -43,13 +54,3 @@ class SocialLink():
 	def save(self):
 		json_reader.writeLink(self)
 		print "Saved to to file"
-		
-		
-#test = SocialLink("Fool")
-#test.getLink(0, 0)
-#test.startLink(0, 0)
-#print test.getLink(0, 0).id
-
-#test = DynamicList()
-#test[6] = "Works"
-#print test[6]
