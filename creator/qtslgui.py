@@ -3,6 +3,7 @@ from sls import SocialLink
 from action import *
 from simulate import Simulation
 from slview import PrettySL
+from slinfo import LinkInfo
 
 class SLFrame(QWidget):
 		
@@ -31,10 +32,14 @@ class SLFrame(QWidget):
 		self.view = QPushButton(self, text="Graphic View")
 		self.view.clicked.connect(lambda:self.viewF(True))
 		self.grid.addWidget(self.view, 2, 1)
+		
+		self.info = QPushButton(self, text="Info")
+		self.info.clicked.connect(self.infoF)
+		self.grid.addWidget(self.info, 2, 2)
 
 		back = QPushButton(self, text="Back to Arcana selection")
 		back.clicked.connect(self.back)
-		self.grid.addWidget(back, 2, 2)
+		self.grid.addWidget(back, 2, 3)
 		
 		self.listview = SLBase(self.mainframe, self)
 		self.graphicview = None
@@ -48,6 +53,9 @@ class SLFrame(QWidget):
 			return
 		self.sim = Simulation(self.link, self.arcana, self.level, self.angle)
 		
+	def infoF(self):
+		self.mainframe.changeState(LinkInfo(self.mainframe, self, self.linkstored, str(self.level), str(self.angle)))
+		
 	def viewF(self, graph):
 		if graph:
 			if len(self.link.getIDs())==0:
@@ -58,7 +66,7 @@ class SLFrame(QWidget):
 			if self.cc:
 				self.cc.close()
 			self.view.setText("List View")
-			self.grid.addWidget(self.graphicview, 0, 0, 1, 3)
+			self.grid.addWidget(self.graphicview, 0, 0, 1, 4)
 			self.graphicview.show()
 			self.view.clicked.disconnect()
 			self.view.clicked.connect(lambda:self.viewF(False))
@@ -70,7 +78,7 @@ class SLFrame(QWidget):
 			if self.graphicview:
 				self.graphicview.close()
 			self.view.setText("Graphic View")
-			self.grid.addWidget(self.listview, 0, 0, 1, 3)
+			self.grid.addWidget(self.listview, 0, 0, 1, 4)
 			self.listview.show()
 			self.view.clicked.disconnect()
 			self.view.clicked.connect(lambda:self.viewF(True))
@@ -90,7 +98,7 @@ class SLBase(QWidget):
 		self.empty = True
 		self.load = 0
 		self.initUI()
-		self.op.grid.addWidget(self, 0, 0, 1, 3)
+		self.op.grid.addWidget(self, 0, 0, 1, 4)
 		
 	def initUI(self):
 		self.grid = QGridLayout()

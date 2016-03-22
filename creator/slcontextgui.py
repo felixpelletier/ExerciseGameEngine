@@ -1,6 +1,7 @@
 from qtheader import *
 from qtslgui import SLFrame
 from sls import SocialLink
+from slinfo import LinkInfo
 
 class SL_creator(QWidget):
 
@@ -28,9 +29,13 @@ class SL_creator(QWidget):
 		select.clicked.connect(self.context)
 		self.grid.addWidget(select, 2, 1)
 		
+		info = QPushButton(self, text="Info")
+		info.clicked.connect(self.infoF)
+		self.grid.addWidget(info, 3, 1)
+		
 		back = QPushButton(self, text="Back")
 		back.clicked.connect(self.back)
-		self.grid.addWidget(back, 3, 1)
+		self.grid.addWidget(back, 4, 1)
 		
 		self.card = QLabel(self)
 		defaultCard = QPixmap(json_reader.buildPath("int/cards/card.png"))
@@ -42,9 +47,15 @@ class SL_creator(QWidget):
 		self.text.setFixedSize(400, 200)
 		self.text.setWordWrap(True)
 		self.text.setAlignment(Qt.AlignHCenter)
-		self.grid.addWidget(self.text, 1, 0, 3, 1)
+		self.grid.addWidget(self.text, 1, 0, 4, 1)
+		
+	def infoF(self):
+		if self.arcSel.currentText() == "Select Arcana":
+			return
+		self.mainframe.changeState(LinkInfo(self.mainframe, self, SocialLink(self.arcSel.currentText())))
 		
 	def context(self):
+		self.destroyContext()
 		if self.arcSel.currentText() == "Select Arcana":
 			return
 		levs = []

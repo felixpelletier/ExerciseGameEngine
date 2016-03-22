@@ -7,9 +7,11 @@ class SocialLink():
 	def __init__(self, arcana):
 		self.arcana = arcana
 		self.cutscenes = {}#[level][angle]
+		self.cutinfo = {}#{level_angle:"Info"}
+		self.info = ""
 		self.pseudoname = ""
 		self.finalpersona = {} #Angle: Persona Name
-		self.requiredPoints = {} #Level:{Angle: Points, Stats:{Stat: (1-5)} }
+		self.requiredPoints = {} #Level#:{Angle#: {'points':#, 'courage':#, 'charm':#, 'acad':#} }
 		self.loadLinks()
 		
 	def setLink(self, graph, level, angle):
@@ -27,8 +29,12 @@ class SocialLink():
 				self.pseudoname = fullLink['pseudoname']
 			if 'finalpersona' in fullLink:
 				self.finalpersona = fullLink['finalpersona']
-			if 'requiredpoints' in fullLink:
-				self.requiredpoints = fullLink['requiredpoints']
+			if 'requiredPoints' in fullLink:
+				self.requiredPoints = fullLink['requiredPoints']
+			if 'info' in fullLink:
+				self.info = fullLink['info']
+			if 'cutinfo' in fullLink:
+				self.cutinfo = fullLink['cutinfo']
 		except:
 			print "No existing link"
 		print self.cutscenes
