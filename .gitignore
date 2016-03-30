@@ -43,7 +43,7 @@ soul*.tar.gz
 .glm
 
 *.*.swp
-
+.DS_Store
 syntax: glob
 [B|b]uild/
 .idea/
