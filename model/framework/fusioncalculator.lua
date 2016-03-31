@@ -1,7 +1,7 @@
 require('json_reader')
 
 function fuse(together, allpersonas)
-	local combos = get({file='fusion_combos.json', path=(#together .. 'way')})
+	local combos = read({file='fusion_combos.json', path=(#together .. 'way')})
 	local fusebetween = ""
 	local fusebetweenbackwards = ""
 	local base_level = 0

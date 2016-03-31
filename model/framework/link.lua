@@ -5,7 +5,7 @@ local function _load(sociallink)
 	require ('json_reader')
 	local level = tonumber(sociallink.level)
 	local angle = tonumber(sociallink.angle)
-	local link = get({file=sociallink.arcana..'_link.json'})
+	local link = read({file=sociallink.arcana..'_link.json'})
 	local angleladder = {angle=nil}
 	local ladderdown = nil
 	local ladderup = nil
