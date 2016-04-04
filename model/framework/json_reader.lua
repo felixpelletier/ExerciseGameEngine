@@ -1,4 +1,6 @@
-function read(datapath)
+local json = {}
+
+function json.read(datapath)
 	local json = require('cjson')
 	local file = io.open(datapath.file)
 	if not file then
@@ -13,7 +15,7 @@ function read(datapath)
 	return decoded
 end
 
-function write(data)
+function json.write(data)
 	local json = require('cjson')
 	local file = io.open(data.path, 'w')
 	if not file then
@@ -23,6 +25,8 @@ function write(data)
 	file:close()
 	return true
 end
+
+return json
 	
 --print(get({file='data.json', path='test'}))
 --print(write({data={some='Some', random='Random', text='Text'}, path='afile.json'}))

@@ -1,11 +1,10 @@
-cut = nil
---cut should actually be in gamestate table
+local link = {}
 
 local function _load(sociallink)
-	require ('json_reader')
+	local json = require ('json_reader')
 	local level = tonumber(sociallink.level)
 	local angle = tonumber(sociallink.angle)
-	local link = read({file=sociallink.arcana..'_link.json'})
+	local link = json.read({file=sociallink.arcana..'_link.json'})
 	local angleladder = {angle=nil}
 	local ladderdown = nil
 	local ladderup = nil
@@ -31,23 +30,41 @@ local function _load(sociallink)
 			angleladder.cutscene=link.cutscenes[level..'_'..ladderup]
 		end
 	end
-	return angleladder.cutscene
+	--for key, value in pairs(angleladder.cutscene.items[1][1]) do print(key, value) end
+	local state = require('state')
+	state.cut = angleladder
+	state.cut.open = angleladder.cutscene.items[1]
+	--return angleladder
 end
 
-local function getcut(sociallink)
-	cut = _load(sociallink)
-	cut.index=1
-	--print("Cut is wrong cut")
-	return cut.items[1]
+function link.refresh()
+	local state = require('state')
+	if state.cut.open then
+		print(state.cut.open[1].text) end
 end
 
-function SocialLink(sociallink)
-	if not cut or cut.id~=sociallink.arcana..sociallink.level..'_'..sociallink.angle then return getcut(sociallink) end
-	--print("Cut is right cut")
-	return cut.items[sociallink.index]
+function link.SocialLink()
+	local state = require('state')
+	return state.cut.cutscene.items[state.cut.open[state.cut.index]]
 end
 
-print(SocialLink({arcana='Aeon', level='1', angle='0'})[1].text)
-print(SocialLink({arcana='Aeon', level='1', angle='0', index=2})[1].text)
-print(SocialLink({arcana='Aeon', level='2', angle='0'})[1].text)
-	
+function link.processinput(input)
+	local state = require('state')
+	if input=='select' then
+		state.cut.open = link.SocialLink()
+		state.cut.index = 2
+	elseif input=='up' then
+		if state.cut.open[state.cut.index+1] then state.cut.index=state.cut.index+1	end
+	elseif input=='down' then
+		if state.cut.open[state.cut.index-1] and state.cut.index-1>=2 then state.cut.index=state.cut.index-1 end
+	else return end
+	link.refresh()
+end
+
+function link.loadcontext(sociallink)
+	local state = require('state')
+	state.context=link
+	_load(sociallink)
+end
+
+return link
