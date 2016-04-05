@@ -23,11 +23,12 @@ local function parsekey(key)
 end
 
 function state.input(inputkey)
-	if not state.backlog then state.backlog=parsekey(inputkey) end
+	if not state.backlog then state.backlog=parsekey(inputkey) print(inputkey) end
 end
 
 function processinput()--threaded
 	if state.backlog then
+		print("Processing input: "..state.backlog)
 		state.context.processinput(state.backlog)
 		state.backlog=nil
 	end

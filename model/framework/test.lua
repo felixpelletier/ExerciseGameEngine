@@ -3,6 +3,23 @@ state.changecontext('link', {arcana='Aeon', level='1', angle='0'})
 
 state.input('select')
 processinput()
+state.input('select')
+processinput()
+state.input('select')
+processinput()
+state.input('select')
+processinput()
+state.input('select')
+processinput()
+state.input('up')
+processinput()
+state.input('select')
+processinput()
+state.input('select')
+processinput()
+state.input('right')
+processinput()
+
 
 print("\nState")
 for key, value in pairs(state) do print(key, value) end
