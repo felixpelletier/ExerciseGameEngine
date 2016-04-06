@@ -1,5 +1,15 @@
 local state = {}
 
+local function jsonparsestate(table)
+	local save = {}
+	for key, value in pairs(table) do
+		print(key, value)
+		if type(value)~='function' and type(value)~='table' then print("Valid") save[key]=value end
+		if type(value)=='table' then print("\nDepth+1") save[key]=jsonparsestate(value) end
+	end
+	return save
+end
+
 function state.loadstate(savefile)
 	local json = require('json_reader')
 	if savefile then savefile="PXS"..savefile..".json" else savefile='state.json' end
@@ -8,13 +18,13 @@ end
 
 function state.savestate(savefile)
 	local json = require('json_reader')
-	evolve('save', savefile)
-	if savefile then savefile="PXS"..savefile..".json" else savefile='state.json' end
-	json.write({data=gamestate, path=savefile})
+	if savefile then savefile="PXS"..savefile..".json" state.evolve('save', savefile) else savefile='state.json' end
+	json.write({data=jsonparsestate(state), path=savefile})
 end
 
+
 function state.evolve(key, value)
-	gamestate[key] = value
+	state[key] = value
 end
 
 local function parsekey(key)
@@ -22,17 +32,15 @@ local function parsekey(key)
 	return key
 end
 
-function state.input(inputkey)
-	if not state.backlog then state.backlog=parsekey(inputkey) print(inputkey) end
-end
-
-function processinput()--threaded
-	if state.backlog then
+function state.input(inputkey)--We assume the threading is happening in C because lua has no multithreading.
+	if not state.backlog then
+		state.backlog=parsekey(inputkey) print(inputkey)
 		print("Processing input: "..state.backlog)
 		state.context.processinput(state.backlog)
 		state.backlog=nil
 	end
 end
+
 
 function state.changecontext(newc, params)
 	local context = require(newc)
@@ -44,19 +52,27 @@ function state.loading(start)
 	--Send loading request to graphics
 end
 
+function state.lock()
+	state.backlog=0
+end
+
+function state.unlock()
+	state.backlog=nil
+end
+
 
 return state
 
 --loadstate(nil)
 --print("Game is at version: "..gamestate.Version)
---evolve('Version', '0.0.0.0.3')
+--evolve('Version', '0.0.0.0.5')
 --savestate(nil)
 
 
 
 --This file defines all global variables that are callable from the controller or that need
 --to be cached for further use. The following are all know values that can be contextually
---found within gamestate and their significance.
+--found within state and their significance.
 
 --Version: Game version. Currently 0.0.0.0.X
 --cut: The current cutscene being played.
@@ -68,5 +84,16 @@ return state
 --place: Current Place.
 --flags: List of all flags that have been raised as of now. (perform "need in flags" for dependancy check)
 --save: The save number (1-inf)
---context: What the player is doing now (link, overworld, dungeon) and the input processor for that context
+--context: What the player is doing now and the input processor for that context
 --backlog: The last key pressed. No inputs are saved unless this value is nil
+
+
+--Current Existing contexts:
+--link: Any cutscene (Social Link, Story or Event)
+
+--Possible contexts:
+--link: Any cutscene (Social Link, Story or Event)
+--overworld: Overworld
+--dungeon: Dungeon
+--battle: Battle
+--velvet: Velvet Room

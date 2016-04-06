@@ -30,21 +30,56 @@ local function _load(sociallink)
 			angleladder.cutscene=link.cutscenes[level..'_'..ladderup]
 		end
 	end
-	--for key, value in pairs(angleladder.cutscene.items[1][1]) do print(key, value) end
 	local state = require('state')
 	state.cut = angleladder
 	state.cut.open = angleladder.cutscene.items[1]
 	state.cut.index = 2
-	--return angleladder
 end
 
-function link.refresh()
+local function showSpeak()
+	local state = require('state')
+	local choices = {}
+	if #state.cut.open > 2 then
+		for i=2, #state.cut.open do choices[#choices+1]=state.cut.cutscene.items[i][1].text end --Won't show anything for physical action based choices
+	end
+	return {
+		key="Social Link Speak Action",
+		assets={['textbox.png']={0,0}, [state.cut.open[1].speaker..'.png']={0,0}},
+		text=state.cut.open[1].text,
+		speaker=state.cut.open[1].speaker,
+		options=choices
+		--Need emotion (domo arigatou, Mr. Roboto)
+	}
+end
+
+local function showMove()
+	local state = require('state')
+	return {
+		key="Social Link Move Action",
+		assets={[state.cut.open[1].subject]={state.cut.open[1].move, state.cut.open[1].animation}}
+	}
+end
+
+--local function showInfo() end Ignore Info actions. These should never show up in the game
+
+local function showCam()
+	local state = require('state')
+	return {
+		key="Social Link Camera Action",
+		place=state.cut.open[1].place,
+		camera={state.cut.open[1].lookAt, state.cut.open[1].cameraPosition}
+	}
+end
+
+function link.refresh()--Send update to graphic view
 	local state = require('state')
 	if state.cut.open then
-		print("\nAction:\n"..state.cut.open[1].text.."\n") end
+		print("\nAction:\n"..state.cut.open[1].text.."\n")
+		state.update = state.cut.open.show
+	end
 end
 
-function link.SocialLink()
+local function socialLink()
 	local state = require('state')
 	return state.cut.cutscene.items[state.cut.open[state.cut.index]+1]
 end
@@ -53,7 +88,8 @@ function link.processinput(input)
 	print("Processing input in context: Social Link")
 	local state = require('state')
 	if input=='select' then
-		state.cut.open = link.SocialLink()
+		state.cut.open = socialLink()
+		if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
 		state.cut.index = 2
 	elseif input=='up' then
 		if state.cut.open[state.cut.index+1] then state.cut.index=state.cut.index+1	return end
