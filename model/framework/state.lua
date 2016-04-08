@@ -3,9 +3,8 @@ local state = {}
 local function jsonparsestate(table)
 	local save = {}
 	for key, value in pairs(table) do
-		print(key, value)
-		if type(value)~='function' and type(value)~='table' then print("Valid") save[key]=value end
-		if type(value)=='table' then print("\nDepth+1") save[key]=jsonparsestate(value) end
+		if type(value)~='function' and type(value)~='table' then save[key]=value end
+		if type(value)=='table' then save[key]=jsonparsestate(value) end
 	end
 	return save
 end

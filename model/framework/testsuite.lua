@@ -2,12 +2,17 @@
 --to view comprehensive analysis of what the model is providing.
 --All calls to the model should respect the formats shown here.
 local state = require('state')
+local json = require('json_reader')
 
 state.evolve('Version', '0.0.0.0.5')
 state.evolve('mc', {['name']='Chaos'})
 state.savestate(nil)
 
-state.changecontext('battle', {['party']={{['name']='Aigis', ['persona']={['name']="Pallas Athena", ['agi']=18}}, {['name']='Chaos', ['persona']={['name']="Jack Frost", ['agi']=17}}}, ['ene']={{['name']='Shadow', ['persona']={['name']="Killer Hand", ['agi']=4}}}})
+shadowep=json.read({file='Seraph.json'})
+aigis=json.read({file='Cherub.json'})
+mc=json.read({file='Dominion.json'})
+
+state.changecontext('battle', {['party']={{['name']='Aigis', ['persona']=aigis}, {['name']='MC', ['persona']=mc}}, ['ene']={{['name']='Shadow', ['persona']=shadowep}}})
 
 state.input('select')
 state.input('select')
