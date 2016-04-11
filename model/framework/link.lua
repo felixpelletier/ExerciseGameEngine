@@ -77,8 +77,9 @@ end
 function link.refresh()--Send update to graphic view
 	local state = require('state')
 	if state.cut.open then
+		local cjson = require('cjson')
 		print("\nAction:\n"..state.cut.open[1].text.."\n")--For testing only.
-		state.update = state.cut.open.show
+		state.update = cjson.encode(state.cut.open.show)
 	end
 end
 
