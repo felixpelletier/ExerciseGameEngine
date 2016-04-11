@@ -77,7 +77,7 @@ end
 function link.refresh()--Send update to graphic view
 	local state = require('state')
 	if state.cut.open then
-		print("\nAction:\n"..state.cut.open[1].text.."\n")
+		print("\nAction:\n"..state.cut.open[1].text.."\n")--For testing only.
 		state.update = state.cut.open.show
 	end
 end
