@@ -1,3 +1,4 @@
+--LEGACY/TEST PROOF OF CONCEPT
 local battle = {}
 
 local function target(who)

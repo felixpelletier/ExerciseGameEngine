@@ -1,10 +1,11 @@
 local link = {}
 
-local function _load(sociallink)
+local function _load(arcana)
 	local json = require ('json_reader')
-	local level = tonumber(sociallink.level)
-	local angle = tonumber(sociallink.angle)
-	local link = json.read({file=sociallink.arcana..'_link.json'})
+	local state = require('state')
+	local level = state.slglobal[arcana].level
+	local angle = state.slglobal[arcana].angle
+	local link = json.read({file=arcana..'_link.json'})
 	local angleladder = {angle=nil}
 	local ladderdown = nil
 	local ladderup = nil
@@ -30,7 +31,6 @@ local function _load(sociallink)
 			angleladder.cutscene=link.cutscenes[level..'_'..ladderup]
 		end
 	end
-	local state = require('state')
 	state.cut = angleladder
 	state.cut.open = angleladder.cutscene.items[1]
 	state.cut.index = 2
@@ -43,10 +43,9 @@ local function showSpeak()
 		for i=2, #state.cut.open do choices[#choices+1]=state.cut.cutscene.items[i][1].text end --Won't show anything for physical action based choices
 	end
 	return {
-		key="Social Link Speak Action",
-		assets={['textbox.png']={0,0}, [state.cut.open[1].speaker..'.png']={0,0}},
+		key="link.show.speak",
 		text=state.cut.open[1].text,
-		speaker=state.cut.open[1].speaker,
+		speaker="sprite_"..state.cut.open[1].speaker.."_emotion",
 		options=choices
 		--Need emotion (domo arigatou, Mr. Roboto)
 	}
@@ -55,8 +54,10 @@ end
 local function showMove()
 	local state = require('state')
 	return {
-		key="Social Link Move Action",
-		assets={[state.cut.open[1].subject]={state.cut.open[1].move, state.cut.open[1].animation}}
+		key="link.show.move",
+		subject=state.cut.open[1].subject,
+		animation=state.cut.open[1].animation,
+		destination=state.cut.open[1].destination
 	}
 end
 
@@ -64,10 +65,12 @@ end
 
 local function showCam()
 	local state = require('state')
+	if state.cut.open[1].place=="Loading" then if not state.isloading then state.loading(true) else state.isloading(false) end end
 	return {
-		key="Social Link Camera Action",
+		key="link.show.camera",
 		place=state.cut.open[1].place,
-		camera={state.cut.open[1].lookAt, state.cut.open[1].cameraPosition}
+		cameraPosition=state.cut.open[1].cameraPosition,
+		lookAt=state.cut.open[1].lookAt
 	}
 end
 
@@ -79,32 +82,30 @@ function link.refresh()--Send update to graphic view
 	end
 end
 
-local function socialLink()
+function link.processinput()
 	local state = require('state')
-	return state.cut.cutscene.items[state.cut.open[state.cut.index]+1]
-end
-
-function link.processinput(input)
-	print("Processing input in context: Social Link")
-	local state = require('state')
-	if input=='select' then
-		state.cut.open = socialLink()
-		if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
-		state.cut.index = 2
-	elseif input=='up' then
-		if state.cut.open[state.cut.index+1] then state.cut.index=state.cut.index+1	return end
-	elseif input=='down' then
-		if state.cut.open[state.cut.index-1] and state.cut.index-1>=2 then state.cut.index=state.cut.index-1 return end
-	else print("Input "..input.." not valid in this context") return end
+	state.cut.index=2
+	if state.context.index then
+		print("Processing input in context: Social Link")
+		state.cut.index = state.context.index+2
+		state.context.index=nil
+	end
+	state.cut.open = state.cut.cutscene.items[state.cut.open[state.cut.index]+1]
+	if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
 	link.refresh()
-	if state.cut.open[1].place or state.cut.open[1].animation then link.processinput('select') end
+	if state.cut.open[1].place or state.cut.open[1].animation then link.processinput() end
 end
 
 function link.loadcontext(sociallink)
 	local state = require('state')
 	state.context=link
-	_load(sociallink)
+	_load(sociallink.arcana)
+	state.loading(false)
 	link.refresh()
 end
 
 return link
+
+
+--HARD-CODED THINGS:
+--"Loading" place (local showCam())

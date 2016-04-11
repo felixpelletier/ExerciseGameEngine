@@ -26,11 +26,23 @@ function state.evolve(key, value)
 	state[key] = value
 end
 
+function state.event(event)
+	if state.locked then state.eventcallerror="State is locked" return end
+	state.lock()
+	local json = require('cjson')
+	local map = json.decode(event)
+	for key, value in pairs(map) do state.context[key]=value end
+	state.context.processinput()
+	state.unlock()
+end
+
+--LEGACY
 local function parsekey(key)
 	--parse input key into lua readable form if necessary, eg KEY.W to 'up' or whatnot
 	return key
 end
 
+--LEGACY
 function state.input(inputkey)--We assume the threading is happening in C because lua has no multithreading.
 	if not state.backlog then
 		state.backlog=parsekey(inputkey) print(inputkey)
@@ -42,32 +54,28 @@ end
 
 
 function state.changecontext(newc, params)
+	state.loading(true)
 	local context = require(newc)
-	context.loadcontext(params)
+	context.loadcontext(params)--Do not forget to cal state.loading(false) once loading context is complete
 end
 
 function state.loading(start)
-	if not start then return end--Loading complete
-	--Send loading request to graphics
+	if not start then state.isloading = true print("Loading complete") return end--Loading complete
+	state.isloading=nil
+	print("Loading...")--Send loading request to graphics
 end
 
+--Having two functions is a bit redundant but idgaf
 function state.lock()
-	state.backlog=0
+	state.locked=true
 end
 
 function state.unlock()
-	state.backlog=nil
+	state.locked=false
 end
 
 
 return state
-
---loadstate(nil)
---print("Game is at version: "..gamestate.Version)
---evolve('Version', '0.0.0.0.5')
---savestate(nil)
-
-
 
 --This file defines all global variables that are callable from the controller or that need
 --to be cached for further use. The following are all know values that can be contextually
@@ -84,7 +92,7 @@ return state
 --flags: List of all flags that have been raised as of now. (perform "need in flags" for dependancy check)
 --save: The save number (1-inf)
 --context: What the player is doing now and the input processor for that context
---backlog: The last key pressed. No inputs are saved unless this value is nil
+--backlog: The last key pressed. No inputs are saved unless this value is nil LEGACY?
 
 
 --Current Existing contexts:
