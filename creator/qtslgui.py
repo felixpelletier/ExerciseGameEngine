@@ -409,6 +409,13 @@ class SpeakFrame(QWidget):
 		self.speaker.addItems(self.characs)
 		self.grid.addWidget(self.speaker, 1, 5)
 		
+		self.emotionL = QLabel(self, text="Emotion:")#emotionL memes
+		self.grid.addWidget(self.emotionL, 1, 6)
+		self.s_emotions = json_reader.data_list('sprite_emotions')
+		self.emotion = QComboBox(self)
+		self.emotion.addItems(self.s_emotions)
+		self.grid.addWidget(self.emotion, 1, 7)		
+		
 		self.addp = QPushButton(self, text="Add points")
 		self.addp.clicked.connect(self.extendP)
 		self.grid.addWidget(self.addp, 30, 4, 1, 2)
