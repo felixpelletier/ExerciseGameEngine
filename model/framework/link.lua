@@ -83,6 +83,10 @@ function link.refresh()--Send update to graphic view
 	end
 end
 
+local function setShowType()
+	if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
+end
+
 function link.processinput()
 	local state = require('state')
 	state.cut.index=2
@@ -92,7 +96,7 @@ function link.processinput()
 		state.context.index=nil
 	end
 	state.cut.open = state.cut.cutscene.items[state.cut.open[state.cut.index]+1]
-	if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
+	setShowType()
 	link.refresh()
 	if state.cut.open[1].place or state.cut.open[1].animation then link.processinput() end
 end
@@ -101,7 +105,7 @@ function link.loadcontext(sociallink)
 	local state = require('state')
 	state.context=link
 	_load(sociallink.arcana)
-	state.loading(false)
+	setShowType()
 	link.refresh()
 end
 

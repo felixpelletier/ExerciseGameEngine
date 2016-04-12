@@ -37,43 +37,34 @@ function state.event(event)
 end
 
 --LEGACY
-local function parsekey(key)
-	--parse input key into lua readable form if necessary, eg KEY.W to 'up' or whatnot
-	return key
-end
-
---LEGACY
 function state.input(inputkey)--We assume the threading is happening in C because lua has no multithreading.
 	if not state.backlog then
-		state.backlog=parsekey(inputkey) print(inputkey)
+		state.backlog=inputkey
+		print(inputkey)
 		print("Processing input: "..state.backlog)
 		state.context.processinput(state.backlog)
 		state.backlog=nil
 	end
 end
 
-
+--There is not state.lock here as we assume that any call to changecontext will be effected
+--through a state.event processinput call
 function state.changecontext(newc, params)
 	state.loading(true)
+	state.inline=nil
 	local context = require(newc)
 	context.loadcontext(params)--Do not forget to cal state.loading(false) once loading context is complete
 end
 
 function state.loading(start)
-	if not start then state.isloading = true print("Loading complete") return end--Loading complete
+	if not start then state.isloading=true print("Loading complete") return end--Loading complete
 	state.isloading=nil
 	print("Loading...")--Send loading request to graphics
 end
 
 --Having two functions is a bit redundant but idgaf
-function state.lock()
-	state.locked=true
-end
-
-function state.unlock()
-	state.locked=false
-end
-
+function state.lock() state.locked=true end
+function state.unlock()	state.locked=false end
 
 return state
 
@@ -104,3 +95,4 @@ return state
 --dungeon: Dungeon
 --battle: Battle
 --velvet: Velvet Room
+--shop: any kind of shop in the game
