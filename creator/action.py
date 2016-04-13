@@ -19,6 +19,8 @@ def load(action):
 	try:
 		o = Speak()
 		o.setSpeaker(action["speaker"])
+		if 'emotion' in action:
+			o.emotion = action['emotion']
 		o.setText(action["text"])
 		for arcana, points in action["points"].iteritems():
 			o.putPoints(arcana, points)
@@ -53,6 +55,7 @@ class Speak():
 		self.speaker = ""
 		self.points = {}
 		self.angle = {}
+		self.emotion = ""
 		
 	def putPoints(self, arcana, points):
 		self.points[arcana] = points

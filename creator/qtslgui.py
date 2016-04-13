@@ -428,6 +428,7 @@ class SpeakFrame(QWidget):
 			try:
 				self.infoBox.setText(self.load.getText())
 				self.speaker.setCurrentIndex(self.characs.index(self.load.getSpeaker()))
+				self.emotion.setCurrentIndex(self.s_emotions.index(self.load.emotion))
 				first = True
 				for arcana, points in self.load.getPoints().iteritems():
 					if first:
@@ -476,6 +477,7 @@ class SpeakFrame(QWidget):
 		speakSlide = Speak()
 		speakSlide.setText(self.infoBox.toPlainText())
 		speakSlide.setSpeaker(self.speaker.currentText())
+		speakSlide.emotion=self.emotion.currentText()
 		for i in xrange(len(self.pointvec)):
 			if(self.pointvar[i].currentText()!=""):
 				try:

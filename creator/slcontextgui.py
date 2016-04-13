@@ -44,7 +44,7 @@ class SL_creator(QWidget):
 		self.grid.addWidget(self.card, 0, 0)
 		
 		self.text = QLabel(self, text="")
-		self.text.setFixedSize(400, 200)
+		self.text.setFixedSize(400, 250)
 		self.text.setWordWrap(True)
 		self.text.setAlignment(Qt.AlignHCenter)
 		self.grid.addWidget(self.text, 1, 0, 4, 1)
