@@ -2,17 +2,19 @@ local shop = {}
 
 local function _load(shopinquestion)
 	local json = require ('json_reader')
-	shop.menu=json.read({file='shopmenus.json'})[shopinquestion]
+	shop.menu=json.read({file='shopmenus.json'})
 end
 
 local function genmenus()
 	local state = require('state')
-	local items = {}
-	local i = 1
-	for key, value in pairs(shop.menu.order) do
-		items[i]={}
-		items[i]=value
-		i=i+1
+	local items = {{}}
+	for order, menuitem in pairs(shop.menu.trainer) do
+		for i=1, 1 do
+			for name, tree in pairs(menuitem) do
+				print(name, tree)
+				items[i]=name
+			end
+		end
 	end
 	if not state.context.index then return items end
 	print(state.context.index)
@@ -33,7 +35,6 @@ function shop.loadcontext(shopinquestion)
 	state.context=shop
 	_load(shopinquestion)
 	shop.refresh()
-	state.loading(false)
 end
 
 return shop
