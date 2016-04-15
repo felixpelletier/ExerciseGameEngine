@@ -14,7 +14,7 @@ json.read({file="shopmenus.json"})
 
 state.changecontext('shop', 'trainer')
 
-state.event(cjson.encode({key="shop.nav.menu", index=0}))
+--state.event(cjson.encode({key="shop.nav.menu", index=0}))
 
 --[[
 state.changecontext('link', {arcana='Aeon'})

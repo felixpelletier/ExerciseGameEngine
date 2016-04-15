@@ -11,13 +11,13 @@ local function genmenus()
 	for order, menuitem in pairs(shop.menu.trainer) do
 		for i=1, 1 do
 			for name, tree in pairs(menuitem) do
-				print(name, tree)
-				items[i]=name
+				print(order, name, tree)
+				items[i][#items[i]+1]=name
 			end
 		end
 	end
-	if not state.context.index then return items end
-	print(state.context.index)
+	--if not state.context.index then return items end
+	for order, item in pairs(items[1]) do print(order, item) end
 end
 
 function shop.refresh()
