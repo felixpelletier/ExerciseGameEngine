@@ -1,6 +1,6 @@
 {
 	"key":"shop.nav.menu",
-	"index":<value selected in the current list>
+	"index":<index selected at within current list (0-n)>
 	"back":true
 }
 /*
@@ -12,7 +12,7 @@
 
 {
 	"key":"shop.nav.menu",
-	"index":<value selected in the current list>
+	"index":<index selected at within current list (0-n)>
 }
 /*
  * or

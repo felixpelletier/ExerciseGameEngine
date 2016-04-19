@@ -13,11 +13,8 @@ state.savestate(nil)
 json.read({file="shopmenus.json"})
 
 state.changecontext('shop', 'trainer')
-print(state.context.depth[0])
-print(state.context.depth[1])
-state.event(cjson.encode({key="shop.nav.menu", index='Buy Gear'}))
-print(state.context.depth[0])
-print(state.context.depth[1])
+
+state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 --[[
 state.changecontext('link', {arcana='Aeon'})
@@ -64,5 +61,5 @@ for key, value in pairs(state) do print(key, value) end
 print("\nContext")
 for key, value in pairs(state.context) do print(key, value) end
 print("\nRefresh")
-for key, value in pairs(cjson.decode(state.update).menus[1]) do print(key, value) end
+for key, value in pairs(cjson.decode(state.update).menus) do for index, name in pairs(value) do print(key, index, name) end end
 --print(#state.update.options.." options")

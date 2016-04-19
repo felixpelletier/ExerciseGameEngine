@@ -2,28 +2,26 @@ local shop = {}
 
 local function _load(shopinquestion)
 	local json = require ('json_reader')
-	shop.menu=json.read({file='shopmenus.json'})
-	shop.depth = {[0]=shopinquestion}
+	shop.menu=json.read({file='shopmenus.json'})[shopinquestion]
+	shop.depth = {}
 end
 
 local function genmenus()
 	local state = require('state')
 	local items = {{}}
 	local current=shop.menu
+	for index, toplevel in pairs(shop.menu) do for name, tree in pairs(toplevel) do items[1][index]=name end end
 	for index, nextlevel in pairs(shop.depth) do
-		print("Next level of depth:", index, nextlevel)
-		for key, value in pairs(current) do print(key, value) end
 		current=current[nextlevel]
+		items[index]={}
 		for order, menuitem in pairs(current) do
-			for i=1, 1 do
-				for name, tree in pairs(menuitem) do
-					print(order, name, tree)
-					items[i][#items[i]+1]=name
-				end
+			for name, tree in pairs(menuitem) do
+				print("Putting "..name.." in "..index)
+				items[index][#items[index]+1]=name
 			end
 		end
 	end
-	for order, item in pairs(items[1]) do print(order, item) end
+	for order, item in pairs(items) do print(order, item, key, value) end
 	return items
 end
 
@@ -35,8 +33,7 @@ end
 
 function shop.processinput()
 	local state = require('state')
-	shop.depth[#shop.depth+1]=state.context.index
-	for key, value in pairs(shop.depth) do print(key, value) end
+	shop.depth[#shop.depth+2]=state.context.index
 	shop.refresh()
 end
 
