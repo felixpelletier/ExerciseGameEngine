@@ -5,6 +5,11 @@ local state = require('state')
 local json = require('json_reader')
 local cjson = require('cjson')
 
+local function printUpdate()
+	print("\nRefresh")
+	for key, value in pairs(cjson.decode(state.update).menus) do for index, name in pairs(value) do print(key, index, name) end end
+end
+
 state.evolve('Version', '0.0.0.0.5')
 state.evolve('mc', {['name']='Chaos'})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
@@ -14,7 +19,22 @@ json.read({file="shopmenus.json"})
 
 state.changecontext('shop', 'trainer')
 
+printUpdate()
+
+print("\ninput 1 (selecting 'Buy Gear')")
+state.event(cjson.encode({key="shop.nav.menu", index=0}))
+
+printUpdate()
+
+print("\ninput 2 (selecting 'Headgear')")
+state.event(cjson.encode({key="shop.nav.menu", index=0}))
+
+printUpdate()
+
+print("\ninput 3 (selecting 'Bikini Armor')")
 state.event(cjson.encode({key="shop.nav.menu", index=1}))
+
+printUpdate()
 
 --[[
 state.changecontext('link', {arcana='Aeon'})
