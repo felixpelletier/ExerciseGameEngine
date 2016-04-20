@@ -2,13 +2,24 @@
 	"key":"shop.show.menutree",
 	"menus":
 		[
-			[""]
+			[<list of strings for the first level of menus>]
 			.
 			.
 			.
-			[""]
+			[<list of strings for the current level of menus>]
 		]
 }
 /*
+ * The lists of strings represent all selectable elements, eg "Buy", "Sell", "Quit". A 'level'
+ * of menu represents how many presses the player made to arrive at a given list. For example:
  *
+ * ["Buy", "Sell", "Quit"]
+ * >> Player selects "Buy"
+ * ["Buy", "Sell", "Quit"], ["Weapons", "Armour", "Booze"]
+ * >> Player selects "Armour"
+ * ["Buy", "Sell", "Quit"], ["Weapons", "Armour", "Booze"], ["Scale Mail", "Leather Armour", "Full Plate Armour"]
+ * etc...
+ *
+ * All levels leading to the current one are returned since we assume we most often will
+ * want to show the player his shop tree path.
 */
