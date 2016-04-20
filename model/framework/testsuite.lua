@@ -10,7 +10,7 @@ local function printUpdate()
 	for key, value in pairs(cjson.decode(state.update).menus) do for index, name in pairs(value) do print(key, index, name) end end
 end
 
-state.evolve('Version', '0.0.0.0.5')
+state.evolve('Version', '0.0.0.0.18')
 state.evolve('mc', {['name']='Chaos'})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
 state.savestate(nil)

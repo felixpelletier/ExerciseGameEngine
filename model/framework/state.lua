@@ -12,7 +12,7 @@ end
 function state.loadstate(savefile)
 	local json = require('json_reader')
 	if savefile then savefile="PXS"..savefile..".json" else savefile='state.json' end
-	gamestate = json.read({file=savefile})
+	state = json.read({file=savefile})
 end
 
 function state.savestate(savefile)
@@ -34,17 +34,6 @@ function state.event(event)
 	for key, value in pairs(map) do state.context[key]=value end
 	state.context.processinput()
 	state.unlock()
-end
-
---LEGACY
-function state.input(inputkey)--We assume the threading is happening in C because lua has no multithreading.
-	if not state.backlog then
-		state.backlog=inputkey
-		print(inputkey)
-		print("Processing input: "..state.backlog)
-		state.context.processinput(state.backlog)
-		state.backlog=nil
-	end
 end
 
 --There is not state.lock here as we assume that any call to changecontext will be effected
@@ -83,7 +72,9 @@ return state
 --flags: List of all flags that have been raised as of now. (perform "need in flags" for dependancy check)
 --save: The save number (1-inf)
 --context: What the player is doing now and the input processor for that context
---backlog: The last key pressed. No inputs are saved unless this value is nil LEGACY?
+--locked: When locked=true, no events are accepted
+--eventcallerror: last error returned by an event handler. Destroy that data to acknowledge it.
+--isloading: unique identifier for when the loading screen is needed.
 
 
 --Current Existing contexts:
