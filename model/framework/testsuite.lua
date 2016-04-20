@@ -31,7 +31,17 @@ state.event(cjson.encode({key="shop.nav.menu", index=0}))
 
 printUpdate()
 
-print("\ninput 3 (selecting 'Bikini Armor')")
+print("\ninput 3 (going back)")
+state.event(cjson.encode({key="shop.nav.menu", back=true}))
+
+printUpdate()
+
+print("\ninput 4 (selecting 'Headgear' again)")
+state.event(cjson.encode({key="shop.nav.menu", index=0}))
+
+printUpdate()
+
+print("\ninput 5 (selecting 'Bikini Armor')")
 state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()

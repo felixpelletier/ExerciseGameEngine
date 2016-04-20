@@ -20,6 +20,7 @@ local function genmenus()--Hope to god I remember this... Ask Samuel what this i
 			if type(current)=='string' then--If element is purchasable then engage in purchase logic
 				items[index][1]="Bought "..current.." for 1000 yen!"
 				print(items[index][1])
+				shop.depth[#shop.depth]=nil--Don't want to get stuck at the buying level, so reset to previous one after purchase.
 				return items--Purchase is end-tree interaction. Do not try and continue parsing
 			end
 			for singlekey, singlevalue in pairs(current) do
@@ -60,7 +61,10 @@ end
 function shop.processinput()
 	local state = require('state')
 	--print(#shop.depth)
-	if state.context.back then shop.depth[#shop.depth]=nil
+	if state.context.back then
+		shop.depth[#shop.depth]=nil
+		state.context.back=nil
+		if #shop.depth==0 then print("Change context") end
 	else shop.depth[#shop.depth+1]=state.context.index+1 end
 	--print(#shop.depth)
 	shop.refresh()

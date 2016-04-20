@@ -6,7 +6,7 @@
 /*
  * Only possible user inputs are "select" and back while in a Shop.
  *
- * ONLY "INDEX" XOR "BACK". NEVER BOTH. If both are given, index is assumed.
+ * ONLY "INDEX" XOR "BACK". NEVER BOTH. If both are given, back is assumed.
  * Possibilities are ultimately:
 */
 
