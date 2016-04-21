@@ -1,11 +1,15 @@
 {
-	"key":"link.show.move",
+	"key":"link.inline.move",
 	"subject":<id of the asset that needs to be moved>,
 	"animation":<id of the animation to play>,
 	"destination":(<x and>, <y coordinates that the asset should move to>)
 }
 
 /*
+ * Move actions in inline cutscenes should be fairly rare, if present at all. Note that there's
+ * no template for camera changes in inline cutscenes. IGNORE ANY CAMERA CHANGE TEMPLATES DURING
+  * AN INLINE CUTSCENE!
+ * 
  * You can always assume that if the subject has not been loaded in, the animation and
  * destination are a bit moot. You can just place them directly at the destination if you want.
  *

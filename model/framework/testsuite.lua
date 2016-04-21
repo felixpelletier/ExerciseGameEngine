@@ -15,6 +15,8 @@ state.evolve('mc', {['name']='Chaos'})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
 state.savestate(nil)
 
+--[[
+
 json.read({file="shopmenus.json"})
 
 state.changecontext('shop', 'trainer')
@@ -45,8 +47,8 @@ print("\ninput 5 (selecting 'Bikini Armor')")
 state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()
+--]]
 
---[[
 state.changecontext('link', {arcana='Aeon'})
 
 state.event(cjson.encode({key="link.action", index=0}))
@@ -60,7 +62,7 @@ state.event(cjson.encode({key="link.action", index=0}))
 state.event(cjson.encode({key="link.action", index=0}))
 
 state.event(cjson.encode({key="link.action", index=1}))
-]]--
+
 --LEGACY/PROOF OF CONCEPT
 --[[
 shadowep=json.read({file='Seraph.json'})
@@ -91,5 +93,5 @@ for key, value in pairs(state) do print(key, value) end
 print("\nContext")
 for key, value in pairs(state.context) do print(key, value) end
 print("\nRefresh")
-for key, value in pairs(cjson.decode(state.update).menus) do for index, name in pairs(value) do print(key, index, name) end end
+for key, value in pairs(cjson.decode(state.update)) do print(key, value) end
 --print(#state.update.options.." options")

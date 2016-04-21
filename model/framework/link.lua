@@ -84,6 +84,7 @@ function link.refresh()--Send update to graphic view
 end
 
 local function setShowType()
+	local state = require('state')
 	if state.cut.open[1].points then state.cut.open.show=showSpeak() elseif state.cut.open[1].place then state.cut.open.show=showCam() elseif state.cut.open[1].animation then state.cut.open.show=showMove() end
 end
 
@@ -103,7 +104,7 @@ end
 
 function link.loadcontext(sociallink)
 	local state = require('state')
-	state.context=link
+	if not sociallink.inline then state.context=link end
 	_load(sociallink.arcana)
 	setShowType()
 	link.refresh()

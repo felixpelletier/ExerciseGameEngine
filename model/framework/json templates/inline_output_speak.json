@@ -1,5 +1,5 @@
 {
-	"key":"link.show.speak",
+	"key":"link.inline.speak",
 	"text":"text of this speak action as a string",
 	"speaker_emote":<id of character emotion file to display (so you know which sprite to load, eg: "sprite_aigis_happy")>,
 	"options":
