@@ -48,7 +48,7 @@ state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()
 --]]
-
+--[[
 state.changecontext('link', {arcana='Aeon'})
 
 state.event(cjson.encode({key="link.action", index=0}))
@@ -62,7 +62,7 @@ state.event(cjson.encode({key="link.action", index=0}))
 state.event(cjson.encode({key="link.action", index=0}))
 
 state.event(cjson.encode({key="link.action", index=1}))
-
+]]--
 --LEGACY/PROOF OF CONCEPT
 --[[
 shadowep=json.read({file='Seraph.json'})

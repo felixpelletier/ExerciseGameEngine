@@ -45,9 +45,8 @@ local function showSpeak()
 	return {
 		key="link.show.speak",
 		text=state.cut.open[1].text,
-		speaker="sprite_"..state.cut.open[1].speaker.."_emotion",
+		speaker="sprite_"..state.cut.open[1].speaker.."_"..state.cut.open[1].emotion,
 		options=choices
-		--Need emotion (domo arigatou, Mr. Roboto)
 	}
 end
 
