@@ -1,0 +1,10 @@
+{
+	"key":"map.goto",
+	"index":<index 0-n>
+}
+
+/*
+ * Selecting any place on the map automatically shunts the player to that place, so the map
+ * mode will only ever en up recieving a single input before changing contexts. Index is the
+ * index of the element selected (see map_output.json).
+*/

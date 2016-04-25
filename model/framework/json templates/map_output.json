@@ -1,0 +1,16 @@
+{
+	"key":"map.show",
+	"places":[
+				{"<1st place's name>":[<x on map>, <y on map>]},
+				.
+				.
+				.
+				{"<nth place's name>":[<x on map>, <y on map>]},
+		]
+}
+
+
+/*
+ * Each place appears in a list on the left of the screen and when selected "lights up" a
+ * point on the map (x, y).
+*/

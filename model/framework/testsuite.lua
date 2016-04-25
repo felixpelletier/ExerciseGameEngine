@@ -15,8 +15,11 @@ state.evolve('mc', {name='Chaos', money=3})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
 state.savestate(nil)
 
+state.changecontext('map', nil)
 
+state.event(cjson.encode({index=2}))
 
+--[[
 json.read({file="shopmenus.json"})
 
 state.changecontext('shop', 'trainer')
@@ -47,7 +50,7 @@ print("\ninput 5 (selecting 'Bikini Armor')")
 state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()
-
+]]--
 --[[
 state.changecontext('link', {arcana='Aeon'})
 
