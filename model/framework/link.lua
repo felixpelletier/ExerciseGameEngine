@@ -42,6 +42,7 @@ local function showSpeak()
 	if #state.cut.open > 2 then
 		for i=2, #state.cut.open do choices[#choices+1]=state.cut.cutscene.items[i][1].text end --Won't show anything for physical action based choices
 	end
+	if not state.cut.open[1].emotion then state.cut.open[1].emotion = 'normal' end
 	return {
 		key="link.show.speak",
 		text=state.cut.open[1].text,

@@ -1,0 +1,10 @@
+[
+				{"Velvet Room Services":[
+							{"Fuse Personas":["state.fusion something something"]},
+							{"Browse Compendium":["get list"]},
+							{"Register Persona":["write to list from list"]}
+				]},
+				{"Talk to Elizabeth":"list quests"},
+				{"Redeem Quest":"hard-coded contextual function"},
+				{"Leave":"local state = require('state') state.changestate('Overworld', {})"}
+]

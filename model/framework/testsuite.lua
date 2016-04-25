@@ -11,11 +11,11 @@ local function printUpdate()
 end
 
 state.evolve('Version', '0.0.0.0.18')
-state.evolve('mc', {['name']='Chaos'})
+state.evolve('mc', {name='Chaos', money=3})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
 state.savestate(nil)
 
---[[
+
 
 json.read({file="shopmenus.json"})
 
@@ -47,7 +47,7 @@ print("\ninput 5 (selecting 'Bikini Armor')")
 state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()
---]]
+
 --[[
 state.changecontext('link', {arcana='Aeon'})
 
