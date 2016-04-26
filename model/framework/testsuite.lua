@@ -10,14 +10,24 @@ local function printUpdate()
 	for key, value in pairs(cjson.decode(state.update).menus) do for index, name in pairs(value) do print(key, index, name) end end
 end
 
-state.evolve('Version', '0.0.0.0.18')
+state.evolve('Version', '0.0.0.0.24')
 state.evolve('mc', {name='Chaos', money=3})
 state.evolve('slglobal', {['Aeon']={level=1, angle=0}})
 state.savestate(nil)
 
+local popup = require('popup')
+popup.loadcontext({'Yes', 'No'})
+print(popup.options[1], popup.options[2])
+state.context = {input='select'}
+print(popup.processinput())
+state.context = {input='back'}
+print(popup.processinput())
+
+--[[
 state.changecontext('map', nil)
 
 state.event(cjson.encode({index=2}))
+]]--
 
 --[[
 json.read({file="shopmenus.json"})
@@ -51,6 +61,7 @@ state.event(cjson.encode({key="shop.nav.menu", index=1}))
 
 printUpdate()
 ]]--
+
 --[[
 state.changecontext('link', {arcana='Aeon'})
 
@@ -66,6 +77,8 @@ state.event(cjson.encode({key="link.action", index=0}))
 
 state.event(cjson.encode({key="link.action", index=1}))
 ]]--
+
+
 --LEGACY/PROOF OF CONCEPT
 --[[
 shadowep=json.read({file='Seraph.json'})

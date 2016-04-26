@@ -79,6 +79,7 @@ function shop.refresh()
 end
 
 function shop.processinput()
+	if shop.popup do shop.popup.processinput() shop.popup=nil return end
 	local state = require('state')
 	--print(#shop.depth)
 	if state.context.back then

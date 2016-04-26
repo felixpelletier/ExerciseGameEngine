@@ -9,10 +9,19 @@ local function jsonparsestate(table)
 	return save
 end
 
+local function corruptioncheck(state)--Ensure data within the save file covers all essential data
+	assert(state.flags~=nil)
+	assert(state.mc~=nil)
+	assert(state.day~=nil)
+	assert(state.slglobal~=nil)
+	assert(state.place~=nil)
+end
+
 function state.loadstate(savefile)
 	local json = require('json_reader')
 	if savefile then savefile="PXS"..savefile..".json" else savefile='state.json' end
 	state = json.read({file=savefile})
+	corruptioncheck(state)
 end
 
 function state.savestate(savefile)
@@ -24,6 +33,10 @@ end
 
 function state.evolve(key, value)
 	state[key] = value
+end
+
+function state.flag(flagkey)
+	state.flags[flagkey]=true
 end
 
 function state.event(event)
