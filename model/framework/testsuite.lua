@@ -41,7 +41,7 @@ state.event(cjson.encode({key="shop.nav.menu", index=0}))
 
 printUpdate()
 
-print("\ninput 2 (selecting 'Headgear')")
+print("\ninput 2 (selecting 'Accessories')")
 state.event(cjson.encode({key="shop.nav.menu", index=0}))
 
 printUpdate()
@@ -51,7 +51,7 @@ state.event(cjson.encode({key="shop.nav.menu", back=true}))
 
 printUpdate()
 
-print("\ninput 4 (selecting 'Headgear' again)")
+print("\ninput 4 (selecting 'Accessories' again)")
 state.event(cjson.encode({key="shop.nav.menu", index=0}))
 
 printUpdate()

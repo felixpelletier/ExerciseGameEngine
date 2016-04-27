@@ -1,7 +1,7 @@
 {
 	"trainer":[
 				{"Buy Gear":[
-							{"Headgear":["print('Getting Headgear') return {{'Classy Hat', 200}, {'Bikini Armour', 2000}}"]},
+							{"Accessories":["print('Getting Headgear') return {{'Classy Hat', 200}, {'Bikini Armour', 2000}}"]},
 							{"Armour":["print('Getting Armour')"]},
 							{"Shoes":["print('Getting Shoes')"]}
 				]},

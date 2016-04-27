@@ -75,7 +75,6 @@ return state
 --found within state and their significance.
 
 --Version: Game version. Currently 0.0.0.0.X
---cut: The current cutscene being played.
 --day: Current day's id (~1-365) and time (morning, after school, evening, etc...)
 --slglobal: Current level and angle of each social link in the game
 --availablechars: Names of characters that can be in the party
