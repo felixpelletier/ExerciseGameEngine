@@ -2,6 +2,7 @@
 
 #include <map>
 #include <vector>
+#include <array>
 #include <iostream>
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -9,6 +10,7 @@
 // glm::translate, glm::rotate, glm::scale
 #include <glm/gtc/matrix_transform.hpp>
 #include <GLFW/glfw3.h>
+#include "config.h"
 #include "GraphicsComponent.h"
 #include "System.h"
 #include "Light.h"
@@ -36,7 +38,8 @@ namespace Soul{
 
 		Shader shader;
 
-		std::map<int, GraphicsComponent> components;
+		std::array<GraphicsComponent, MAX_ENTITIES> components;
+		int highest_element = 0;
 
 		ModelManager modelManager;
 

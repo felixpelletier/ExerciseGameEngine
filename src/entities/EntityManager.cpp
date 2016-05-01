@@ -20,9 +20,17 @@ Handle EntityManager::getNewHandle(){
 	return id_counter++;
 }
 
-Handle EntityManager::createEntity(std::string modelPath){
+Handle EntityManager::createEntity(){
 
 	Handle entity = getNewHandle();
+
+	return entity;
+
+}
+
+Handle EntityManager::createEntity(std::string modelPath){
+
+	Handle entity = createEntity();
 	//Model loading should not be here.
 	int model = graphic_system->getModelManager()->loadModel(modelPath);
 	graphic_system->addComponent(GraphicsComponent(entity, model));

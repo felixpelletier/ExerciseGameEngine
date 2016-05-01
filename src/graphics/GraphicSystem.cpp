@@ -79,7 +79,7 @@ void GraphicSystem::update(float dt){
 		glUniformMatrix4fv(shader.s_projMat, 1, GL_FALSE, &this->projMat[0][0]);
 		glUniformMatrix4fv(shader.s_viewMat, 1, GL_FALSE, &this->viewMat[0][0]);
 		glUniform3fv(shader.s_lightpos, 1, &this->light.position[0]);
-		glUniform3fv(shader.s_lightdir, 1, &this->light.direction[0]);
+		//glUniform3fv(shader.s_lightdir, 1, &this->light.direction[0]);
 		glUniform3fv(shader.s_lightcolor, 1, &this->light.color[0]);
 
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -98,10 +98,12 @@ void GraphicSystem::update(float dt){
 
 		scriptingEvents.clear();
 
-		for (auto &component : components){
-			if (component.second.enabled){
-				drawComponent(component.second);
+		for(Handle i = 0; i<=highest_element; i++){
+			GraphicsComponent& component = components[i];
+			if (component.enabled){
+				drawComponent(component);
 			}
+
 		}
 
 		glDisableVertexAttribArray(0);
@@ -137,12 +139,14 @@ void GraphicSystem::drawComponent(const GraphicsComponent& component){
 }
 
 GraphicsComponent* GraphicSystem::getComponent(Handle id){
-	return &components.find(id)->second;
+	return &components.data()[id];
 }
 
 Handle GraphicSystem::addComponent(GraphicsComponent component){
 
-	components.insert(std::pair<int, GraphicsComponent>(component.id, component));
+	components[component.id] = component;
+
+	if (highest_element < component.id) highest_element = component.id;
 
 	return component.id;
 

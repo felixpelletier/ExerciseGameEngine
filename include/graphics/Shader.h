@@ -18,7 +18,7 @@ class Shader{
 		GLuint s_modelMat;
 		
 		GLuint s_lightpos;
-		GLuint s_lightdir;
+		//GLuint s_lightdir;
 		GLuint s_lightcolor;
 
         	GLuint DiffuseTexID;

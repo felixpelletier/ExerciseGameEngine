@@ -11,11 +11,13 @@ class GraphicsComponent{
 		glm::mat4 modelMat;
 		int model_id;
 		int id;
-		bool enabled = true;
+		bool enabled;
+		GraphicsComponent();
 		GraphicsComponent(int id, int model);
 
-	private:
+		inline bool isValid() { return model_id != 0; }; 
 
+	private:
 };
 
 }

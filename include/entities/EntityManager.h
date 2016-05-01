@@ -10,6 +10,7 @@ namespace Soul{
 class EntityManager{
 	public:
 		EntityManager(CollisionSystem* collisions, GraphicSystem* graphics);
+		Handle createEntity();
 		Handle createEntity(std::string modelPath);
 		Handle createStaticEntity(std::string modelPath);
 

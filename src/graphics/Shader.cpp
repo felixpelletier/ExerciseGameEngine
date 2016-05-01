@@ -93,7 +93,7 @@ void Shader::loadShaders(std::string vertex_file_path,std::string fragment_file_
 	this->s_modelMat = glGetUniformLocation(this->id, "modelMat");
 	
 	this->s_lightpos = glGetUniformLocation(this->id, "lightPos");
-	this->s_lightdir = glGetUniformLocation(this->id, "lightDir");
+	//this->s_lightdir = glGetUniformLocation(this->id, "lightDir");
 	this->s_lightcolor = glGetUniformLocation(this->id, "lightColor");
 	
 	// Get a handle for our "myTextureSampler" uniform
